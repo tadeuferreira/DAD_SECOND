@@ -1,0 +1,45 @@
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+h1,h2{
+  text-align: center;
+  font-family: monospace;
+}
+.container {
+  margin-bottom: 100px;
+}
+
+.player{
+  margin-bottom: 10px;
+  border-bottom: 2px dotted #CCCCCC;
+  height: 80px;
+  padding-bottom: 5px;
+}
+
+.player>div{
+  display: inline-block;
+  font-size: 2.5em;
+}
+
+.avatar{
+  width: 20%;
+}
+
+.name{
+  width: 59%;
+}
+
+.score{
+  width: 20%;
+}
+
+.avatar img{
+  width:75px;
+  height: 75px;
+  border-radius: 50%;
+
+}

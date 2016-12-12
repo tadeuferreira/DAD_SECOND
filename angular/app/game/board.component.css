@@ -1,0 +1,17 @@
+.board {
+  display: inline-block;
+  width: 250px;
+}
+
+.game-cell {
+  float:left;
+  border-style: solid;
+  border-width: 1px;
+  margin: 0;
+  padding: 0;
+  width: 25px;
+  height: 25px;
+  font-size: 20px;
+  font-weight: bolder;
+  text-align: center;
+}

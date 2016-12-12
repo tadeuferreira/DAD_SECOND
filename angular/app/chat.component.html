@@ -1,0 +1,8 @@
+<form #messageForm="ngForm">
+    <input name="message" placeholder="Type a message" size="50" required
+            [(ngModel)]="message"
+        >
+    <button class="btn btn-primary"
+        [disabled]="!messageForm.form.valid"
+        (click)="send()">Send</button>
+</form>

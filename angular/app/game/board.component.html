@@ -1,0 +1,4 @@
+<div class="board" *ngIf="elementos">
+    <div class="game-cell" *ngFor="let elemento of elementos; let i = index"  (click)="clickElemento(i)" [style.background-color]="getColor(elemento)">
+    </div>
+</div>
