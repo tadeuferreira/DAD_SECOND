@@ -11,6 +11,7 @@ var WebSocketServer = (function () {
                 client.emit('players', Date.now() + ': Welcome to battleship');
                 client.broadcast.emit('players', Date.now() + ': A new player has arrived');
                 client.on('chat', function (data) { return _this.io.emit('chat', data); });
+                console.log("login");
                 //Extra Exercise
                 client.emit('board', _this.board);
                 client.on('clickElement', function (indexElement) {
