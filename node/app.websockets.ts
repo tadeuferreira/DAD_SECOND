@@ -17,7 +17,7 @@ export class WebSocketServer {
             client.emit('players', Date.now() + ': Welcome to battleship');
             client.broadcast.emit('players', Date.now() + ': A new player has arrived');
             client.on('chat', (data) => this.io.emit('chat', data));
-            
+            console.log("login");
             //Extra Exercise
             client.emit('board', this.board);
             client.on('clickElement', (indexElement) => {

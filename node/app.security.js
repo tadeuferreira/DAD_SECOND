@@ -3,7 +3,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var BearerStrategy = require('passport-http-bearer').Strategy;
 var sha1 = require('sha1');
-var app_database_1 = require('./app.database');
+var app_database_1 = require("./app.database");
 var Security = (function () {
     function Security() {
         this.passport = passport;
