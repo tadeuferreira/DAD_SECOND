@@ -3,7 +3,8 @@ var io = require('socket.io');
 var WebSocketServer = (function () {
     function WebSocketServer() {
         var _this = this;
-        this.board = [];
+        this.aboard = [];
+        this.dboard = [];
         this.init = function (server) {
             _this.initBoard();
             _this.io = io.listen(server);
@@ -13,13 +14,21 @@ var WebSocketServer = (function () {
                 client.on('chat', function (data) { return _this.io.emit('chat', data); });
                 console.log("login");
                 //Extra Exercise
-                client.emit('board', _this.board);
-                client.on('clickElement', function (indexElement) {
-                    _this.board[indexElement]++;
-                    if (_this.board[indexElement] > 2) {
-                        _this.board[indexElement] = 0;
+                client.emit('aboard', _this.aboard);
+                client.emit('dboard', _this.dboard);
+                client.on('clickElement%dboard', function (indexElement) {
+                    _this.dboard[indexElement]++;
+                    if (_this.dboard[indexElement] > 2) {
+                        _this.dboard[indexElement] = 0;
                     }
-                    _this.notifyAll('board', _this.board);
+                    _this.notifyAll('dboard', _this.dboard);
+                });
+                client.on('clickElement%aboard', function (indexElement) {
+                    _this.aboard[indexElement]++;
+                    if (_this.aboard[indexElement] > 2) {
+                        _this.aboard[indexElement] = 0;
+                    }
+                    _this.notifyAll('aboard', _this.aboard);
                 });
             });
         };
@@ -29,7 +38,8 @@ var WebSocketServer = (function () {
     }
     WebSocketServer.prototype.initBoard = function () {
         for (var i = 0; i < 100; i++) {
-            this.board[i] = 0;
+            this.aboard[i] = 0;
+            this.dboard[i] = 0;
         }
     };
     return WebSocketServer;

@@ -12,10 +12,14 @@ var core_1 = require("@angular/core");
 var platform_browser_1 = require("@angular/platform-browser");
 var forms_1 = require("@angular/forms");
 var app_component_1 = require("./app.component");
+var router_1 = require("@angular/router");
 var notifications_module_1 = require("./notifications/notifications.module");
 var chat_component_1 = require("./chat.component");
-var board_component_1 = require("./game/board.component");
+var aboard_component_1 = require("./game/aboard.component");
+var dboard_component_1 = require("./game/dboard.component");
 var websocket_service_1 = require("./notifications/websocket.service");
+var menu_component_1 = require("./menu/menu.component");
+var dashboard_component_1 = require("./menu/dashboard.component");
 var AppModule = (function () {
     function AppModule() {
     }
@@ -23,8 +27,27 @@ var AppModule = (function () {
 }());
 AppModule = __decorate([
     core_1.NgModule({
-        imports: [platform_browser_1.BrowserModule, notifications_module_1.NotificationModule, forms_1.FormsModule],
-        declarations: [app_component_1.AppComponent, chat_component_1.ChatComponent, board_component_1.BoardComponent],
+        imports: [
+            platform_browser_1.BrowserModule,
+            notifications_module_1.NotificationModule,
+            forms_1.FormsModule,
+            router_1.RouterModule.forRoot([
+                {
+                    path: '',
+                    redirectTo: '/dashboard',
+                    pathMatch: 'full'
+                },
+                {
+                    path: 'menu',
+                    component: menu_component_1.MenuComponent
+                },
+                {
+                    path: 'dashboard',
+                    component: dashboard_component_1.DashboardComponent
+                }
+            ])
+        ],
+        declarations: [app_component_1.AppComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
         providers: [websocket_service_1.WebSocketService],
         bootstrap: [app_component_1.AppComponent]
     }),

@@ -9,23 +9,24 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
-var AppComponent = (function () {
-    function AppComponent() {
-        this.onMenu = true;
-        this.onCreateGame = false;
+var MenuComponent = (function () {
+    function MenuComponent() {
     }
-    AppComponent.prototype.switchMenu = function () {
-        this.onMenu = !this.onMenu;
+    MenuComponent.prototype.ngOnInit = function () {
     };
-    return AppComponent;
+    return MenuComponent;
 }());
-AppComponent = __decorate([
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Boolean)
+], MenuComponent.prototype, "hidden", void 0);
+MenuComponent = __decorate([
     core_1.Component({
         moduleId: module.id,
-        selector: 'my-app',
-        templateUrl: 'app.component.html',
+        selector: 'menu',
+        templateUrl: 'menu.component.html',
     }),
     __metadata("design:paramtypes", [])
-], AppComponent);
-exports.AppComponent = AppComponent;
-//# sourceMappingURL=app.component.js.map
+], MenuComponent);
+exports.MenuComponent = MenuComponent;
+//# sourceMappingURL=menu.component.js.map

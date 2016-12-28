@@ -27,11 +27,11 @@ var WebSocketService = (function () {
         return this.listenOnChannel('chat');
     };
     // Extra Exercise
-    WebSocketService.prototype.sendClickElementMessage = function (index) {
-        this.socket.emit('clickElement', index);
+    WebSocketService.prototype.sendClickElementMessage = function (index, board) {
+        this.socket.emit('clickElement%' + board, index);
     };
-    WebSocketService.prototype.getBoardMessages = function () {
-        return this.listenOnChannel('board');
+    WebSocketService.prototype.getBoardMessages = function (channel) {
+        return this.listenOnChannel(channel);
     };
     WebSocketService.prototype.listenOnChannel = function (channel) {
         var _this = this;

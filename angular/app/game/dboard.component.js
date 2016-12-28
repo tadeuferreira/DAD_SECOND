@@ -10,23 +10,23 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require("@angular/core");
 var websocket_service_1 = require("../notifications/websocket.service");
-var BoardComponent = (function () {
-    function BoardComponent(websocketService) {
+var DBoardComponent = (function () {
+    function DBoardComponent(websocketService) {
         this.websocketService = websocketService;
         this.elementos = [];
     }
-    BoardComponent.prototype.ngOnInit = function () {
+    DBoardComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.elementos = [];
-        this.websocketService.getBoardMessages().subscribe(function (m) {
+        this.websocketService.getBoardMessages("dboard").subscribe(function (m) {
             console.log(m);
             _this.elementos = m;
         });
     };
-    BoardComponent.prototype.clickElemento = function (index) {
-        this.websocketService.sendClickElementMessage(index);
+    DBoardComponent.prototype.clickElemento = function (index) {
+        this.websocketService.sendClickElementMessage(index, "dboard");
     };
-    BoardComponent.prototype.getColor = function (elemento) {
+    DBoardComponent.prototype.getColor = function (elemento) {
         switch (elemento) {
             case 0: return 'lightgray';
             case 1: return 'blue';
@@ -34,16 +34,16 @@ var BoardComponent = (function () {
         }
         return 'white';
     };
-    return BoardComponent;
+    return DBoardComponent;
 }());
-BoardComponent = __decorate([
+DBoardComponent = __decorate([
     core_1.Component({
         moduleId: module.id,
-        selector: 'board',
+        selector: 'dboard',
         templateUrl: 'board.component.html',
         styleUrls: ['board.component.css']
     }),
     __metadata("design:paramtypes", [websocket_service_1.WebSocketService])
-], BoardComponent);
-exports.BoardComponent = BoardComponent;
-//# sourceMappingURL=board.component.js.map
+], DBoardComponent);
+exports.DBoardComponent = DBoardComponent;
+//# sourceMappingURL=dboard.component.js.map

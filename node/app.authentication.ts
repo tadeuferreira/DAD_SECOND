@@ -1,4 +1,5 @@
 import {HandlerSettings} from './handler.settings';
+import {Player} from './app.players';
 
 export class Authentication{
    

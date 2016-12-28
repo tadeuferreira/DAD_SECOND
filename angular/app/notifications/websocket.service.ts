@@ -28,11 +28,11 @@ export class WebSocketService {
     }
 
     // Extra Exercise
-    sendClickElementMessage(index: number) {
-        this.socket.emit('clickElement', index);
+    sendClickElementMessage(index: number, board: string) {
+        this.socket.emit('clickElement%'+board, index);
     }
-    getBoardMessages(): Observable<any> {
-        return this.listenOnChannel('board');
+    getBoardMessages(channel: string): Observable<any> {
+        return this.listenOnChannel(channel);
     }
     
 
