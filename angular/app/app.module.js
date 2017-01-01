@@ -9,17 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
-var platform_browser_1 = require("@angular/platform-browser");
 var forms_1 = require("@angular/forms");
+var platform_browser_1 = require("@angular/platform-browser");
+var forms_2 = require("@angular/forms");
 var app_component_1 = require("./app.component");
 var router_1 = require("@angular/router");
+var websocket_service_1 = require("./notifications/websocket.service");
 var notifications_module_1 = require("./notifications/notifications.module");
 var chat_component_1 = require("./chat.component");
 var aboard_component_1 = require("./game/aboard.component");
 var dboard_component_1 = require("./game/dboard.component");
-var websocket_service_1 = require("./notifications/websocket.service");
 var menu_component_1 = require("./menu/menu.component");
 var dashboard_component_1 = require("./menu/dashboard.component");
+var login_component_1 = require("./auth/login.component");
+var register_component_1 = require("./auth/register.component");
+var user_service_1 = require("./auth/user.service");
 var AppModule = (function () {
     function AppModule() {
     }
@@ -30,7 +34,8 @@ AppModule = __decorate([
         imports: [
             platform_browser_1.BrowserModule,
             notifications_module_1.NotificationModule,
-            forms_1.FormsModule,
+            forms_2.FormsModule,
+            forms_1.ReactiveFormsModule,
             router_1.RouterModule.forRoot([
                 {
                     path: '',
@@ -44,11 +49,19 @@ AppModule = __decorate([
                 {
                     path: 'dashboard',
                     component: dashboard_component_1.DashboardComponent
+                },
+                {
+                    path: 'login',
+                    component: login_component_1.LoginComponent
+                },
+                {
+                    path: 'register',
+                    component: register_component_1.RegisterComponent
                 }
             ])
         ],
-        declarations: [app_component_1.AppComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
-        providers: [websocket_service_1.WebSocketService],
+        declarations: [app_component_1.AppComponent, login_component_1.LoginComponent, register_component_1.RegisterComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
+        providers: [websocket_service_1.WebSocketService, user_service_1.UserService],
         bootstrap: [app_component_1.AppComponent]
     }),
     __metadata("design:paramtypes", [])

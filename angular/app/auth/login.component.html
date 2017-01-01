@@ -1,0 +1,21 @@
+<div class="container">
+<form [formGroup]="myForm" (ngSubmit)="save(myForm.value, myForm.valid)">
+    <div>
+    <label>Username</label>
+    <input type="text" formControlName="username">
+    <small [hidden]="myForm.controls.username.valid">
+        username is required
+    </small>
+    </div>
+    <div>
+    <label>Password</label>
+    <input type="password" formControlName="password">
+    <small [hidden]="myForm.controls.password.valid">
+        password is required
+    </small>
+    </div>
+    <button type="submit">Login</button>
+</form>
+
+
+</div>

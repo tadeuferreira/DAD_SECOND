@@ -1,6 +1,7 @@
 "use strict";
 var mongodb = require('mongodb');
 var util = require('util');
+var sha1 = require('sha1');
 var app_database_1 = require("./app.database");
 var Player = (function () {
     function Player() {
@@ -59,10 +60,32 @@ var Player = (function () {
         };
         this.createPlayer = function (request, response, next) {
             var player = request.body;
+            console.log(player);
             if (player === undefined) {
                 response.send(400, 'No player data');
                 return next();
             }
+            if (player.username === undefined || player.username === "") {
+                response.send(400, 'No player username');
+                return next();
+            }
+            if (player.password === undefined || player.password === "") {
+                response.send(400, 'No player password');
+                return next();
+            }
+            if (player.email === undefined || player.email === "") {
+                response.send(400, 'No player email');
+                return next();
+            }
+            app_database_1.databaseConnection.db.collection('players').findOne({
+                username: player.username
+            }).then(function (player) {
+                if (player !== null) {
+                    response.send(400, 'Player already exist');
+                    return next();
+                }
+            }).catch(function (err) { return _this.handleError(err, response, next); });
+            player.password = sha1(player.password);
             app_database_1.databaseConnection.db.collection('players')
                 .insertOne(player)
                 .then(function (result) { return _this.returnPlayer(result.insertedId, response, next); })
@@ -107,7 +130,7 @@ var Player = (function () {
             server.get(settings.prefix + 'players', settings.security.authorize, _this.getPlayers);
             server.get(settings.prefix + 'players/:id', settings.security.authorize, _this.getPlayer);
             server.put(settings.prefix + 'players/:id', settings.security.authorize, _this.updatePlayer);
-            server.post(settings.prefix + 'players', settings.security.authorize, _this.createPlayer);
+            server.post(settings.prefix + 'register', _this.createPlayer);
             server.del(settings.prefix + 'players/:id', settings.security.authorize, _this.deletePlayer);
             console.log("Players routes registered");
         };

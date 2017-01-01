@@ -16,12 +16,13 @@ var Security = (function () {
 }());
 exports.Security = Security;
 var validPassword = function (player, password) {
-    return sha1(password) === player.passwordHash;
+    return sha1(password) === player.password;
 };
 passport.use(new LocalStrategy(function (username, password, done) {
     app_database_1.databaseConnection.db.collection('players').findOne({
         username: username
     }).then(function (player) {
+        console.log("found");
         if (player === null) {
             return done(null, false, {
                 message: 'Incorrect credentials.'
