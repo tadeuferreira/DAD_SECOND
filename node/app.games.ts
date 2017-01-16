@@ -104,7 +104,7 @@ export class Game {
                     second : null,
                     third : null,
                     fourth : null,
-                    state : null,
+                    state : 0,
                     pack : {}
                 };
                 game.pack = this.createCards();
@@ -127,21 +127,21 @@ export class Game {
         server.put(settings.prefix + 'games/:id', settings.security.authorize, this.updateGame);
         server.post(settings.prefix + 'games', settings.security.authorize, this.createGame);
         server.del(settings.prefix + 'games/:id', settings.security.authorize, this.deleteGame);
+        //server.del(settings.prefix + 'test',  this.test);
         console.log("Games routes registered");
     };    
 
-    public createCards() {
 
+
+    private createCards() {
         var pack = {
             trump : 0,
             cards : {}
         };
         var cards = [];
-
-
         for (var i = 0; i < 4; ++i) {
             for (var j = 0; j < 10; ++j) {
-                cards.push({type:j , suit: i , isOnHand: false, isUsed: false});
+                cards.push({type:j , suit: i , isOnHand: false, isUsed: false, playerOwner: null});
             }
         }
         pack.cards = cards;

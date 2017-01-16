@@ -56,17 +56,17 @@ var Game = (function () {
                 .then(function (result) { return _this.returnGame(id, response, next); })
                 .catch(function (err) { return _this.handleError(err, response, next); });
         };
-        this.createGame = function (request, response, next) {
-            var game = request.body;
-            if (game === undefined) {
-                response.send(400, 'No game data');
-                return next();
-            }
-            app_database_1.databaseConnection.db.collection('games')
-                .insertOne(game)
-                .then(function (result) { return _this.returnGame(result.insertedId, response, next); })
-                .catch(function (err) { return _this.handleError(err, response, next); });
-        };
+        /* public createGame =  (request: any, response: any, next: any) => {
+             var game = request.body;
+             if (game === undefined) {
+                 response.send(400, 'No game data');
+                 return next();
+             }
+             database.db.collection('games')
+             .insertOne(game)
+             .then(result => this.returnGame(result.insertedId, response, next))
+             .catch(err => this.handleError(err, response, next));
+         }*/
         this.deleteGame = function (request, response, next) {
             var id = new mongodb.ObjectID(request.params.id);
             app_database_1.databaseConnection.db.collection('games')
@@ -86,18 +86,32 @@ var Game = (function () {
             })
                 .catch(function (err) { return _this.handleError(err, response, next); });
         };
-        this.test = function (request, response, next) {
-            var game = {
-                owner: 0,
-                second: 0,
-                third: 0,
-                fourth: 0,
-                state: "",
-                pack: {}
-            };
-            game.pack = _this.createCards();
-            response.json(game || []);
-            next();
+        this.createGame = function (request, response, next) {
+            var player = request.body;
+            app_database_1.databaseConnection.db.collection('players').findOne({
+                username: player.username
+            }).then(function (player) {
+                if (player !== null) {
+                    var game = {
+                        owner: null,
+                        second: null,
+                        third: null,
+                        fourth: null,
+                        state: 0,
+                        pack: {}
+                    };
+                    game.pack = _this.createCards();
+                    game.owner = player.id;
+                    app_database_1.databaseConnection.db.collection('games')
+                        .insertOne(game)
+                        .then(function (result) { return _this.returnGame(result.insertedId, response, next); })
+                        .catch(function (err) { return _this.handleError(err, response, next); });
+                }
+                else {
+                    response.send(400, 'Problem in creating Game');
+                    return next();
+                }
+            }).catch(function (err) { return _this.handleError(err, response, next); });
         };
         // Routes for the games
         this.init = function (server, settings) {
@@ -106,18 +120,22 @@ var Game = (function () {
             server.put(settings.prefix + 'games/:id', settings.security.authorize, _this.updateGame);
             server.post(settings.prefix + 'games', settings.security.authorize, _this.createGame);
             server.del(settings.prefix + 'games/:id', settings.security.authorize, _this.deleteGame);
-            server.get(settings.prefix + 'test', _this.test);
+            //server.del(settings.prefix + 'test',  this.test);
             console.log("Games routes registered");
         };
     }
     Game.prototype.createCards = function () {
-        var pack = [];
+        var pack = {
+            trump: 0,
+            cards: {}
+        };
+        var cards = [];
         for (var i = 0; i < 4; ++i) {
             for (var j = 0; j < 10; ++j) {
-                pack.push({ type: j, suit: i, isOnHand: false, isUsed: false });
+                cards.push({ type: j, suit: i, isOnHand: false, isUsed: false, playerOwner: null });
             }
         }
-        console.log(pack);
+        pack.cards = cards;
         return pack;
     };
     return Game;

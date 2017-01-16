@@ -27,14 +27,9 @@ var LoginComponent = (function () {
         });
     };
     LoginComponent.prototype.save = function (model, isValid) {
-        var _this = this;
         this.submitted = true; // set form submit to true
         if (isValid) {
-            this.userService.login(model.username, model.password).subscribe(function (result) {
-                if (result) {
-                    _this.router.navigate(['dashboard']);
-                }
-            });
+            this.userService.login(model.username, model.password);
         }
     };
     return LoginComponent;

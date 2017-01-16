@@ -4,6 +4,7 @@ var Authentication = (function () {
         var _this = this;
         this.login = function (request, response, next) {
             var player = request.user;
+            console.log(player);
             response.json(player);
             return next();
         };

@@ -29,11 +29,7 @@ export class LoginComponent implements OnInit {
   save(model: User, isValid: boolean) {
     this.submitted = true; // set form submit to true
     if(isValid){
-      this.userService.login(model.username, model.password).subscribe((result: any) => {
-        if (result) {
-       this.router.navigate(['dashboard']);
-        }
-      });
+      this.userService.login(model.username, model.password);
     }
   }
 }

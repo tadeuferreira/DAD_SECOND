@@ -28,14 +28,9 @@ var RegisterComponent = (function () {
         });
     };
     RegisterComponent.prototype.save = function (model, isValid) {
-        var _this = this;
         this.submitted = true; // set form submit to true
         if (isValid) {
-            this.userService.register(model.username, model.email, model.password).subscribe(function (result) {
-                if (result) {
-                    _this.router.navigate(['dashboard']);
-                }
-            });
+            this.userService.register(model.username, model.email, model.password);
         }
     };
     return RegisterComponent;

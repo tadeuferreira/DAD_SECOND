@@ -30,11 +30,7 @@ export class RegisterComponent implements OnInit {
   save(model: User, isValid: boolean) {
     this.submitted = true; // set form submit to true
      if(isValid){
-      this.userService.register(model.username, model.email, model.password).subscribe((result: any) => {
-        if (result) {
-        this.router.navigate(['dashboard']);
-        }
-      });
+      this.userService.register(model.username, model.email, model.password);
     }
   }
 }

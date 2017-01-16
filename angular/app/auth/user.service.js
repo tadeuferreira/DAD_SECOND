@@ -10,10 +10,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require("@angular/core");
 var http_1 = require("@angular/http");
+var router_1 = require("@angular/router");
 require("rxjs/add/operator/map");
 var UserService = (function () {
-    function UserService(http) {
+    function UserService(http, router) {
         this.http = http;
+        this.router = router;
         this.loggedIn = false;
         this.loggedIn = !!localStorage.getItem('auth_token');
     }
@@ -22,14 +24,15 @@ var UserService = (function () {
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/json');
         return this.http
-            .post('http://localhost:7777/api/v1/login', JSON.stringify({ username: username, password: password }), { headers: headers })
-            .map(function (res) { return res.json(); })
-            .map(function (res) {
-            if (res.success) {
-                localStorage.setItem('auth_token', res.auth_token);
+            .post('http://localhost:7777/api/v1/login', JSON.stringify({ username: username, password: password }), { headers: headers }).subscribe(function (response) {
+            if (response.ok) {
+                localStorage.setItem('auth_token', response.auth_token);
                 _this.loggedIn = true;
+                _this.router.navigate(['dashboard']);
             }
-            return res.success;
+        }, function (error) {
+            alert(error.text());
+            console.log(error.text());
         });
     };
     UserService.prototype.register = function (username, email, password) {
@@ -38,11 +41,11 @@ var UserService = (function () {
         headers.append('Content-Type', 'application/json');
         return this.http
             .post('http://localhost:7777/api/v1/register', JSON.stringify({ username: username, email: email, password: password }), { headers: headers })
-            .map(function (res) { return res.json(); })
-            .map(function (res) {
-            if (res.success) {
-                _this.login(username, password);
-            }
+            .subscribe(function (response) {
+            _this.router.navigate(['login']);
+        }, function (error) {
+            alert(error.text());
+            console.log(error.text());
         });
     };
     UserService.prototype.logout = function () {
@@ -56,7 +59,7 @@ var UserService = (function () {
 }());
 UserService = __decorate([
     core_1.Injectable(),
-    __metadata("design:paramtypes", [http_1.Http])
+    __metadata("design:paramtypes", [http_1.Http, router_1.Router])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

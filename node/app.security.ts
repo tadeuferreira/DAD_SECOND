@@ -23,7 +23,6 @@ passport.use(new LocalStrategy((username, password, done) => {
     database.db.collection('players').findOne({
         username: username
     }).then(player => {
-        console.log("found");
         if (player === null) {
             return done(null, false, {
                 message: 'Incorrect credentials.'
