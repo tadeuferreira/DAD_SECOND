@@ -86,6 +86,19 @@ var Game = (function () {
             })
                 .catch(function (err) { return _this.handleError(err, response, next); });
         };
+        this.test = function (request, response, next) {
+            var game = {
+                owner: 0,
+                second: 0,
+                third: 0,
+                fourth: 0,
+                state: "",
+                pack: {}
+            };
+            game.pack = _this.createCards();
+            response.json(game || []);
+            next();
+        };
         // Routes for the games
         this.init = function (server, settings) {
             server.get(settings.prefix + 'games', settings.security.authorize, _this.getGames);
@@ -93,9 +106,20 @@ var Game = (function () {
             server.put(settings.prefix + 'games/:id', settings.security.authorize, _this.updateGame);
             server.post(settings.prefix + 'games', settings.security.authorize, _this.createGame);
             server.del(settings.prefix + 'games/:id', settings.security.authorize, _this.deleteGame);
+            server.get(settings.prefix + 'test', _this.test);
             console.log("Games routes registered");
         };
     }
+    Game.prototype.createCards = function () {
+        var pack = [];
+        for (var i = 0; i < 4; ++i) {
+            for (var j = 0; j < 10; ++j) {
+                pack.push({ type: j, suit: i, isOnHand: false, isUsed: false });
+            }
+        }
+        console.log(pack);
+        return pack;
+    };
     return Game;
 }());
 exports.Game = Game;
