@@ -18,8 +18,12 @@ import { DashboardComponent } from './menu/dashboard.component';
 
 import { LoginComponent } from './auth/login.component';
 import { RegisterComponent } from './auth/register.component';
-import { UserService } from './auth/user.service';
 
+import { UserService } from './auth/user.service';
+import { GameService } from './gameCards/game.service';
+
+import { GameLobbyComponent } from './gameCards/gameLobby.component';
+import { NewGameComponent } from './gameCards/newGame.component';
 
 
 @NgModule({
@@ -29,27 +33,35 @@ import { UserService } from './auth/user.service';
   FormsModule,
   ReactiveFormsModule,
   RouterModule.forRoot([
-  	{
-  path: '',
-  redirectTo: '/dashboard',
-  pathMatch: 'full'
-	},
   {
- 	path: 'dashboard',
-  component: DashboardComponent
+    path: '',
+    redirectTo: '/dashboard',
+    pathMatch: 'full'
   },
   {
- 	path: 'login',
-  component: LoginComponent
+    path: 'dashboard',
+    component: DashboardComponent
   },
   {
-   path: 'register',
-  component: RegisterComponent
+    path: 'login',
+    component: LoginComponent
+  },
+  {
+    path: 'register',
+    component: RegisterComponent
+  },
+  {
+    path: 'game/new',
+    component: NewGameComponent
+  },
+  {
+    path: 'game/:id',
+    component: GameLobbyComponent
   }
-])
+  ])
   ],
-  declarations: [ AppComponent, LoginComponent,RegisterComponent, MenuComponent,ChatComponent, ABoardComponent, DBoardComponent, DashboardComponent ],
-  providers:    [ WebSocketService, UserService ],
+  declarations: [ AppComponent, NewGameComponent, GameLobbyComponent, LoginComponent, RegisterComponent, MenuComponent,ChatComponent, ABoardComponent, DBoardComponent, DashboardComponent ],
+  providers:    [ WebSocketService, UserService, GameService],
   bootstrap:    [ AppComponent ]
 })
 

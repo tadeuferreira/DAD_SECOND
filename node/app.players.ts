@@ -92,6 +92,14 @@ export class Player {
                 return next();
             }
         }).catch(err => this.handleError(err, response, next));
+        database.db.collection('players').findOne({
+            email: player.email
+        }).then(player => {
+            if (player !== null) {
+                response.send(400, 'Player already exist');
+                return next();
+            }
+        }).catch(err => this.handleError(err, response, next));
 
         player.password = sha1(player.password);
         database.db.collection('players')

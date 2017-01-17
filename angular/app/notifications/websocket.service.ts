@@ -18,7 +18,7 @@ export class WebSocketService {
     sendChatMessage(message: any) {
         this.socket.emit('chat', message);
     }
-
+/*
     getPlayersMessages(): Observable<any> {
         return this.listenOnChannel('players');
     }
@@ -34,7 +34,14 @@ export class WebSocketService {
     getBoardMessages(channel: string): Observable<any> {
         return this.listenOnChannel(channel);
     }
-    
+    */
+
+    getInitLobby(): Observable<any> {
+        return this.listenOnChannel('initLobby');
+    }
+    sendInitLobby(msgData: any){
+        this.socket.emit('initLobby', msgData);
+    }
 
     private listenOnChannel(channel: string): Observable<any> {
         return new Observable((observer:any) => {

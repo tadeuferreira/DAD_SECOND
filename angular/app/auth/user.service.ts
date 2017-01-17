@@ -22,10 +22,9 @@ export class UserService {
           sessionStorage.setItem('token', response.json().token);
           sessionStorage.setItem('username', response.json().username);
           sessionStorage.setItem('email', response.json().email);
-        //  sessionStorage.setItem('avatar', response.json().avatar);
+          sessionStorage.setItem('avatar', response.json().avatar);
           this.loggedIn = true;
-          console.log(this.loggedIn);
-          console.log(response);
+          console.log(sessionStorage.getItem('token'));
           this.router.navigate(['dashboard']);
         }
       },
@@ -37,10 +36,11 @@ export class UserService {
     register(username: string, email: string, password: string) {
       let headers = new Headers();
       headers.append('Content-Type', 'application/json');
+      let avatar = 'https://api.adorable.io/avatars/285/'+email+'.png';
       return this.http
       .post(
         'http://localhost:7777/api/v1/register', 
-        JSON.stringify({ username, email ,password }), 
+        JSON.stringify({ username, email ,password, avatar}), 
         { headers }
         )
       .subscribe(
@@ -48,7 +48,6 @@ export class UserService {
           this.router.navigate(['login']);
         },
         error => {
-          alert(error.text());
           console.log(error.text());
         }
         );

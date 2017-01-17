@@ -93,22 +93,27 @@ export class Game {
     }
 
     public createGame =  (request: any, response: any, next: any) => {
-        var player = request.body;
+        var gameInfo = request.body;
 
         database.db.collection('players').findOne({
-            username: player.username
+            username: gameInfo.player.username
         }).then(player => {
-            if (player !== null) {
+            if (player !== null && player.id === gameInfo.player.id) {
                 var game = {
                     owner : null,
                     second : null,
                     third : null,
                     fourth : null,
-                    state : 0,
+                    state : null,
+                    creationDate: null,
                     pack : {}
                 };
+
                 game.pack = this.createCards();
-                game.owner = player.id;
+                game.owner = player._id;
+                game.state = gameInfo.state;
+                game.creationDate = gameInfo.creationDate;
+                
                 database.db.collection('games')
                 .insertOne(game)
                 .then(result => this.returnGame(result.insertedId, response, next))
@@ -127,7 +132,6 @@ export class Game {
         server.put(settings.prefix + 'games/:id', settings.security.authorize, this.updateGame);
         server.post(settings.prefix + 'games', settings.security.authorize, this.createGame);
         server.del(settings.prefix + 'games/:id', settings.security.authorize, this.deleteGame);
-        //server.del(settings.prefix + 'test',  this.test);
         console.log("Games routes registered");
     };    
 

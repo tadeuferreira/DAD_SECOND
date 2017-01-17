@@ -20,18 +20,28 @@ var WebSocketService = (function () {
     WebSocketService.prototype.sendChatMessage = function (message) {
         this.socket.emit('chat', message);
     };
-    WebSocketService.prototype.getPlayersMessages = function () {
-        return this.listenOnChannel('players');
+    /*
+        getPlayersMessages(): Observable<any> {
+            return this.listenOnChannel('players');
+        }
+    
+        getChatMessages(): Observable<any> {
+            return this.listenOnChannel('chat');
+        }
+    
+        // Extra Exercise
+        sendClickElementMessage(index: number, board: string) {
+            this.socket.emit('clickElement%'+board, index);
+        }
+        getBoardMessages(channel: string): Observable<any> {
+            return this.listenOnChannel(channel);
+        }
+        */
+    WebSocketService.prototype.getInitLobby = function () {
+        return this.listenOnChannel('initLobby');
     };
-    WebSocketService.prototype.getChatMessages = function () {
-        return this.listenOnChannel('chat');
-    };
-    // Extra Exercise
-    WebSocketService.prototype.sendClickElementMessage = function (index, board) {
-        this.socket.emit('clickElement%' + board, index);
-    };
-    WebSocketService.prototype.getBoardMessages = function (channel) {
-        return this.listenOnChannel(channel);
+    WebSocketService.prototype.sendInitLobby = function (msgData) {
+        this.socket.emit('initLobby', msgData);
     };
     WebSocketService.prototype.listenOnChannel = function (channel) {
         var _this = this;

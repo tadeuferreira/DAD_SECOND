@@ -28,5 +28,8 @@ export class AppComponent {
 	getUsername(){
 		return sessionStorage.getItem('username');
 	}
+	getAvatar(){
+		return sessionStorage.getItem('avatar');
+	}
 
 }

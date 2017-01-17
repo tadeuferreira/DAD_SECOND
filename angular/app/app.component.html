@@ -1,12 +1,14 @@
 <div class="container">
-<h1>DAD - Websockets</h1>
-<hr>
-   <nav>
-     <a routerLink="/dashboard">Dashboard</a>
-     <a *ngIf="!isLoggedIn()" routerLink="/login">Login</a>
-     <a  *ngIf="!isLoggedIn()" routerLink="/register">Register</a>
-     <a  *ngIf="isLoggedIn()" (click)="logout()">Logout</a>
-     <a *ngIf="isLoggedIn()">{{getUsername()}}</a>
-   </nav>
-<router-outlet></router-outlet>
-</div>
+	<h1>DAD - Websockets</h1>
+	<hr>
+	<div><span *ngIf="isLoggedIn()">{{getUsername()}}</span>
+		<img  *ngIf="isLoggedIn()" id="demo-image" src="{{getAvatar()}}" style="width: 30px; height: 30px; border-radius: 50%;" alt="demo-image"></div>
+		<nav>
+			<a routerLink="/dashboard">Dashboard</a>
+			<a *ngIf="!isLoggedIn()" routerLink="/login">Login</a>
+			<a  *ngIf="!isLoggedIn()" routerLink="/register">Register</a>
+			<a  *ngIf="isLoggedIn()" (click)="logout()">Logout</a>
+		</nav>
+	<hr>
+		<router-outlet></router-outlet>
+	</div>

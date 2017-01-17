@@ -24,6 +24,9 @@ var dashboard_component_1 = require("./menu/dashboard.component");
 var login_component_1 = require("./auth/login.component");
 var register_component_1 = require("./auth/register.component");
 var user_service_1 = require("./auth/user.service");
+var game_service_1 = require("./gameCards/game.service");
+var gameLobby_component_1 = require("./gameCards/gameLobby.component");
+var newGame_component_1 = require("./gameCards/newGame.component");
 var AppModule = (function () {
     function AppModule() {
     }
@@ -53,11 +56,19 @@ AppModule = __decorate([
                 {
                     path: 'register',
                     component: register_component_1.RegisterComponent
+                },
+                {
+                    path: 'game/new',
+                    component: newGame_component_1.NewGameComponent
+                },
+                {
+                    path: 'game/:id',
+                    component: gameLobby_component_1.GameLobbyComponent
                 }
             ])
         ],
-        declarations: [app_component_1.AppComponent, login_component_1.LoginComponent, register_component_1.RegisterComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
-        providers: [websocket_service_1.WebSocketService, user_service_1.UserService],
+        declarations: [app_component_1.AppComponent, newGame_component_1.NewGameComponent, gameLobby_component_1.GameLobbyComponent, login_component_1.LoginComponent, register_component_1.RegisterComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
+        providers: [websocket_service_1.WebSocketService, user_service_1.UserService, game_service_1.GameService],
         bootstrap: [app_component_1.AppComponent]
     }),
     __metadata("design:paramtypes", [])

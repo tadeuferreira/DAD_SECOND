@@ -31,6 +31,9 @@ var AppComponent = (function () {
     AppComponent.prototype.getUsername = function () {
         return sessionStorage.getItem('username');
     };
+    AppComponent.prototype.getAvatar = function () {
+        return sessionStorage.getItem('avatar');
+    };
     return AppComponent;
 }());
 AppComponent = __decorate([

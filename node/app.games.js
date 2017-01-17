@@ -87,21 +87,24 @@ var Game = (function () {
                 .catch(function (err) { return _this.handleError(err, response, next); });
         };
         this.createGame = function (request, response, next) {
-            var player = request.body;
+            var gameInfo = request.body;
             app_database_1.databaseConnection.db.collection('players').findOne({
-                username: player.username
+                username: gameInfo.player.username
             }).then(function (player) {
-                if (player !== null) {
+                if (player !== null && player.id === gameInfo.player.id) {
                     var game = {
                         owner: null,
                         second: null,
                         third: null,
                         fourth: null,
-                        state: 0,
+                        state: null,
+                        creationDate: null,
                         pack: {}
                     };
                     game.pack = _this.createCards();
-                    game.owner = player.id;
+                    game.owner = player._id;
+                    game.state = gameInfo.state;
+                    game.creationDate = gameInfo.creationDate;
                     app_database_1.databaseConnection.db.collection('games')
                         .insertOne(game)
                         .then(function (result) { return _this.returnGame(result.insertedId, response, next); })
@@ -120,7 +123,6 @@ var Game = (function () {
             server.put(settings.prefix + 'games/:id', settings.security.authorize, _this.updateGame);
             server.post(settings.prefix + 'games', settings.security.authorize, _this.createGame);
             server.del(settings.prefix + 'games/:id', settings.security.authorize, _this.deleteGame);
-            //server.del(settings.prefix + 'test',  this.test);
             console.log("Games routes registered");
         };
     }

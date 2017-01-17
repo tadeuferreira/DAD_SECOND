@@ -15,6 +15,13 @@ restifyServer.use(restify.bodyParser());
 restifyServer.use(restify.queryParser());
 restifyServer.use(restify.CORS());
 restifyServer.use(restify.fullResponse());
+restifyServer.opts(/.*/, function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", req.header("Access-Control-Request-Method"));
+    res.header("Access-Control-Allow-Headers", req.header("Access-Control-Request-Headers"));
+    res.send(200);
+    return next();
+});
 // Prepare and configure Passport based security
 var app_security_1 = require("./app.security");
 var security = new app_security_1.Security();

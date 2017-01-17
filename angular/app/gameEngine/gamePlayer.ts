@@ -12,8 +12,11 @@ export class GamePlayer{
 public hand: Hand;
 public type: PlayerType;
 public isTurn: boolean;
+public avatar: string;
+public username: string;
+public id: string;
 
-public constructor(type: PlayerType){
+public constructor(type: PlayerType, avatar: string, username: string, id: string){
 	this.hand = [];
 	this.type = type;
 	this.isTurn = false;
