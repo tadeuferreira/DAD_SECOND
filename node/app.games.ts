@@ -28,7 +28,7 @@ export class Game {
 
     public getGames = (request: any, response: any, next: any) => {
         database.db.collection('games')
-        .find()
+        .find( state: 'pending')
         .toArray()
         .then(games => {
             response.json(games || []);

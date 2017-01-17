@@ -24,6 +24,7 @@ import { GameService } from './gameCards/game.service';
 
 import { GameLobbyComponent } from './gameCards/gameLobby.component';
 import { NewGameComponent } from './gameCards/newGame.component';
+import { GameSearchComponent } from './gameCards/gameSearch.component';
 
 
 @NgModule({
@@ -57,10 +58,14 @@ import { NewGameComponent } from './gameCards/newGame.component';
   {
     path: 'game/:id',
     component: GameLobbyComponent
+  },
+  {
+    path: 'games',
+    component: GameSearchComponent
   }
   ])
   ],
-  declarations: [ AppComponent, NewGameComponent, GameLobbyComponent, LoginComponent, RegisterComponent, MenuComponent,ChatComponent, ABoardComponent, DBoardComponent, DashboardComponent ],
+  declarations: [ AppComponent, GameSearchComponent,NewGameComponent, GameLobbyComponent, LoginComponent, RegisterComponent, MenuComponent,ChatComponent, ABoardComponent, DBoardComponent, DashboardComponent ],
   providers:    [ WebSocketService, UserService, GameService],
   bootstrap:    [ AppComponent ]
 })

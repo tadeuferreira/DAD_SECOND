@@ -27,6 +27,7 @@ var user_service_1 = require("./auth/user.service");
 var game_service_1 = require("./gameCards/game.service");
 var gameLobby_component_1 = require("./gameCards/gameLobby.component");
 var newGame_component_1 = require("./gameCards/newGame.component");
+var gameSearch_component_1 = require("./gameCards/gameSearch.component");
 var AppModule = (function () {
     function AppModule() {
     }
@@ -64,10 +65,14 @@ AppModule = __decorate([
                 {
                     path: 'game/:id',
                     component: gameLobby_component_1.GameLobbyComponent
+                },
+                {
+                    path: 'games',
+                    component: gameSearch_component_1.GameSearchComponent
                 }
             ])
         ],
-        declarations: [app_component_1.AppComponent, newGame_component_1.NewGameComponent, gameLobby_component_1.GameLobbyComponent, login_component_1.LoginComponent, register_component_1.RegisterComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
+        declarations: [app_component_1.AppComponent, gameSearch_component_1.GameSearchComponent, newGame_component_1.NewGameComponent, gameLobby_component_1.GameLobbyComponent, login_component_1.LoginComponent, register_component_1.RegisterComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
         providers: [websocket_service_1.WebSocketService, user_service_1.UserService, game_service_1.GameService],
         bootstrap: [app_component_1.AppComponent]
     }),

@@ -52,12 +52,16 @@ export class WebSocketServer {
                 })
                 .then(game => {
                     if (game !== null) {
-                        console.log(game);
+                       // console.log(game);
                         if(game.state === 'pending'){
+                            console.log('pending');
                             this.join(msgData._id);
                             if(msgData.msg =="Joinning"){
-                                if(game.owner === new mongodb.ObjectID()){
-
+                                console.log('joining');
+                                console.log(game.owner == new mongodb.ObjectID(msgData.player._id));
+                                console.log(game.owner == msgData.player._id);
+                                if(game.owner == msgData.player._id){
+                                    console.log('owner');
                                     var player = new Player(PlayerClass.owner, msgData.player.avatar,  msgData.player.username,  msgData.player._id);
                                     console.log(player);
                                     this.emit('initLobby', player);

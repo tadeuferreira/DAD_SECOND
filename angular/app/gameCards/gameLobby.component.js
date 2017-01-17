@@ -20,6 +20,7 @@ var GameLobbyComponent = (function () {
         this.gameService = gameService;
         this.userService = userService;
         this.router = router;
+        this.players = [];
     }
     GameLobbyComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -31,7 +32,6 @@ var GameLobbyComponent = (function () {
                 _this.id = params['id'];
             });
             console.log(this.id);
-            this.players = [];
             this.websocketService.getInitLobbyErr().subscribe(function (p) { return console.log(p); });
             this.websocketService.getInitLobby().subscribe(function (p) { return _this.players.push(p); });
             this.websocketService.sendInitLobby({ _id: this.id, msg: 'Joinning', player: { _id: sessionStorage.getItem('id'), username: sessionStorage.getItem('username'), avatar: sessionStorage.getItem('avatar') } });
@@ -46,7 +46,7 @@ GameLobbyComponent = __decorate([
     core_1.Component({
         moduleId: module.id,
         selector: 'gamelobby',
-        template: '<h1>Lobby</h1>'
+        templateUrl: 'gameLobby.component.html'
     }),
     __metadata("design:paramtypes", [websocket_service_1.WebSocketService, router_1.ActivatedRoute, game_service_1.GameService, user_service_1.UserService, router_1.Router])
 ], GameLobbyComponent);

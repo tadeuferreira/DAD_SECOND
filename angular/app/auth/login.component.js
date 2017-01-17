@@ -38,7 +38,7 @@ LoginComponent = __decorate([
     core_1.Component({
         moduleId: module.id,
         selector: 'login',
-        templateUrl: 'login.component.html',
+        templateUrl: 'login.component.html'
     }),
     __metadata("design:paramtypes", [forms_1.FormBuilder, user_service_1.UserService, router_1.Router])
 ], LoginComponent);

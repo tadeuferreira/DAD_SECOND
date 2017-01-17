@@ -8,13 +8,13 @@ import { Player } from '../gameEngine/player';
 @Component({
     moduleId: module.id,
     selector: 'gamelobby',
-    template:'<h1>Lobby</h1>'
+    templateUrl:'gameLobby.component.html'
 
 })
 export class GameLobbyComponent implements OnInit, OnDestroy{
 	id: string;
 	private sub: any;
-	public players: Player[];
+	public players: Player[] = [];
 	constructor(private websocketService: WebSocketService, private activatedRoute: ActivatedRoute, private gameService: GameService ,private userService: UserService, private router: Router) {}
 
 	 ngOnInit() {
@@ -26,7 +26,6 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
             });
 
 			 console.log(this.id);
-			 this.players = [];
 			 this.websocketService.getInitLobbyErr().subscribe((p: any) => console.log(p));
 			 this.websocketService.getInitLobby().subscribe((p: any) => this.players.push(<Player> p));
 			 this.websocketService.sendInitLobby({_id: this.id, msg: 'Joinning', player:{ _id: sessionStorage.getItem('id') ,username: sessionStorage.getItem('username'), avatar: sessionStorage.getItem('avatar')}});

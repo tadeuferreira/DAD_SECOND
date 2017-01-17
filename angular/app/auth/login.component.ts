@@ -8,7 +8,7 @@ import { User } from './user.interface';
 @Component({
   moduleId: module.id,
   selector: 'login',
-  templateUrl: 'login.component.html',
+  templateUrl: 'login.component.html'
 })
 export class LoginComponent implements OnInit {
   public myForm: FormGroup; // our model driven form
