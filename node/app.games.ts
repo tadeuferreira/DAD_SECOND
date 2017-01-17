@@ -110,7 +110,7 @@ export class Game {
                 };
 
                 game.pack = this.createCards();
-                game.owner = player._id;
+                game.owner = new mongodb.ObjectID(player._id);
                 game.state = gameInfo.state;
                 game.creationDate = gameInfo.creationDate;
                 

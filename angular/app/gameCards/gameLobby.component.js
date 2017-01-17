@@ -32,6 +32,7 @@ var GameLobbyComponent = (function () {
             });
             console.log(this.id);
             this.players = [];
+            this.websocketService.getInitLobbyErr().subscribe(function (p) { return console.log(p); });
             this.websocketService.getInitLobby().subscribe(function (p) { return _this.players.push(p); });
             this.websocketService.sendInitLobby({ _id: this.id, msg: 'Joinning', player: { _id: sessionStorage.getItem('id'), username: sessionStorage.getItem('username'), avatar: sessionStorage.getItem('avatar') } });
         }

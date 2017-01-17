@@ -102,7 +102,7 @@ var Game = (function () {
                         pack: {}
                     };
                     game.pack = _this.createCards();
-                    game.owner = player._id;
+                    game.owner = new mongodb.ObjectID(player._id);
                     game.state = gameInfo.state;
                     game.creationDate = gameInfo.creationDate;
                     app_database_1.databaseConnection.db.collection('games')

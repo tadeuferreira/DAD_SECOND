@@ -14,7 +14,7 @@ var io = require("socket.io-client");
 var WebSocketService = (function () {
     function WebSocketService() {
         if (!this.socket) {
-            this.socket = io("http://localhost:7777");
+            this.socket = io('http://localhost:7777');
         }
     }
     WebSocketService.prototype.sendChatMessage = function (message) {
@@ -37,6 +37,9 @@ var WebSocketService = (function () {
             return this.listenOnChannel(channel);
         }
         */
+    WebSocketService.prototype.getInitLobbyErr = function () {
+        return this.listenOnChannel('initLobbyErr');
+    };
     WebSocketService.prototype.getInitLobby = function () {
         return this.listenOnChannel('initLobby');
     };
