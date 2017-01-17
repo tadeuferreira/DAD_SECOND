@@ -9,13 +9,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
+var user_service_1 = require("./auth/user.service");
+var router_1 = require("@angular/router");
 var AppComponent = (function () {
-    function AppComponent() {
+    function AppComponent(userService, router) {
+        this.userService = userService;
+        this.router = router;
         this.onMenu = true;
         this.onCreateGame = false;
     }
+    AppComponent.prototype.isLoggedIn = function () {
+        return this.userService.isLoggedIn();
+    };
+    AppComponent.prototype.logout = function () {
+        this.userService.logout();
+        return this.router.navigate(['login']);
+    };
     AppComponent.prototype.switchMenu = function () {
         this.onMenu = !this.onMenu;
+    };
+    AppComponent.prototype.getUsername = function () {
+        return sessionStorage.getItem('username');
     };
     return AppComponent;
 }());
@@ -25,7 +39,7 @@ AppComponent = __decorate([
         selector: 'my-app',
         templateUrl: 'app.component.html',
     }),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [user_service_1.UserService, router_1.Router])
 ], AppComponent);
 exports.AppComponent = AppComponent;
 //# sourceMappingURL=app.component.js.map

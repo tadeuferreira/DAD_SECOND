@@ -43,10 +43,6 @@ AppModule = __decorate([
                     pathMatch: 'full'
                 },
                 {
-                    path: 'menu',
-                    component: menu_component_1.MenuComponent
-                },
-                {
                     path: 'dashboard',
                     component: dashboard_component_1.DashboardComponent
                 },

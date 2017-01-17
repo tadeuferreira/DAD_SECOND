@@ -3,9 +3,10 @@
 <hr>
    <nav>
      <a routerLink="/dashboard">Dashboard</a>
-     <a routerLink="/menu">Menu</a>
-     <a routerLink="/login">Login</a>
-     <a routerLink="/register">Register</a>
+     <a *ngIf="!isLoggedIn()" routerLink="/login">Login</a>
+     <a  *ngIf="!isLoggedIn()" routerLink="/register">Register</a>
+     <a  *ngIf="isLoggedIn()" (click)="logout()">Logout</a>
+     <a *ngIf="isLoggedIn()">{{getUsername()}}</a>
    </nav>
 <router-outlet></router-outlet>
 </div>

@@ -7,7 +7,6 @@ import {AppComponent} from '../app.component';
     moduleId: module.id,
     selector: 'menu',
     templateUrl: 'menu.component.html',
-    //styleUrls: ['menu.component.css']
 })
 
 export class MenuComponent implements OnInit{

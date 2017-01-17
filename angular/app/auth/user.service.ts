@@ -18,13 +18,18 @@ export class UserService {
     .post('http://localhost:7777/api/v1/login', JSON.stringify({ username, password }),{ headers }).subscribe(
       response => {
         if(response.ok){
-          localStorage.setItem('auth_token', response.auth_token);
+          sessionStorage.setItem('id', response.json()._id);
+          sessionStorage.setItem('token', response.json().token);
+          sessionStorage.setItem('username', response.json().username);
+          sessionStorage.setItem('email', response.json().email);
+        //  sessionStorage.setItem('avatar', response.json().avatar);
           this.loggedIn = true;
+          console.log(this.loggedIn);
+          console.log(response);
           this.router.navigate(['dashboard']);
         }
       },
       error => {
-        alert(error.text());
         console.log(error.text());
       }
       );

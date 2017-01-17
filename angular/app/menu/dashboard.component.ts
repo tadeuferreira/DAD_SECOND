@@ -1,7 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { MenuComponent } from '../menu/menu.component';
 
 @Component({
+  moduleId: module.id,
   selector: 'my-dashboard',
-  template: '<h3>My Dashboard</h3>'
+  templateUrl: 'dashboard.component.html'
 })
-export class DashboardComponent { }
+export class DashboardComponent implements OnInit{
+
+	@Input() hidden:boolean;
+    
+    ngOnInit() {
+    }
+}

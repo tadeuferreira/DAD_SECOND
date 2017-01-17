@@ -26,12 +26,17 @@ var UserService = (function () {
         return this.http
             .post('http://localhost:7777/api/v1/login', JSON.stringify({ username: username, password: password }), { headers: headers }).subscribe(function (response) {
             if (response.ok) {
-                localStorage.setItem('auth_token', response.auth_token);
+                sessionStorage.setItem('id', response.json()._id);
+                sessionStorage.setItem('token', response.json().token);
+                sessionStorage.setItem('username', response.json().username);
+                sessionStorage.setItem('email', response.json().email);
+                //  sessionStorage.setItem('avatar', response.json().avatar);
                 _this.loggedIn = true;
+                console.log(_this.loggedIn);
+                console.log(response);
                 _this.router.navigate(['dashboard']);
             }
         }, function (error) {
-            alert(error.text());
             console.log(error.text());
         });
     };

@@ -35,10 +35,6 @@ import { UserService } from './auth/user.service';
   pathMatch: 'full'
 	},
   {
-    path: 'menu',
-    component: MenuComponent
-  },
-  {
  	path: 'dashboard',
   component: DashboardComponent
   },
