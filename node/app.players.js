@@ -118,15 +118,28 @@ var Player = (function () {
             })
                 .catch(function (err) { return _this.handleError(err, response, next); });
         };
-        this.getTop10 = function (request, response, next) {
+        this.getTop10Star = function (request, response, next) {
             app_database_1.databaseConnection.db.collection('players')
-                .find()
-                .sort({ totalVictories: -1 })
+                .find({ totalEstrelas: { $exists: true } })
+                .sort({ totalEstrelas: -1 })
                 .limit(10)
                 .toArray()
                 .then(function (players) {
                 response.json(players || []);
-                _this.settings.wsServer.notifyAll('players', Date.now() + ': Somebody accessed top 10');
+                _this.settings.wsServer.notifyAll('players', Date.now() + ': Somebody accessed top 10 Star');
+                next();
+            })
+                .catch(function (err) { return _this.handleError(err, response, next); });
+        };
+        this.getTop10Point = function (request, response, next) {
+            app_database_1.databaseConnection.db.collection('players')
+                .find({ totalPontos: { $exists: true } })
+                .sort({ totalPontos: -1 })
+                .limit(10)
+                .toArray()
+                .then(function (players) {
+                response.json(players || []);
+                _this.settings.wsServer.notifyAll('players', Date.now() + ': Somebody accessed top 10 Point');
                 next();
             })
                 .catch(function (err) { return _this.handleError(err, response, next); });
@@ -134,7 +147,8 @@ var Player = (function () {
         // Routes for the games
         this.init = function (server, settings) {
             _this.settings = settings;
-            server.get(settings.prefix + 'top10', _this.getTop10);
+            server.get(settings.prefix + 'top10Stars', _this.getTop10Star);
+            server.get(settings.prefix + 'top10Points', _this.getTop10Point);
             server.get(settings.prefix + 'players', settings.security.authorize, _this.getPlayers);
             server.get(settings.prefix + 'players/:id', settings.security.authorize, _this.getPlayer);
             server.put(settings.prefix + 'players/:id', settings.security.authorize, _this.updatePlayer);

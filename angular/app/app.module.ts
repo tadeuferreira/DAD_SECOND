@@ -15,6 +15,8 @@ import { DBoardComponent } from './game/dboard.component';
 
 import { MenuComponent } from './menu/menu.component';
 import { DashboardComponent } from './menu/dashboard.component';
+import { Top10StarComponent } from './menu/top10Star.component';
+import { Top10PointComponent } from './menu/top10Point.component';
 
 import { LoginComponent } from './auth/login.component';
 import { RegisterComponent } from './auth/register.component';
@@ -60,12 +62,21 @@ import { GameSearchComponent } from './gameCards/gameSearch.component';
     component: GameLobbyComponent
   },
   {
+
     path: 'games',
     component: GameSearchComponent
+  },
+    {
+       path: 'top10Stars',
+    component: Top10StarComponent
+  },
+  {
+    path: 'top10Points',
+    component: Top10PointComponent
   }
   ])
   ],
-  declarations: [ AppComponent, GameSearchComponent,NewGameComponent, GameLobbyComponent, LoginComponent, RegisterComponent, MenuComponent,ChatComponent, ABoardComponent, DBoardComponent, DashboardComponent ],
+  declarations: [ AppComponent,Top10StarComponent, Top10PointComponent, GameSearchComponent,NewGameComponent, GameLobbyComponent, LoginComponent, RegisterComponent, MenuComponent,ChatComponent, ABoardComponent, DBoardComponent, DashboardComponent ],
   providers:    [ WebSocketService, UserService, GameService],
   bootstrap:    [ AppComponent ]
 })
