@@ -26,6 +26,7 @@ import { GameService } from './gameCards/game.service';
 
 import { GameLobbyComponent } from './gameCards/gameLobby.component';
 import { NewGameComponent } from './gameCards/newGame.component';
+import { GameSearchComponent } from './gameCards/gameSearch.component';
 
 
 @NgModule({
@@ -57,11 +58,16 @@ import { NewGameComponent } from './gameCards/newGame.component';
     component: NewGameComponent
   },
   {
-    path: 'game/:id',
+    path: 'game/play',
     component: GameLobbyComponent
   },
   {
-    path: 'top10Stars',
+
+    path: 'games',
+    component: GameSearchComponent
+  },
+    {
+       path: 'top10Stars',
     component: Top10StarComponent
   },
   {
@@ -70,7 +76,7 @@ import { NewGameComponent } from './gameCards/newGame.component';
   }
   ])
   ],
-  declarations: [ AppComponent, Top10StarComponent, Top10PointComponent, NewGameComponent, GameLobbyComponent, LoginComponent, RegisterComponent, MenuComponent,ChatComponent, ABoardComponent, DBoardComponent, DashboardComponent ],
+  declarations: [ AppComponent,Top10StarComponent, Top10PointComponent, GameSearchComponent,NewGameComponent, GameLobbyComponent, LoginComponent, RegisterComponent, MenuComponent,ChatComponent, ABoardComponent, DBoardComponent, DashboardComponent ],
   providers:    [ WebSocketService, UserService, GameService],
   bootstrap:    [ AppComponent ]
 })

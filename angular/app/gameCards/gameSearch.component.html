@@ -1,0 +1,6 @@
+<h1>Games</h1>
+<div *ngFor="let m of games">
+<span >{{m.ownername}}</span>
+<span >{{m.count}}/4</span>	
+<button type="button" class="btn btn-danger"(click)="enterGame(m)">Enter</button>
+</div>

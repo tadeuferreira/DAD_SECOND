@@ -17,7 +17,7 @@ var UserService = (function () {
         this.http = http;
         this.router = router;
         this.loggedIn = false;
-        this.loggedIn = !!localStorage.getItem('auth_token');
+        this.loggedIn = !!sessionStorage.getItem('token');
     }
     UserService.prototype.login = function (username, password) {
         var _this = this;
@@ -53,7 +53,7 @@ var UserService = (function () {
         });
     };
     UserService.prototype.logout = function () {
-        localStorage.removeItem('auth_token');
+        sessionStorage.removeItem('auth_token');
         this.loggedIn = false;
     };
     UserService.prototype.isLoggedIn = function () {

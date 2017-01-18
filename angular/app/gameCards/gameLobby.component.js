@@ -14,12 +14,14 @@ var user_service_1 = require("../auth/user.service");
 var game_service_1 = require("../gameCards/game.service");
 var websocket_service_1 = require("../notifications/websocket.service");
 var GameLobbyComponent = (function () {
-    function GameLobbyComponent(websocketService, activatedRoute, gameService, userService, router) {
+    function GameLobbyComponent(websocketService, gameService, userService, router) {
         this.websocketService = websocketService;
-        this.activatedRoute = activatedRoute;
         this.gameService = gameService;
         this.userService = userService;
         this.router = router;
+        this.players = [];
+        this.team1 = [];
+        this.team2 = [];
     }
     GameLobbyComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -27,18 +29,82 @@ var GameLobbyComponent = (function () {
             this.router.navigate(['login']);
         }
         else {
-            this.sub = this.activatedRoute.params.subscribe(function (params) {
-                _this.id = params['id'];
+            this.gameService.joinGame().subscribe(function (response) {
+                if (response.ok) {
+                    switch (response._body) {
+                        case '"joined"':
+                            _this.websocketService.sendInitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'joining' });
+                            break;
+                        case '"already In"':
+                            _this.websocketService.sendInitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'already In' });
+                            break;
+                    }
+                    _this.websocketService.getInitLobby().subscribe(function (p) {
+                        if (p.msg == 'refresh') {
+                            _this.gameService.getPlayersGame().subscribe(function (response) {
+                                _this.setPlayers(response);
+                            }, function (error) {
+                                console.log(error);
+                            });
+                        }
+                    });
+                    _this.websocketService.getExitLobby().subscribe(function (p) {
+                        if (p.msg == 'terminated') {
+                            _this.router.navigate(['dashboard']);
+                        }
+                    });
+                }
+                else {
+                    _this.router.navigate(['dashboard']);
+                }
+            }, function (error) {
+                console.log(error);
             });
-            console.log(this.id);
-            this.players = [];
-            this.websocketService.getInitLobbyErr().subscribe(function (p) { return console.log(p); });
-            this.websocketService.getInitLobby().subscribe(function (p) { return _this.players.push(p); });
-            this.websocketService.sendInitLobby({ _id: this.id, msg: 'Joinning', player: { _id: sessionStorage.getItem('id'), username: sessionStorage.getItem('username'), avatar: sessionStorage.getItem('avatar') } });
         }
     };
     GameLobbyComponent.prototype.ngOnDestroy = function () {
-        this.sub.unsubscribe();
+        this.leave();
+    };
+    GameLobbyComponent.prototype.setPlayers = function (response) {
+        var json = JSON.parse(response._body);
+        this.team1 = json.team1;
+        this.team2 = json.team2;
+        console.log(json);
+    };
+    GameLobbyComponent.prototype.changeTeam = function () {
+        var _this = this;
+        this.gameService.changeTeamGame().subscribe(function (response) {
+            if (response.ok) {
+                switch (response._body) {
+                    case '"changed"':
+                        _this.websocketService.sendInitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'changed' });
+                        break;
+                    case '"full"':
+                        alert('The other team is full');
+                        break;
+                }
+            }
+        }, function (error) {
+            console.log(error);
+        });
+    };
+    GameLobbyComponent.prototype.leave = function () {
+        var _this = this;
+        this.gameService.leaveGame().subscribe(function (response) {
+            if (response.ok) {
+                switch (response._body) {
+                    case '"terminated"':
+                        _this.websocketService.sendExitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'terminated' });
+                        break;
+                    case '"left"':
+                        _this.websocketService.sendExitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'left' });
+                        break;
+                }
+                _this.router.navigate(['dashboard']);
+            }
+        }, function (error) {
+            console.log(error);
+        });
     };
     return GameLobbyComponent;
 }());
@@ -46,9 +112,9 @@ GameLobbyComponent = __decorate([
     core_1.Component({
         moduleId: module.id,
         selector: 'gamelobby',
-        template: '<h1>Lobby</h1>'
+        templateUrl: 'gameLobby.component.html'
     }),
-    __metadata("design:paramtypes", [websocket_service_1.WebSocketService, router_1.ActivatedRoute, game_service_1.GameService, user_service_1.UserService, router_1.Router])
+    __metadata("design:paramtypes", [websocket_service_1.WebSocketService, game_service_1.GameService, user_service_1.UserService, router_1.Router])
 ], GameLobbyComponent);
 exports.GameLobbyComponent = GameLobbyComponent;
 //# sourceMappingURL=gameLobby.component.js.map

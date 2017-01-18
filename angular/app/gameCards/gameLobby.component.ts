@@ -1,40 +1,111 @@
 import { Component, OnInit , OnDestroy } from '@angular/core';
-import { Router , ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { UserService } from '../auth/user.service';
 import { GameService } from '../gameCards/game.service';
 import { WebSocketService } from '../notifications/websocket.service';
-import { Player } from '../gameEngine/player';
 
 @Component({
-    moduleId: module.id,
-    selector: 'gamelobby',
-    template:'<h1>Lobby</h1>'
+	moduleId: module.id,
+	selector: 'gamelobby',
+	templateUrl:'gameLobby.component.html'
 
 })
 export class GameLobbyComponent implements OnInit, OnDestroy{
-	id: string;
-	private sub: any;
-	public players: Player[];
-	constructor(private websocketService: WebSocketService, private activatedRoute: ActivatedRoute, private gameService: GameService ,private userService: UserService, private router: Router) {}
+	private players: string[] = [];
+	public team1: string[] = [];
+	public team2: string[] = [];
+	constructor(private websocketService: WebSocketService, private gameService: GameService ,private userService: UserService, private router: Router) {}
 
-	 ngOnInit() {
-	 	if(!this.userService.isLoggedIn()){
+	ngOnInit() {
+		if(!this.userService.isLoggedIn()){
 			this.router.navigate(['login']);
 		}else{
-			 this.sub = this.activatedRoute.params.subscribe(params => {
-                this.id = params['id'];
-            });
+			this.gameService.joinGame().subscribe(response => {
+				if (response.ok) {
+					switch (response._body) {
+						case '"joined"':
+						this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'joining'});
+						break;
+						
+						case '"already In"':
+						this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'already In'});
+						break;
+					}
+					this.websocketService.getInitLobby().subscribe((p: any) => 
+						{
+							if(p.msg == 'refresh'){
+								this.gameService.getPlayersGame().subscribe(response => {
+									this.setPlayers(response);
+								}, error => {
+									console.log(error);
+								}
+								);
+							}
+						});
+					this.websocketService.getExitLobby().subscribe((p: any) => { 	
+							if(p.msg == 'terminated'){
+								this.router.navigate(['dashboard']);
+					}});
 
-			 console.log(this.id);
-			 this.players = [];
-			 this.websocketService.getInitLobbyErr().subscribe((p: any) => console.log(p));
-			 this.websocketService.getInitLobby().subscribe((p: any) => this.players.push(<Player> p));
-			 this.websocketService.sendInitLobby({_id: this.id, msg: 'Joinning', player:{ _id: sessionStorage.getItem('id') ,username: sessionStorage.getItem('username'), avatar: sessionStorage.getItem('avatar')}});
+				}else{
+					this.router.navigate(['dashboard']);
+				}
+			}, error => {
+				console.log(error);
+			});
 		}	
-    }
+	}
 
-    ngOnDestroy() {
-        this.sub.unsubscribe();
-    }
-	
+	ngOnDestroy() {
+		this.leave();
+
+	}
+
+
+	setPlayers(response: any){
+		var json = JSON.parse(response._body);
+		this.team1 = json.team1;
+		this.team2 = json.team2;
+		console.log(json);
+	}
+
+	changeTeam(){
+		this.gameService.changeTeamGame().subscribe(response => {
+				if (response.ok) {
+					switch (response._body) {
+						case '"changed"':
+							this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'changed'});
+							break;					
+						case '"full"':			
+							alert('The other team is full');
+							break;
+					}			
+				}
+			}, error => {
+				console.log(error);
+			}
+			);
+	}
+
+	leave(){
+		this.gameService.leaveGame().subscribe(response => {
+				if (response.ok) {
+					switch (response._body) {
+						case '"terminated"':
+							this.websocketService.sendExitLobby({_id: sessionStorage.getItem('game_id'), msg: 'terminated'});
+							break;
+						
+						case '"left"':
+							this.websocketService.sendExitLobby({_id: sessionStorage.getItem('game_id'), msg: 'left'});
+							break;
+					}
+					this.router.navigate(['dashboard']);
+					
+				}
+			}, error => {
+				console.log(error);
+			}
+			);
+	}
+
 }

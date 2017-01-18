@@ -8,7 +8,7 @@ export class UserService {
   private loggedIn = false;
 
   constructor(private http: Http, private router: Router) {
-    this.loggedIn = !!localStorage.getItem('auth_token');
+    this.loggedIn = !!sessionStorage.getItem('token');
   }
 
   login(username: string, password: string) {
@@ -54,7 +54,7 @@ export class UserService {
     }
 
     logout() {
-      localStorage.removeItem('auth_token');
+      sessionStorage.removeItem('auth_token');
       this.loggedIn = false;
     }
 

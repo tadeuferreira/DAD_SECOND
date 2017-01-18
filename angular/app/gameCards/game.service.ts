@@ -24,14 +24,52 @@ export class GameService {
 			.post('http://localhost:7777/api/v1/games', body, <RequestOptionsArgs>{ headers: headers, withCredentials: false })
 			.subscribe(response => {
 				if (response.ok) {
-					this.router.navigate(['game', response.json()._id]);
+					sessionStorage.setItem('game_id', response.json()._id);
+					this.router.navigate(['game/play']);
 				}
 			}, error => {
 				console.log(error);
 			}
-
-
 			);
+	}
+
+	getGames() {
+		let headers = new Headers();
+		console.log(sessionStorage.getItem('token'));
+		headers.append('Content-Type', 'application/json');
+		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
+		return this.http.get('http://localhost:7777/api/v1/games', <RequestOptionsArgs>{ headers: headers, withCredentials: false });
+	}
+
+	joinGame(): Promise<any>{
+		let body = JSON.stringify({_id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id')});
+		
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
+		return this.http.post('http://localhost:7777/api/v1/games/join', body, <RequestOptionsArgs>{ headers: headers, withCredentials: false });
+	}
+	getPlayersGame(): Promise<any>{
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
+		return this.http.get('http://localhost:7777/api/v1/games/players/'+ sessionStorage.getItem('game_id'), <RequestOptionsArgs>{ headers: headers, withCredentials: false });
+	}
+	leaveGame(): Promise<any>{
+		console.log(sessionStorage.getItem('game_id'));
+		let body = JSON.stringify({_id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id')});
+		
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
+		return this.http.post('http://localhost:7777/api/v1/games/leave', body, <RequestOptionsArgs>{ headers: headers, withCredentials: false });
+	}
+	changeTeamGame(): Promise<any>{
+		let body = JSON.stringify({_id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id')});
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
+		return this.http.post('http://localhost:7777/api/v1/games/change', body,<RequestOptionsArgs>{ headers: headers, withCredentials: false });
 	}
 
 }
