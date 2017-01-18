@@ -63,7 +63,7 @@ AppModule = __decorate([
                     component: newGame_component_1.NewGameComponent
                 },
                 {
-                    path: 'game/:id',
+                    path: 'game/play',
                     component: gameLobby_component_1.GameLobbyComponent
                 },
                 {

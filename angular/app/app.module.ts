@@ -56,7 +56,7 @@ import { GameSearchComponent } from './gameCards/gameSearch.component';
     component: NewGameComponent
   },
   {
-    path: 'game/:id',
+    path: 'game/play',
     component: GameLobbyComponent
   },
   {

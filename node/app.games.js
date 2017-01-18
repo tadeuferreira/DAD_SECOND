@@ -268,6 +268,81 @@ var Game = (function () {
             })
                 .catch(function (err) { return _this.handleError(err, response, next); });
         };
+        this.changeTeamGame = function (request, response, next) {
+            var info = request.body;
+            console.log(info);
+            app_database_1.databaseConnection.db.collection('games')
+                .findOne({
+                _id: new mongodb.ObjectID(info._id)
+            })
+                .then(function (game) {
+                if (game !== null) {
+                    var team = 0;
+                    for (var i = 0; i < 2; ++i) {
+                        if (game.team1[i].id == info.player_id) {
+                            team = 1;
+                        }
+                        if (game.team2[i].id == info.player_id) {
+                            team = 2;
+                        }
+                    }
+                    console.log(info.player_id);
+                    console.log(team);
+                    var isChanged = false;
+                    if (team === 1) {
+                        for (var j = 0; j < 2; ++j) {
+                            if (game.team2[j].id == null) {
+                                game.team2[j].id = info.player_id;
+                                isChanged = true;
+                                for (var l = 0; l < 2; ++l) {
+                                    if (game.team1[l].id == info.player_id) {
+                                        game.team1[l].id = null;
+                                    }
+                                }
+                                j = 0;
+                                break;
+                            }
+                        }
+                    }
+                    else if (team === 2) {
+                        for (var k = 0; k < 2; ++k) {
+                            if (game.team1[k].id == null) {
+                                game.team1[k].id = info.player_id;
+                                isChanged = true;
+                                for (var d = 0; d < 2; ++d) {
+                                    if (game.team2[d].id == info.player_id) {
+                                        game.team2[d].id = null;
+                                    }
+                                }
+                                k = 0;
+                                break;
+                            }
+                        }
+                    }
+                    if (isChanged) {
+                        delete game._id;
+                        app_database_1.databaseConnection.db.collection('games')
+                            .updateOne({
+                            _id: new mongodb.ObjectID(info._id)
+                        }, {
+                            $set: game
+                        })
+                            .then(function (result) {
+                            response.send(200, 'changed');
+                        })
+                            .catch(function (err) { return _this.handleError(err, response, next); });
+                    }
+                    else {
+                        response.send(200, 'full');
+                    }
+                }
+                else {
+                    response.send(404, 'No game found');
+                }
+                next();
+            })
+                .catch(function (err) { return _this.handleError(err, response, next); });
+        };
         this.endGame = function (game, response, next) {
             var id = game._id;
             game.state = 'terminated';
@@ -289,6 +364,7 @@ var Game = (function () {
             server.post(settings.prefix + 'games', settings.security.authorize, _this.createGame);
             server.post(settings.prefix + 'games/join', settings.security.authorize, _this.joinGame);
             server.post(settings.prefix + 'games/leave', settings.security.authorize, _this.leaveGame);
+            server.post(settings.prefix + 'games/change', settings.security.authorize, _this.changeTeamGame);
             server.get(settings.prefix + 'games/players/:id', settings.security.authorize, _this.playersGame);
             server.del(settings.prefix + 'games/:id', settings.security.authorize, _this.deleteGame);
             console.log("Games routes registered");

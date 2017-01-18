@@ -1,5 +1,5 @@
 import { Component, OnInit , OnDestroy } from '@angular/core';
-import { Router , ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { UserService } from '../auth/user.service';
 import { GameService } from '../gameCards/game.service';
 import { WebSocketService } from '../notifications/websocket.service';
@@ -11,47 +11,30 @@ import { WebSocketService } from '../notifications/websocket.service';
 
 })
 export class GameLobbyComponent implements OnInit, OnDestroy{
-	id_game: string;
-	private sub: any;
 	private players: string[] = [];
 	public team1: string[] = [];
 	public team2: string[] = [];
-	constructor(private websocketService: WebSocketService, private activatedRoute: ActivatedRoute, private gameService: GameService ,private userService: UserService, private router: Router) {}
+	constructor(private websocketService: WebSocketService, private gameService: GameService ,private userService: UserService, private router: Router) {}
 
 	ngOnInit() {
 		if(!this.userService.isLoggedIn()){
 			this.router.navigate(['login']);
 		}else{
-			this.sub = this.activatedRoute.params.subscribe(params => {
-				this.id_game = params['id'];
-			});
-			console.log(this.id_game);
-			this.gameService.joinGame(this.id_game).subscribe(response => {
-				console.log(response);
+			this.gameService.joinGame().subscribe(response => {
 				if (response.ok) {
 					switch (response._body) {
 						case '"joined"':
-						console.log('joined');
-						this.websocketService.getInitLobby().subscribe((p: any) => 
-						{
-							if(p.msg == 'refresh'){
-								this.gameService.getPlayersGame(this.id_game).subscribe(response => {
-									this.setPlayers(response);
-								}, error => {
-									console.log(error);
-								}
-								);
-							}
-						});
-						console.log('joinning sent');
-						this.websocketService.sendInitLobby({_id: this.id_game, msg: 'joining'});
+						this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'joining'});
 						break;
 						
 						case '"already In"':
-						this.websocketService.getInitLobby().subscribe((p: any) => 
-							{
+						this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'already In'});
+						break;
+					}
+					this.websocketService.getInitLobby().subscribe((p: any) => 
+						{
 							if(p.msg == 'refresh'){
-								this.gameService.getPlayersGame(this.id_game).subscribe(response => {
+								this.gameService.getPlayersGame().subscribe(response => {
 									this.setPlayers(response);
 								}, error => {
 									console.log(error);
@@ -59,14 +42,10 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 								);
 							}
 						});
-						this.websocketService.sendInitLobby({_id: this.id_game, msg: 'already In'});
-						break;
-					}
 					this.websocketService.getExitLobby().subscribe((p: any) => { 	
-
 							if(p.msg == 'terminated'){
 								this.router.navigate(['dashboard']);
-							}});
+					}});
 
 				}else{
 					this.router.navigate(['dashboard']);
@@ -78,27 +57,7 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 	}
 
 	ngOnDestroy() {
-		console.log('leaving');
-		this.gameService.leaveGame(this.id_game).subscribe(response => {
-				console.log(response);
-				if (response.ok) {
-					switch (response._body) {
-						case '"terminated"':
-						console.log('terminated');
-							this.websocketService.sendExitLobby({_id: this.id_game, msg: 'terminated'});
-							break;
-						
-						case '"left"':
-						console.log('left');
-							this.websocketService.sendExitLobby({_id: this.id_game, msg: 'left'});
-							break;
-					}
-					
-				}
-			}, error => {
-				console.log(error);
-			}
-			);
+		this.leave();
 
 	}
 
@@ -108,6 +67,45 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 		this.team1 = json.team1;
 		this.team2 = json.team2;
 		console.log(json);
+	}
+
+	changeTeam(){
+		this.gameService.changeTeamGame().subscribe(response => {
+				if (response.ok) {
+					switch (response._body) {
+						case '"changed"':
+							this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'changed'});
+							break;					
+						case '"full"':			
+							alert('The other team is full');
+							break;
+					}			
+				}
+			}, error => {
+				console.log(error);
+			}
+			);
+	}
+
+	leave(){
+		this.gameService.leaveGame().subscribe(response => {
+				if (response.ok) {
+					switch (response._body) {
+						case '"terminated"':
+							this.websocketService.sendExitLobby({_id: sessionStorage.getItem('game_id'), msg: 'terminated'});
+							break;
+						
+						case '"left"':
+							this.websocketService.sendExitLobby({_id: sessionStorage.getItem('game_id'), msg: 'left'});
+							break;
+					}
+					this.router.navigate(['dashboard']);
+					
+				}
+			}, error => {
+				console.log(error);
+			}
+			);
 	}
 
 }

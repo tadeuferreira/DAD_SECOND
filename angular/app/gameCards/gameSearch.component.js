@@ -25,12 +25,16 @@ var GameSearchComponent = (function () {
             this.router.navigate(['login']);
         }
         else {
-            this.gameService.getGames().subscribe(function (response) { return _this.games = response.json(); });
+            this.gameService.getGames().subscribe(function (response) {
+                _this.games = response.json();
+                console.log(response.json());
+            });
         }
     };
     GameSearchComponent.prototype.enterGame = function (m) {
         if (m.count < 4) {
-            this.router.navigate(['game', m._id]);
+            sessionStorage.setItem('game_id', m._id);
+            this.router.navigate(['game/play']);
         }
     };
     return GameSearchComponent;

@@ -36,6 +36,10 @@ var WebSocketServer = (function () {
                             this.emit('initLobby', { _id: msgData._id, msg: 'refresh' });
                             this.to(msgData._id).emit('initLobby', { _id: msgData._id, msg: 'refresh' });
                             break;
+                        case 'changed':
+                            this.emit('initLobby', { _id: msgData._id, msg: 'refresh' });
+                            this.to(msgData._id).emit('initLobby', { _id: msgData._id, msg: 'refresh' });
+                            break;
                     }
                 });
             });

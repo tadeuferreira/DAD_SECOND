@@ -20,13 +20,15 @@ export class GameSearchComponent implements OnInit, OnDestroy{
 	 	if(!this.userService.isLoggedIn()){
 			this.router.navigate(['login']);
 		}else{
-			 this.gameService.getGames().subscribe(response => this.games = response.json());
+			 this.gameService.getGames().subscribe(response => {this.games = response.json();
+			 	console.log(response.json());});
 		}	
     }
 
     enterGame(m:any){
     	if(m.count < 4){
-    		this.router.navigate(['game',m._id]);
+    		sessionStorage.setItem('game_id',m._id);
+    		this.router.navigate(['game/play']);
     	}
     }
 
