@@ -1,5 +1,12 @@
 <h1>Lobby</h1>
-<div *ngFor="let m of players">
+<hr>
+<h2>Team 1</h2>
+<div *ngFor="let m of team1">
+<span >{{m.username}}</span>
+		<img id="demo-image" src="{{m.avatar}}" style="width: 60px; height: 60px; border-radius: 50%;" alt="demo-image">
+</div>
+<h2>Team 2</h2>
+<div *ngFor="let m of team2">
 <span >{{m.username}}</span>
 		<img id="demo-image" src="{{m.avatar}}" style="width: 60px; height: 60px; border-radius: 50%;" alt="demo-image">
 </div>

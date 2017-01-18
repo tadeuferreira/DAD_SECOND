@@ -41,8 +41,7 @@ var GameService = (function () {
         console.log(sessionStorage.getItem('token'));
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
-        console.log(body);
-        return this.http.get('http://localhost:7777/api/v1/games', body, { headers: headers, withCredentials: false });
+        return this.http.get('http://localhost:7777/api/v1/games', { headers: headers, withCredentials: false });
     };
     return GameService;
 }());

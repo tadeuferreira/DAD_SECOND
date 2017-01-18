@@ -42,8 +42,17 @@ export class WebSocketService {
         return this.listenOnChannel('initLobby');
     }
     sendInitLobby(msgData: any){
+        console.log(msgData);
         this.socket.emit('initLobby', msgData);
     }
+    sendExitLobby(msgData: any){
+        this.socket.emit('exitLobby', msgData);
+    }
+    getExitLobby(): Observable<any> {
+        return this.listenOnChannel('exitLobby');
+    }
+
+    
 
     private listenOnChannel(channel: string): Observable<any> {
         return new Observable((observer:any) => {

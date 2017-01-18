@@ -44,7 +44,14 @@ var WebSocketService = (function () {
         return this.listenOnChannel('initLobby');
     };
     WebSocketService.prototype.sendInitLobby = function (msgData) {
+        console.log(msgData);
         this.socket.emit('initLobby', msgData);
+    };
+    WebSocketService.prototype.sendExitLobby = function (msgData) {
+        this.socket.emit('exitLobby', msgData);
+    };
+    WebSocketService.prototype.getExitLobby = function () {
+        return this.listenOnChannel('exitLobby');
     };
     WebSocketService.prototype.listenOnChannel = function (channel) {
         var _this = this;

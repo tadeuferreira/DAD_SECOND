@@ -28,6 +28,11 @@ var GameSearchComponent = (function () {
             this.gameService.getGames().subscribe(function (response) { return _this.games = response.json(); });
         }
     };
+    GameSearchComponent.prototype.enterGame = function (m) {
+        if (m.count < 4) {
+            this.router.navigate(['game', m._id]);
+        }
+    };
     return GameSearchComponent;
 }());
 GameSearchComponent = __decorate([

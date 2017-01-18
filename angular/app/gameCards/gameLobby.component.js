@@ -21,6 +21,8 @@ var GameLobbyComponent = (function () {
         this.userService = userService;
         this.router = router;
         this.players = [];
+        this.team1 = [];
+        this.team2 = [];
     }
     GameLobbyComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -33,12 +35,22 @@ var GameLobbyComponent = (function () {
             });
             console.log(this.id);
             this.websocketService.getInitLobbyErr().subscribe(function (p) { return console.log(p); });
-            this.websocketService.getInitLobby().subscribe(function (p) { return _this.players.push(p); });
+            this.websocketService.getInitLobby().subscribe(function (p) { return _this.setPlayers(p); });
+            this.websocketService.getExitLobby().subscribe(function (p) {
+                if (p.status == 'terminated') {
+                    _this.router.navigate(['dashboard']);
+                }
+            });
             this.websocketService.sendInitLobby({ _id: this.id, msg: 'Joinning', player: { _id: sessionStorage.getItem('id'), username: sessionStorage.getItem('username'), avatar: sessionStorage.getItem('avatar') } });
         }
     };
     GameLobbyComponent.prototype.ngOnDestroy = function () {
-        this.sub.unsubscribe();
+        this.websocketService.sendExitLobby({ _id: this.id, player: { _id: sessionStorage.getItem('id'), username: sessionStorage.getItem('username'), avatar: sessionStorage.getItem('avatar') } });
+    };
+    GameLobbyComponent.prototype.setPlayers = function (p) {
+        this.team1 = p.team1;
+        this.team2 = p.team2;
+        console.log(p);
     };
     return GameLobbyComponent;
 }());

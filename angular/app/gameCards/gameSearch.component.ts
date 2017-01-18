@@ -24,6 +24,12 @@ export class GameSearchComponent implements OnInit, OnDestroy{
 		}	
     }
 
+    enterGame(m:any){
+    	if(m.count < 4){
+    		this.router.navigate(['game',m._id]);
+    	}
+    }
+
 
 	
 }

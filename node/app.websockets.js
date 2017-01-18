@@ -2,7 +2,6 @@
 var io = require('socket.io');
 var mongodb = require('mongodb');
 var app_database_1 = require("./app.database");
-var player_1 = require("./gameEngine/player");
 var WebSocketServer = (function () {
     function WebSocketServer() {
         var _this = this;
@@ -12,111 +11,158 @@ var WebSocketServer = (function () {
             _this.initBoard();
             _this.io = io.listen(server);
             _this.io.sockets.on('connection', function (client) {
-                /*
-                client.emit('players', Date.now() + ': Welcome to battleship');
-                client.broadcast.emit('players', Date.now() + ': A new player has arrived');
-                client.on('chat', (data) => this.io.emit('chat', data));
-                console.log("login");
-                //Extra Exercise
-                client.emit('aboard', this.aboard);
-                client.emit('dboard', this.dboard);
-    
-                client.on('clickElement%dboard', (indexElement) => {
-                    this.dboard[indexElement]++;
-                    if (this.dboard[indexElement] > 2) {
-                        this.dboard[indexElement] = 0;
-                    }
-                    this.notifyAll('dboard', this.dboard);
-                });
-                client.on('clickElement%aboard', (indexElement) => {
-                    this.aboard[indexElement]++;
-                    if (this.aboard[indexElement] > 2) {
-                        this.aboard[indexElement] = 0;
-                    }
-                    this.notifyAll('aboard', this.aboard);
-                });
-                */
-                client.on('initLobby', function (msgData) {
+                client.on('exitLobby', function (msgData) {
                     var _this = this;
-                    //check if game exists 
-                    console.log(msgData);
                     var gameID = new mongodb.ObjectID(msgData._id);
+                    var player_id = msgData.player._id;
+                    var i = 0;
                     app_database_1.databaseConnection.db.collection('games')
                         .findOne({
                         _id: gameID
                     })
                         .then(function (game) {
                         if (game !== null) {
-                            // console.log(game);
-                            if (game.state === 'pending') {
-                                console.log('pending');
-                                _this.join(msgData._id);
-                                if (msgData.msg == "Joinning") {
-                                    console.log('joining');
-                                    console.log(game.owner == new mongodb.ObjectID(msgData.player._id));
-                                    console.log(game.owner == msgData.player._id);
-                                    if (game.owner == msgData.player._id) {
-                                        console.log('owner');
-                                        var player = new player_1.Player(player_1.PlayerClass.owner, msgData.player.avatar, msgData.player.username, msgData.player._id);
-                                        console.log(player);
-                                        _this.emit('initLobby', player);
-                                    }
-                                    else {
-                                        if (game.second !== null) {
-                                            var player = new player_1.Player(player_1.PlayerClass.two, msgData.player.avatar, msgData.player.username, msgData.player._id);
-                                            game.second = new mongodb.ObjectID(msgData.player._id);
-                                            delete game._id;
-                                            app_database_1.databaseConnection.db.collection('games')
-                                                .updateOne({
-                                                _id: gameID
-                                            }, {
-                                                $set: game
-                                            })
-                                                .then(function (result) { return _this.emit('initLobby', player); })
-                                                .catch(function (err) { return _this.emit('initLobbyErr', 'Error'); });
-                                        }
-                                        else if (game.third !== null) {
-                                            var player = new player_1.Player(player_1.PlayerClass.three, msgData.player.avatar, msgData.player.username, msgData.player._id);
-                                            game.third = new mongodb.ObjectID(msgData.player._id);
-                                            delete game._id;
-                                            app_database_1.databaseConnection.db.collection('games')
-                                                .updateOne({
-                                                _id: gameID
-                                            }, {
-                                                $set: game
-                                            })
-                                                .then(function (result) { return _this.emit('initLobby', player); })
-                                                .catch(function (err) { return _this.emit('initLobbyErr', 'Error'); });
-                                        }
-                                        else if (game.fourth !== null) {
-                                            var player = new player_1.Player(player_1.PlayerClass.four, msgData.player.avatar, msgData.player.username, msgData.player._id);
-                                            game.second = new mongodb.ObjectID(msgData.player._id);
-                                            delete game._id;
-                                            app_database_1.databaseConnection.db.collection('games')
-                                                .updateOne({
-                                                _id: gameID
-                                            }, {
-                                                $set: game
-                                            })
-                                                .then(function (result) { return _this.emit('initLobby', player); })
-                                                .catch(function (err) { return _this.emit('initLobbyErr', 'Error'); });
-                                        }
+                            _this.join(msgData._id);
+                            if (game.owner == msgData.player._id) {
+                                game.state = 'terminated';
+                                delete game._id;
+                                app_database_1.databaseConnection.db.collection('games')
+                                    .updateOne({
+                                    _id: gameID
+                                }, {
+                                    $set: game
+                                })
+                                    .then(function (result) { _this.emit('exitLobby', { status: 'terminated' }); _this.to(msgData._id).emit('exitLobby', { status: 'terminated' }); })
+                                    .catch(function (err) { return _this.emit('initLobbyErr', 'Error'); });
+                            }
+                            else {
+                                for (i = 0; i < 2; ++i) {
+                                    if (game.team1[i].id == player_id) {
+                                        game.team1[i].id = null;
                                     }
                                 }
+                                ;
+                                for (i = 0; i < 2; ++i) {
+                                    if (game.team2[i].id == player_id) {
+                                        game.team2[i].id = null;
+                                    }
+                                }
+                                ;
+                                delete game._id;
+                                app_database_1.databaseConnection.db.collection('games')
+                                    .updateOne({
+                                    _id: gameID
+                                }, {
+                                    $set: game
+                                })
+                                    .then(function (result) {
+                                    app_database_1.databaseConnection.db.collection('players')
+                                        .find({ $or: [{ _id: new mongodb.ObjectID(game.team1[0].id) }, { _id: new mongodb.ObjectID(game.team1[1].id) }] })
+                                        .toArray()
+                                        .then(function (team1u) {
+                                        app_database_1.databaseConnection.db.collection('players')
+                                            .find({ $or: [{ _id: new mongodb.ObjectID(game.team2[0].id) }, { _id: new mongodb.ObjectID(game.team2[1].id) }] })
+                                            .toArray()
+                                            .then(function (team2u) {
+                                            var team1p = [];
+                                            var team2p = [];
+                                            for (var j = 0; j < team1u.length; ++j) {
+                                                team1p.push({ id: team1u[j]._id, username: team1u[j].username, avatar: team1u[j].avatar });
+                                            }
+                                            for (var k = 0; k < team2u.length; ++k) {
+                                                team2p.push({ id: team2u[k]._id, username: team2u[k].username, avatar: team2u[k].avatar });
+                                            }
+                                            _this.emit('initLobby', { team1: team1p, team2: team2p });
+                                            _this.to(msgData._id).emit('initLobby', { team1: team1p, team2: team2p });
+                                        }).catch(function (err) { return _this.emit('initLobbyErr', console.log(err)); });
+                                    }).catch(function (err) { return _this.emit('initLobbyErr', 'error team 1'); });
+                                })
+                                    .catch(function (err) { return _this.emit('initLobbyErr', 'Error'); });
                             }
                         }
                     }).catch(function (err) { return _this.emit('initLobbyErr', 'Error'); });
-                    //if msg == joinning
-                    //if is owner 
-                    //emit owner player
-                    //else check available position and join
-                    //add to db
-                    //if is full 
-                    //emit player then statr the game
-                    //else
-                    //emit player
-                    //if msg == change team
-                    //do team code
+                });
+                client.on('initLobby', function (msgData) {
+                    var _this = this;
+                    var player_id = msgData.player._id;
+                    var i = 0;
+                    console.log('joing');
+                    app_database_1.databaseConnection.db.collection('games')
+                        .findOne({
+                        _id: new mongodb.ObjectID(msgData._id)
+                    })
+                        .then(function (game) {
+                        if (game !== null) {
+                            if (game.state === 'pending') {
+                                _this.join(msgData._id);
+                                console.log('pending');
+                                if (msgData.msg == "Joinning") {
+                                    console.log('Joinning');
+                                    var ableToJoin = true;
+                                    for (i = 0; i < 2; ++i) {
+                                        if (game.team1[i].id == player_id) {
+                                            ableToJoin = false;
+                                        }
+                                    }
+                                    ;
+                                    for (i = 0; i < 2; ++i) {
+                                        if (game.team2[i].id == player_id) {
+                                            ableToJoin = false;
+                                        }
+                                    }
+                                    ;
+                                    console.log(ableToJoin);
+                                    if (ableToJoin) {
+                                        var isSet = false;
+                                        for (i = 0; i < 2; ++i) {
+                                            if (game.team1[i].id == null) {
+                                                game.team1[i].id = player_id;
+                                                i = 2;
+                                                isSet = true;
+                                            }
+                                        }
+                                        ;
+                                        for (i = 0; i < 2; ++i) {
+                                            if (game.team2[i].id == null && !isSet) {
+                                                game.team2[i].id = player_id;
+                                                i = 2;
+                                            }
+                                        }
+                                        ;
+                                    }
+                                    delete game._id;
+                                    app_database_1.databaseConnection.db.collection('games')
+                                        .updateOne({
+                                        _id: new mongodb.ObjectID(msgData._id)
+                                    }, {
+                                        $set: game
+                                    })
+                                        .then(function (result) {
+                                        app_database_1.databaseConnection.db.collection('players')
+                                            .find({ $or: [{ _id: new mongodb.ObjectID(game.team1[0].id) }, { _id: new mongodb.ObjectID(game.team1[1].id) }] })
+                                            .toArray()
+                                            .then(function (team1u) {
+                                            app_database_1.databaseConnection.db.collection('players')
+                                                .find({ $or: [{ _id: new mongodb.ObjectID(game.team2[0].id) }, { _id: new mongodb.ObjectID(game.team2[1].id) }] })
+                                                .toArray()
+                                                .then(function (team2u) {
+                                                var team1p = [];
+                                                var team2p = [];
+                                                for (var j = 0; j < team1u.length; ++j) {
+                                                    team1p.push({ id: team1u[j]._id, username: team1u[j].username, avatar: team1u[j].avatar });
+                                                }
+                                                for (var k = 0; k < team2u.length; ++k) {
+                                                    team2p.push({ id: team2u[k]._id, username: team2u[k].username, avatar: team2u[k].avatar });
+                                                }
+                                                _this.emit('initLobby', { team1: team1p, team2: team2p });
+                                                _this.to(msgData._id).emit('initLobby', { team1: team1p, team2: team2p });
+                                            }).catch(function (err) { return _this.emit('initLobbyErr', console.log(err)); });
+                                        }).catch(function (err) { return _this.emit('initLobbyErr', 'error team 1'); });
+                                    }).catch(function (err) { return _this.emit('initLobbyErr', 'error update game'); });
+                                }
+                            }
+                        }
+                    }).catch(function (err) { return _this.emit('initLobbyErr', err); });
                 });
             });
         };
@@ -133,4 +179,3 @@ var WebSocketServer = (function () {
     return WebSocketServer;
 }());
 exports.WebSocketServer = WebSocketServer;
-;

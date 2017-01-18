@@ -28,9 +28,23 @@ export class Game {
 
     public getGames = (request: any, response: any, next: any) => {
         database.db.collection('games')
-        .find( state: 'pending')
+        .find({state: 'pending'})
         .toArray()
         .then(games => {
+            for (var i = 0; i < games.length; ++i) {
+                 var count = 0;
+                for (var j = 0; j < games[i].team1.length; ++j) {
+                    if(games[i].team1[j].id != null){
+                        count++;
+                    }
+                }
+                for (var k = 0; k < games[i].team1.length; ++k) {
+                    if(games[i].team2[k].id != null){
+                        count++;
+                    }
+                }
+                games[i].count = count;
+            }
             response.json(games || []);
             next();
         })
@@ -100,19 +114,21 @@ export class Game {
         }).then(player => {
             if (player !== null && player.id === gameInfo.player.id) {
                 var game = {
+                    ownername: '',
                     owner : null,
-                    second : null,
-                    third : null,
-                    fourth : null,
+                    team1 : [{id : null},{id : null}],
+                    team2 : [{id : null},{id : null}],
                     state : null,
-                    creationDate: null,
+                    count : 0,
+                    creationDate : null,
                     pack : {}
                 };
-
+                game.ownername = player.username;
                 game.pack = this.createCards();
                 game.owner = new mongodb.ObjectID(player._id);
                 game.state = gameInfo.state;
                 game.creationDate = gameInfo.creationDate;
+                game.count = 1;
                 
                 database.db.collection('games')
                 .insertOne(game)
