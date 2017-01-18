@@ -18,7 +18,8 @@ var aboard_component_1 = require("./game/aboard.component");
 var dboard_component_1 = require("./game/dboard.component");
 var menu_component_1 = require("./menu/menu.component");
 var dashboard_component_1 = require("./menu/dashboard.component");
-var top10_component_1 = require("./menu/top10.component");
+var top10Star_component_1 = require("./menu/top10Star.component");
+var top10Point_component_1 = require("./menu/top10Point.component");
 var login_component_1 = require("./auth/login.component");
 var register_component_1 = require("./auth/register.component");
 var user_service_1 = require("./auth/user.service");
@@ -64,12 +65,16 @@ AppModule = __decorate([
                     component: gameLobby_component_1.GameLobbyComponent
                 },
                 {
-                    path: 'top10',
-                    component: top10_component_1.Top10Component
+                    path: 'top10Stars',
+                    component: top10Star_component_1.Top10StarComponent
+                },
+                {
+                    path: 'top10Points',
+                    component: top10Point_component_1.Top10PointComponent
                 }
             ])
         ],
-        declarations: [app_component_1.AppComponent, top10_component_1.Top10Component, newGame_component_1.NewGameComponent, gameLobby_component_1.GameLobbyComponent, login_component_1.LoginComponent, register_component_1.RegisterComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
+        declarations: [app_component_1.AppComponent, top10Star_component_1.Top10StarComponent, top10Point_component_1.Top10PointComponent, newGame_component_1.NewGameComponent, gameLobby_component_1.GameLobbyComponent, login_component_1.LoginComponent, register_component_1.RegisterComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
         providers: [websocket_service_1.WebSocketService, user_service_1.UserService, game_service_1.GameService],
         bootstrap: [app_component_1.AppComponent]
     })

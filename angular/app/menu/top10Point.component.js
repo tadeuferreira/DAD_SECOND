@@ -11,37 +11,37 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require("@angular/core");
 var router_1 = require("@angular/router");
 var http_1 = require("@angular/http");
-var Top10Component = (function () {
-    function Top10Component(http, router) {
+var Top10PointComponent = (function () {
+    function Top10PointComponent(http, router) {
         this.http = http;
         this.router = router;
-        this.arrayTop10 = [];
-        this.getTop10();
+        this.arrayTop10Point = [];
+        this.getTop10Point();
     }
-    Top10Component.prototype.getTop10 = function () {
+    Top10PointComponent.prototype.getTop10Point = function () {
         var _this = this;
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/json');
-        this.http.get('http://localhost:7777/api/v1/top10', { headers: headers, withCredentials: false })
+        this.http.get('http://localhost:7777/api/v1/top10Points', { headers: headers, withCredentials: false })
             .subscribe(function (response) {
             if (response.ok) {
-                _this.arrayTop10 = response.json();
+                _this.arrayTop10Point = response.json();
                 // console.log(response.json);
-                console.log(_this.arrayTop10);
+                console.log(_this.arrayTop10Point);
             }
         }, function (error) {
             console.log(error.text());
         });
     };
-    return Top10Component;
+    return Top10PointComponent;
 }());
-Top10Component = __decorate([
+Top10PointComponent = __decorate([
     core_1.Component({
         moduleId: module.id,
-        selector: 'top10',
-        templateUrl: 'top10.component.html'
+        selector: 'top10Point',
+        templateUrl: 'top10Point.component.html'
     }),
     __metadata("design:paramtypes", [http_1.Http, router_1.Router])
-], Top10Component);
-exports.Top10Component = Top10Component;
-//# sourceMappingURL=top10.component.js.map
+], Top10PointComponent);
+exports.Top10PointComponent = Top10PointComponent;
+//# sourceMappingURL=top10Point.component.js.map

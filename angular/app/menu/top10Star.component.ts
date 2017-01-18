@@ -4,27 +4,27 @@ import { Http, Response, Headers, RequestOptions, RequestOptionsArgs } from '@an
 
 @Component({
     moduleId: module.id,
-    selector: 'top10',
-    templateUrl: 'top10.component.html'
+    selector: 'top10Star',
+    templateUrl: 'top10Star.component.html'
 })
-export class Top10Component {
-    public arrayTop10: any[] = [];
+export class Top10StarComponent {
+    public arrayTop10Star: any[] = [];
 
     constructor(private http: Http, private router: Router) {
-        this.getTop10();
+        this.getTop10Star();
     }
 
-    getTop10(){
+    getTop10Star(){
          let headers = new Headers();
         headers.append('Content-Type', 'application/json');
 
-        this.http.get('http://localhost:7777/api/v1/top10', <RequestOptionsArgs>{ headers: headers, withCredentials: false })
+        this.http.get('http://localhost:7777/api/v1/top10Stars', <RequestOptionsArgs>{ headers: headers, withCredentials: false })
         .subscribe(
       response => {
         if(response.ok){
-          this.arrayTop10 = response.json();
+          this.arrayTop10Star = response.json();
          // console.log(response.json);
-          console.log(this.arrayTop10);
+          console.log(this.arrayTop10Star);
         }
       },
       error => {

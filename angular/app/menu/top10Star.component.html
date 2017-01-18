@@ -1,0 +1,15 @@
+<div class="col-md-6 col-md-offset-3">
+    <h2>Top 10 Stars <button class="btn btn-primary" (click)="getTop10Star()"> Refresh </button></h2>
+    
+    <table>
+        <tr>
+
+            <th>Name</th>
+            <th>Number of Stars</th>
+        </tr>
+        <tr *ngFor="let m of arrayTop10Star">
+            <td>{{m.name}}</td>
+            <td>{{m.totalEstrelas}}</td>
+        </tr>
+    </table>
+</div>

@@ -127,15 +127,29 @@ export class Player {
         .catch(err => this.handleError(err, response, next));
     }
     
-    public getTop10 = (request: any, response: any, next: any) => {
+    public getTop10Star = (request: any, response: any, next: any) => {
         database.db.collection('players')
-        .find()
-        .sort({totalVictories:-1})
+        .find({ totalEstrelas: { $exists: true } })
+        .sort({totalEstrelas:-1})
         .limit(10)
         .toArray()
         .then(players => {
             response.json(players || []);
-            this.settings.wsServer.notifyAll('players', Date.now() + ': Somebody accessed top 10');
+            this.settings.wsServer.notifyAll('players', Date.now() + ': Somebody accessed top 10 Star');
+            next();
+        })
+        .catch(err => this.handleError(err, response, next));
+    }
+
+    public getTop10Point = (request: any, response: any, next: any) => {
+        database.db.collection('players')
+        .find({ totalPontos: { $exists: true } })
+        .sort({totalPontos:-1})
+        .limit(10)
+        .toArray()
+        .then(players => {
+            response.json(players || []);
+            this.settings.wsServer.notifyAll('players', Date.now() + ': Somebody accessed top 10 Point');
             next();
         })
         .catch(err => this.handleError(err, response, next));
@@ -144,7 +158,8 @@ export class Player {
     // Routes for the games
     public init = (server: any, settings: HandlerSettings) => {
         this.settings = settings;
-        server.get(settings.prefix + 'top10', this.getTop10);
+        server.get(settings.prefix + 'top10Stars', this.getTop10Star);
+        server.get(settings.prefix + 'top10Points', this.getTop10Point);
         server.get(settings.prefix + 'players', settings.security.authorize, this.getPlayers);
         server.get(settings.prefix + 'players/:id', settings.security.authorize, this.getPlayer);
         server.put(settings.prefix + 'players/:id', settings.security.authorize, this.updatePlayer);
