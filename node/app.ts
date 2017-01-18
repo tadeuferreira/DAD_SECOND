@@ -20,7 +20,7 @@ restifyServer.use(restify.CORS());
 restifyServer.use(restify.fullResponse());
 
 restifyServer.opts(/.*/, function (req,res,next) {
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
     res.header("Access-Control-Allow-Methods", req.header("Access-Control-Request-Method"));
     res.header("Access-Control-Allow-Headers", req.header("Access-Control-Request-Headers"));
     res.send(200);

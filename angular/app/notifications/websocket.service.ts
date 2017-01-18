@@ -42,7 +42,6 @@ export class WebSocketService {
         return this.listenOnChannel('initLobby');
     }
     sendInitLobby(msgData: any){
-        console.log(msgData);
         this.socket.emit('initLobby', msgData);
     }
     sendExitLobby(msgData: any){

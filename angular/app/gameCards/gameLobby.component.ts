@@ -5,48 +5,109 @@ import { GameService } from '../gameCards/game.service';
 import { WebSocketService } from '../notifications/websocket.service';
 
 @Component({
-    moduleId: module.id,
-    selector: 'gamelobby',
-    templateUrl:'gameLobby.component.html'
+	moduleId: module.id,
+	selector: 'gamelobby',
+	templateUrl:'gameLobby.component.html'
 
 })
 export class GameLobbyComponent implements OnInit, OnDestroy{
-	id: string;
+	id_game: string;
 	private sub: any;
 	private players: string[] = [];
 	public team1: string[] = [];
 	public team2: string[] = [];
 	constructor(private websocketService: WebSocketService, private activatedRoute: ActivatedRoute, private gameService: GameService ,private userService: UserService, private router: Router) {}
 
-	 ngOnInit() {
-	 	if(!this.userService.isLoggedIn()){
+	ngOnInit() {
+		if(!this.userService.isLoggedIn()){
 			this.router.navigate(['login']);
 		}else{
-			 this.sub = this.activatedRoute.params.subscribe(params => {
-                this.id = params['id'];
-            });
+			this.sub = this.activatedRoute.params.subscribe(params => {
+				this.id_game = params['id'];
+			});
+			console.log(this.id_game);
+			this.gameService.joinGame(this.id_game).subscribe(response => {
+				console.log(response);
+				if (response.ok) {
+					switch (response._body) {
+						case '"joined"':
+						console.log('joined');
+						this.websocketService.getInitLobby().subscribe((p: any) => 
+						{
+							if(p.msg == 'refresh'){
+								this.gameService.getPlayersGame(this.id_game).subscribe(response => {
+									this.setPlayers(response);
+								}, error => {
+									console.log(error);
+								}
+								);
+							}
+						});
+						console.log('joinning sent');
+						this.websocketService.sendInitLobby({_id: this.id_game, msg: 'joining'});
+						break;
+						
+						case '"already In"':
+						this.websocketService.getInitLobby().subscribe((p: any) => 
+							{
+							if(p.msg == 'refresh'){
+								this.gameService.getPlayersGame(this.id_game).subscribe(response => {
+									this.setPlayers(response);
+								}, error => {
+									console.log(error);
+								}
+								);
+							}
+						});
+						this.websocketService.sendInitLobby({_id: this.id_game, msg: 'already In'});
+						break;
+					}
+					this.websocketService.getExitLobby().subscribe((p: any) => { 	
 
-			 console.log(this.id);
-			 this.websocketService.getInitLobbyErr().subscribe((p: any) => console.log(p));
-			 this.websocketService.getInitLobby().subscribe((p: any) => this.setPlayers(p));
-			 this.websocketService.getExitLobby().subscribe((p: any) => { 	
-			 	if(p.status == 'terminated'){
-			 		this.router.navigate(['dashboard']);
-			 	}
-			 });
-			 this.websocketService.sendInitLobby({_id: this.id, msg: 'Joinning', player:{ _id: sessionStorage.getItem('id') ,username: sessionStorage.getItem('username'), avatar: sessionStorage.getItem('avatar')}});
+							if(p.msg == 'terminated'){
+								this.router.navigate(['dashboard']);
+							}});
+
+				}else{
+					this.router.navigate(['dashboard']);
+				}
+			}, error => {
+				console.log(error);
+			});
 		}	
-    }
+	}
 
-    ngOnDestroy() {
-    	this.websocketService.sendExitLobby({_id: this.id, player:{ _id: sessionStorage.getItem('id') ,username: sessionStorage.getItem('username'), avatar: sessionStorage.getItem('avatar')}});
-    }
+	ngOnDestroy() {
+		console.log('leaving');
+		this.gameService.leaveGame(this.id_game).subscribe(response => {
+				console.log(response);
+				if (response.ok) {
+					switch (response._body) {
+						case '"terminated"':
+						console.log('terminated');
+							this.websocketService.sendExitLobby({_id: this.id_game, msg: 'terminated'});
+							break;
+						
+						case '"left"':
+						console.log('left');
+							this.websocketService.sendExitLobby({_id: this.id_game, msg: 'left'});
+							break;
+					}
+					
+				}
+			}, error => {
+				console.log(error);
+			}
+			);
+
+	}
 
 
-    setPlayers(p:string[]){
-    	this.team1 = p.team1;
-    	this.team2 = p.team2;
-    	console.log(p);
-    }
-	
+	setPlayers(response: any){
+		var json = JSON.parse(response._body);
+		this.team1 = json.team1;
+		this.team2 = json.team2;
+		console.log(json);
+	}
+
 }

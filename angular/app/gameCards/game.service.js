@@ -43,6 +43,26 @@ var GameService = (function () {
         headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
         return this.http.get('http://localhost:7777/api/v1/games', { headers: headers, withCredentials: false });
     };
+    GameService.prototype.joinGame = function (id) {
+        var body = JSON.stringify({ _id: id, player_id: sessionStorage.getItem('id') });
+        var headers = new http_1.Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
+        return this.http.post('http://localhost:7777/api/v1/games/join', body, { headers: headers, withCredentials: false });
+    };
+    GameService.prototype.getPlayersGame = function (id_game) {
+        var headers = new http_1.Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
+        return this.http.get('http://localhost:7777/api/v1/games/players/' + id_game, { headers: headers, withCredentials: false });
+    };
+    GameService.prototype.leaveGame = function (id) {
+        var body = JSON.stringify({ _id: id, player_id: sessionStorage.getItem('id') });
+        var headers = new http_1.Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
+        return this.http.post('http://localhost:7777/api/v1/games/leave', body, { headers: headers, withCredentials: false });
+    };
     return GameService;
 }());
 GameService = __decorate([
