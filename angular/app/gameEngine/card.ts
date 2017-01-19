@@ -1,4 +1,4 @@
-
+import { GamePlayer } from './gamePlayer';
 export enum TypeCard {
     Hidden,
     Two,//0
@@ -26,8 +26,16 @@ export class Card{
 
 	public type : TypeCard;
 	public suit: Suit;
+  public isOnHand: boolean;
+  public isUsed: boolean;
+  public playerOwner: GamePlayer;
+  public isFirstTrump: boolean;
 
-	public constructor (type: number, suit: number){
+	public constructor (type: number, suit: number, isOnHand: boolean, isUsed: boolean, playerOwner: GamePlayer, isFirstTrump: boolean){
+       this.isOnHand = isOnHand;
+       this.isUsed = isUsed;
+       this.playerOwner = playerOwner;
+       this.isFirstTrump = isFirstTrump;
        switch (type) {
        	case 0: this.type = TypeCard.Two;
        	break;
@@ -64,7 +72,5 @@ export class Card{
        	default: this.suit = Suit.Hidden;
        	break;
        }
-
-
     }
 }

@@ -42,7 +42,7 @@ export class GameService {
 	}
 
 	joinGame(): Promise<any>{
-		let body = JSON.stringify({_id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id')});
+		let body = JSON.stringify({_id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id'),player_avatar : sessionStorage.getItem('avatar')  ,player_username : sessionStorage.getItem('username') });
 		
 		let headers = new Headers();
 		headers.append('Content-Type', 'application/json');

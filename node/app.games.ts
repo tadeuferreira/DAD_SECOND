@@ -19,6 +19,7 @@ export class Game {
             if (game === null) {
                 response.send(404, 'Game not found');
             } else {
+                console.log(game);
                 response.json(game);
             }
             next();
@@ -31,20 +32,6 @@ export class Game {
         .find({state: 'pending'})
         .toArray()
         .then(games => {
-            for (var i = 0; i < games.length; ++i) {
-                var count = 0;
-                for (var j = 0; j < games[i].team1.length; ++j) {
-                    if(games[i].team1[j].id != null){
-                        count++;
-                    }
-                }
-                for (var k = 0; k < games[i].team1.length; ++k) {
-                    if(games[i].team2[k].id != null){
-                        count++;
-                    }
-                }
-                games[i].count = count;
-            }
             response.json(games || []);
             next();
         })
@@ -105,9 +92,10 @@ export class Game {
                 var game = {
                     ownername: '',
                     owner : null,
-                    team1 : [{id : null},{id : null}],
-                    team2 : [{id : null},{id : null}],
+                    team1 : [{id : null, avatar: null, username: null},{id : null, avatar: null, username: null}],
+                    team2 : [{id : null, avatar: null, username: null},{id : null, avatar: null, username: null}],
                     state : null,
+                    first : null,
                     count : 0,
                     creationDate : null,
                     pack : {}
@@ -117,7 +105,6 @@ export class Game {
                 game.owner = player._id.toString();
                 game.state = gameInfo.state;
                 game.creationDate = gameInfo.creationDate;
-                game.count = 1;
                 
                 database.db.collection('games')
                 .insertOne(game)
@@ -157,21 +144,30 @@ export class Game {
                     for(i = 0; i < 2; i++){
                         if(game.team1[i].id == null){
                             game.team1[i].id = info.player_id;
+                            game.team1[i].avatar = info.player_avatar;
+                            game.team1[i].username = info.player_username;
                             break;
                         }
                         if(game.team2[i].id == null){
                             game.team2[i].id = info.player_id;
+                            game.team2[i].avatar = info.player_avatar;
+                            game.team2[i].username = info.player_username;
                             break;
                         }
                     }
-                    var isFull = true;
-                        for (var u = 0; u < 2; ++u) {
-                            if(game.team1[u].id == null || game.team2[u].id == null)
-                                isFull = false;
-                    }
-                    
-                    if(isFull){
+                    game.count++;           
+                    if(game.count == 4){
                         game.state = 'in Progress';
+
+                        var team = this.getRandomInt(1,2);  
+                        var pos = this.getRandomInt(0,1);
+                        //selects the first player to play;
+                        if(team == 1){
+                            game.first = game.team1[pos].id;
+                        }else if(team == 2){
+                            game.first = game.team2[pos].id;
+                        }  
+
                     }
 
 
@@ -184,8 +180,8 @@ export class Game {
                         $set: game
                     })
                     .then(result => {
-                        
-                        if(isFull){
+
+                        if(game.count == 4){
                             response.send(200, 'start');
                             return next(); 
                         }else{
@@ -405,13 +401,13 @@ export class Game {
 
     private createCards() {
         var pack = {
-            trump : 0,
+            suitTrump: -1,
             cards : {}
         };
         var cards = [];
         for (var i = 0; i < 4; ++i) {
             for (var j = 0; j < 10; ++j) {
-                cards.push({type:j , suit: i , isOnHand: false, isUsed: false, playerOwner: null});
+                cards.push({type:j , suit: i , isOnHand: false, isUsed: false, playerOwner: null, isTrump: false});
             }
         }
         cards = this.shuffleArray(cards);
@@ -420,12 +416,15 @@ export class Game {
     }
 
     private shuffleArray(array) {
-    for (var i = array.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+        return array;
     }
-    return array;
-}
+    private getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 }

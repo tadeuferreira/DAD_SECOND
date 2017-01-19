@@ -45,7 +45,7 @@ var GameService = (function () {
         return this.http.get('http://localhost:7777/api/v1/games', { headers: headers, withCredentials: false });
     };
     GameService.prototype.joinGame = function () {
-        var body = JSON.stringify({ _id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id') });
+        var body = JSON.stringify({ _id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id'), player_avatar: sessionStorage.getItem('avatar'), player_username: sessionStorage.getItem('username') });
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));

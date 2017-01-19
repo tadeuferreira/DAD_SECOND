@@ -22,7 +22,11 @@ var Suit;
     Suit[Suit["Diamonds"] = 4] = "Diamonds";
 })(Suit = exports.Suit || (exports.Suit = {}));
 var Card = (function () {
-    function Card(type, suit) {
+    function Card(type, suit, isOnHand, isUsed, playerOwner, isFirstTrump) {
+        this.isOnHand = isOnHand;
+        this.isUsed = isUsed;
+        this.playerOwner = playerOwner;
+        this.isFirstTrump = isFirstTrump;
         switch (type) {
             case 0:
                 this.type = TypeCard.Two;

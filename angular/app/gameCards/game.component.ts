@@ -26,7 +26,7 @@ export class GameComponent implements OnInit, OnDestroy{
             response => {
             	console.log(response.json());
             	console.log(response.json().pack);
-                //this.game = new Game(response.json());
+                this.game = new Game(response.json());
             },
             error => {
                 console.log(error.text());

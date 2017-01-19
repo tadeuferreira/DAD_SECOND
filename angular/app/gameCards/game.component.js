@@ -13,6 +13,7 @@ var router_1 = require("@angular/router");
 var user_service_1 = require("../auth/user.service");
 var game_service_1 = require("../gameCards/game.service");
 var websocket_service_1 = require("../notifications/websocket.service");
+var game_1 = require("../gameEngine/game");
 var GameComponent = (function () {
     function GameComponent(websocketService, gameService, userService, router) {
         this.websocketService = websocketService;
@@ -21,6 +22,7 @@ var GameComponent = (function () {
         this.router = router;
     }
     GameComponent.prototype.ngOnInit = function () {
+        var _this = this;
         if (!this.userService.isLoggedIn()) {
             this.router.navigate(['login']);
         }
@@ -28,7 +30,7 @@ var GameComponent = (function () {
             this.gameService.getGame().subscribe(function (response) {
                 console.log(response.json());
                 console.log(response.json().pack);
-                //this.game = new Game(response.json());
+                _this.game = new game_1.Game(response.json());
             }, function (error) {
                 console.log(error.text());
             });
