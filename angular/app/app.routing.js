@@ -9,6 +9,7 @@ var register_component_1 = require("./auth/register.component");
 var gameLobby_component_1 = require("./gameCards/gameLobby.component");
 var newGame_component_1 = require("./gameCards/newGame.component");
 var gameSearch_component_1 = require("./gameCards/gameSearch.component");
+var game_component_1 = require("./gameCards/game.component");
 var appRoutes = [
     {
         path: '',
@@ -46,6 +47,10 @@ var appRoutes = [
     {
         path: 'top10Points',
         component: top10Point_component_1.Top10PointComponent
+    },
+    {
+        path: 'game/playing',
+        component: game_component_1.GameComponent
     },
     {
         path: 'home',

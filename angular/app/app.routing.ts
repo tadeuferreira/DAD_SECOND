@@ -13,6 +13,7 @@ import { RegisterComponent } from './auth/register.component';
 import { GameLobbyComponent } from './gameCards/gameLobby.component';
 import { NewGameComponent } from './gameCards/newGame.component';
 import { GameSearchComponent } from './gameCards/gameSearch.component';
+import { GameComponent } from './gameCards/game.component';
 
 const appRoutes: Routes = [
     {
@@ -51,6 +52,10 @@ const appRoutes: Routes = [
     {
         path: 'top10Points',
         component: Top10PointComponent
+    },
+    {
+        path: 'game/playing',
+        component: GameComponent
     },
     {
         path: 'home',

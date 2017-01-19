@@ -30,64 +30,31 @@ import { GameLobbyComponent } from './gameCards/gameLobby.component';
 import { NewGameComponent } from './gameCards/newGame.component';
 import { GameSearchComponent } from './gameCards/gameSearch.component';
 import { GameComponent } from './gameCards/game.component';
-
+import { Routing } from './app.routing';
 
 @NgModule({
-  imports:      [ 
-  BrowserModule, 
-  NotificationModule, 
-  FormsModule,
-  ReactiveFormsModule,
-  RouterModule.forRoot([
-  {
-    path: '',
-    redirectTo: '/home',
-    pathMatch: 'full'
-  },
-  {
-    path: 'dashboard',
-    component: DashboardComponent
-  },
-  {
-    path: 'login',
-    component: LoginComponent
-  },
-  {
-    path: 'register',
-    component: RegisterComponent
-  },
-  {
-    path: 'game/new',
-    component: NewGameComponent
-  },
-  {
-    path: 'game/play',
-    component: GameLobbyComponent
-  },
-  {
-
-    path: 'games',
-    component: GameSearchComponent
-  },
-    {
-       path: 'top10Stars',
-    component: Top10StarComponent
-  },
-  {
-    path: 'top10Points',
-    component: Top10PointComponent
-  },
-  {
-    path: 'home',
-    component: HomeComponent
-  },
-  {
-    path: 'game/playing',
-    component: GameComponent
-  }
-  ])
+  imports: [ BrowserModule, 
+             NotificationModule, 
+             FormsModule,
+             ReactiveFormsModule,
+             Routing
   ],
-  declarations: [ AppComponent, GameComponent, HomeComponent, Top10StarComponent, Top10PointComponent, GameSearchComponent, NewGameComponent, GameLobbyComponent, LoginComponent, RegisterComponent, MenuComponent,ChatComponent, ABoardComponent, DBoardComponent, DashboardComponent ],
+  declarations: [ AppComponent, 
+                  HomeComponent, 
+                  Top10StarComponent, 
+                  Top10PointComponent, 
+                  GameSearchComponent, 
+                  NewGameComponent, 
+                  GameComponent,
+                  GameLobbyComponent, 
+                  LoginComponent, 
+                  RegisterComponent, 
+                  MenuComponent, 
+                  ChatComponent, 
+                  ABoardComponent, 
+                  DBoardComponent, 
+                  DashboardComponent
+  ],
   providers:    [ WebSocketService, UserService, GameService],
   bootstrap:    [ AppComponent ]
 })
