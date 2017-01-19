@@ -1,10 +1,10 @@
 "use strict";
-var table = (function () {
-    function table() {
+var Table = (function () {
+    function Table() {
         this.gameArea = [];
         this.trump = null;
     }
-    return table;
+    return Table;
 }());
-exports.table = table;
+exports.Table = Table;
 //# sourceMappingURL=table.js.map

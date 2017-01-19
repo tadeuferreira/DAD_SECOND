@@ -44,6 +44,10 @@ export class WebSocketServer {
                     this.emit('initLobby', {_id: msgData._id , msg : 'refresh'});
                     this.to(msgData._id).emit('initLobby', {_id: msgData._id , msg : 'refresh'});
                     break;
+                    case 'start':
+                    this.emit('initLobby', {_id: msgData._id , msg : 'startGame'});
+                    this.to(msgData._id).emit('initLobby', {_id: msgData._id , msg : 'startGame'});
+                    break;
                     case 'already In':
                       this.emit('initLobby', {_id: msgData._id , msg : 'refresh'});
                       this.to(msgData._id).emit('initLobby', {_id: msgData._id , msg : 'refresh'});

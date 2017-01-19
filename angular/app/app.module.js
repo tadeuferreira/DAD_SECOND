@@ -31,6 +31,7 @@ var game_service_1 = require("./gameCards/game.service");
 var gameLobby_component_1 = require("./gameCards/gameLobby.component");
 var newGame_component_1 = require("./gameCards/newGame.component");
 var gameSearch_component_1 = require("./gameCards/gameSearch.component");
+var game_component_1 = require("./gameCards/game.component");
 var AppModule = (function () {
     function AppModule() {
     }
@@ -46,7 +47,7 @@ AppModule = __decorate([
             router_1.RouterModule.forRoot([
                 {
                     path: '',
-                    redirectTo: '/dashboard',
+                    redirectTo: '/home',
                     pathMatch: 'full'
                 },
                 {
@@ -84,10 +85,14 @@ AppModule = __decorate([
                 {
                     path: 'home',
                     component: home_component_1.HomeComponent
+                },
+                {
+                    path: 'game/playing',
+                    component: game_component_1.GameComponent
                 }
             ])
         ],
-        declarations: [app_component_1.AppComponent, home_component_1.HomeComponent, top10Star_component_1.Top10StarComponent, top10Point_component_1.Top10PointComponent, gameSearch_component_1.GameSearchComponent, newGame_component_1.NewGameComponent, gameLobby_component_1.GameLobbyComponent, login_component_1.LoginComponent, register_component_1.RegisterComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
+        declarations: [app_component_1.AppComponent, game_component_1.GameComponent, home_component_1.HomeComponent, top10Star_component_1.Top10StarComponent, top10Point_component_1.Top10PointComponent, gameSearch_component_1.GameSearchComponent, newGame_component_1.NewGameComponent, gameLobby_component_1.GameLobbyComponent, login_component_1.LoginComponent, register_component_1.RegisterComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
         providers: [websocket_service_1.WebSocketService, user_service_1.UserService, game_service_1.GameService],
         bootstrap: [app_component_1.AppComponent]
     }),

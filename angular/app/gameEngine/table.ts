@@ -1,7 +1,7 @@
 import {Card} from "./card";
 import {Hand} from "./hand";
 
-export class table{
+export class Table{
 
 	public gameArea: Hand;
 	public trump: Card;

@@ -14,6 +14,7 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 	private players: string[] = [];
 	public team1: string[] = [];
 	public team2: string[] = [];
+	private gameIsStarting = false;
 	constructor(private websocketService: WebSocketService, private gameService: GameService ,private userService: UserService, private router: Router) {}
 
 	ngOnInit() {
@@ -26,7 +27,9 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 						case '"joined"':
 						this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'joining'});
 						break;
-						
+						case '"start"':
+						this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'start'});
+						break;	
 						case '"already In"':
 						this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'already In'});
 						break;
@@ -40,6 +43,11 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 									console.log(error);
 								}
 								);
+							}else if(p.msg == 'startGame'){
+								this.websocketService.unsubLobby();
+								this.gameIsStarting = true;
+								this.router.navigate(['game/playing']);
+
 							}
 						});
 					this.websocketService.getExitLobby().subscribe((p: any) => { 	
@@ -57,8 +65,8 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 	}
 
 	ngOnDestroy() {
-		this.leave();
-
+		if(!this.gameIsStarting)
+			this.leave();
 	}
 
 

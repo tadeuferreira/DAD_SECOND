@@ -29,6 +29,7 @@ import { GameService } from './gameCards/game.service';
 import { GameLobbyComponent } from './gameCards/gameLobby.component';
 import { NewGameComponent } from './gameCards/newGame.component';
 import { GameSearchComponent } from './gameCards/gameSearch.component';
+import { GameComponent } from './gameCards/game.component';
 
 
 @NgModule({
@@ -40,7 +41,7 @@ import { GameSearchComponent } from './gameCards/gameSearch.component';
   RouterModule.forRoot([
   {
     path: '',
-    redirectTo: '/dashboard',
+    redirectTo: '/home',
     pathMatch: 'full'
   },
   {
@@ -75,15 +76,18 @@ import { GameSearchComponent } from './gameCards/gameSearch.component';
   {
     path: 'top10Points',
     component: Top10PointComponent
-  }
-  ,
+  },
   {
     path: 'home',
     component: HomeComponent
+  },
+  {
+    path: 'game/playing',
+    component: GameComponent
   }
   ])
   ],
-  declarations: [ AppComponent,HomeComponent,Top10StarComponent, Top10PointComponent, GameSearchComponent,NewGameComponent, GameLobbyComponent, LoginComponent, RegisterComponent, MenuComponent,ChatComponent, ABoardComponent, DBoardComponent, DashboardComponent ],
+  declarations: [ AppComponent, GameComponent, HomeComponent, Top10StarComponent, Top10PointComponent, GameSearchComponent, NewGameComponent, GameLobbyComponent, LoginComponent, RegisterComponent, MenuComponent,ChatComponent, ABoardComponent, DBoardComponent, DashboardComponent ],
   providers:    [ WebSocketService, UserService, GameService],
   bootstrap:    [ AppComponent ]
 })

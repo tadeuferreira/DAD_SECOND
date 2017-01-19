@@ -154,6 +154,14 @@ var Game = (function () {
                                 break;
                             }
                         }
+                        var isFull = true;
+                        for (var u = 0; u < 2; ++u) {
+                            if (game.team1[u].id == null || game.team2[u].id == null)
+                                isFull = false;
+                        }
+                        if (isFull) {
+                            game.state = 'in Progress';
+                        }
                         var game_id = game._id;
                         delete game._id;
                         app_database_1.databaseConnection.db.collection('games')
@@ -163,8 +171,14 @@ var Game = (function () {
                             $set: game
                         })
                             .then(function (result) {
-                            response.send(200, 'joined');
-                            return next();
+                            if (isFull) {
+                                response.send(200, 'start');
+                                return next();
+                            }
+                            else {
+                                response.send(200, 'joined');
+                                return next();
+                            }
                         })
                             .catch(function (err) { return _this.handleError(err, response, next); });
                     }

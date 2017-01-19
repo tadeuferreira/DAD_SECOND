@@ -1,14 +1,13 @@
 "use strict";
-var gamePlayer_1 = require("./gamePlayer");
 var table_1 = require("./table");
 var Game = (function () {
-    function Game() {
+    function Game(json) {
         this.players = [];
         this.table = new table_1.Table();
-        players.push(new gamePlayer_1.GamePlayer(PlayerType.Me));
-        players.push(new gamePlayer_1.GamePlayer(PlayerType.Friend));
-        players.push(new gamePlayer_1.GamePlayer(PlayerType.Foe1));
-        players.push(new gamePlayer_1.GamePlayer(PlayerType.Foe2));
+        /*this.players.push(new GamePlayer(PlayerType.Me));
+        this.players.push(new GamePlayer(PlayerType.Friend));
+        this.players.push(new GamePlayer(PlayerType.Foe1));
+        this.players.push(new GamePlayer(PlayerType.Foe2));*/
     }
     return Game;
 }());

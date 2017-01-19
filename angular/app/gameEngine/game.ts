@@ -9,12 +9,12 @@ export class Game{
 	public table: Table;
 
 
-	public constructor(){
+	public constructor(json: any){
 	this.players = [];
 	this.table = new Table();
-	players.push(new GamePlayer(PlayerType.Me));
-	players.push(new GamePlayer(PlayerType.Friend));
-	players.push(new GamePlayer(PlayerType.Foe1));
-	players.push(new GamePlayer(PlayerType.Foe2));
+	/*this.players.push(new GamePlayer(PlayerType.Me));
+	this.players.push(new GamePlayer(PlayerType.Friend));
+	this.players.push(new GamePlayer(PlayerType.Foe1));
+	this.players.push(new GamePlayer(PlayerType.Foe2));*/
 	}
 }

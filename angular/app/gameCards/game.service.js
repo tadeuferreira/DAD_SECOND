@@ -72,6 +72,12 @@ var GameService = (function () {
         headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
         return this.http.post('http://localhost:7777/api/v1/games/change', body, { headers: headers, withCredentials: false });
     };
+    GameService.prototype.getGame = function () {
+        var headers = new http_1.Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
+        return this.http.get('http://localhost:7777/api/v1/games/' + sessionStorage.getItem('game_id'), { headers: headers, withCredentials: false });
+    };
     return GameService;
 }());
 GameService = __decorate([

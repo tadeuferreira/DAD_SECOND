@@ -50,6 +50,10 @@ export class WebSocketService {
     getExitLobby(): Observable<any> {
         return this.listenOnChannel('exitLobby');
     }
+    unsubLobby(){
+        this.socket.off('initLobby', null);
+        this.socket.off('exitLobby', null);
+    }
 
     
 

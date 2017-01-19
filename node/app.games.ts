@@ -164,6 +164,17 @@ export class Game {
                             break;
                         }
                     }
+                    var isFull = true;
+                        for (var u = 0; u < 2; ++u) {
+                            if(game.team1[u].id == null || game.team2[u].id == null)
+                                isFull = false;
+                    }
+                    
+                    if(isFull){
+                        game.state = 'in Progress';
+                    }
+
+
                     var game_id = game._id;
                     delete game._id;
                     database.db.collection('games')
@@ -173,8 +184,14 @@ export class Game {
                         $set: game
                     })
                     .then(result => {
-                        response.send(200, 'joined');
-                        return next(); 
+                        
+                        if(isFull){
+                            response.send(200, 'start');
+                            return next(); 
+                        }else{
+                            response.send(200, 'joined');
+                            return next();  
+                        }  
                     })
                     .catch(err => this.handleError(err, response, next));
                 }else if(alreadyIn){
@@ -397,7 +414,18 @@ export class Game {
                 cards.push({type:j , suit: i , isOnHand: false, isUsed: false, playerOwner: null});
             }
         }
+        cards = this.shuffleArray(cards);
         pack.cards = cards;
         return pack;
     }
+
+    private shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
 }

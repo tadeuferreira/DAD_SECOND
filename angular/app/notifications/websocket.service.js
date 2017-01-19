@@ -52,6 +52,10 @@ var WebSocketService = (function () {
     WebSocketService.prototype.getExitLobby = function () {
         return this.listenOnChannel('exitLobby');
     };
+    WebSocketService.prototype.unsubLobby = function () {
+        this.socket.off('initLobby', null);
+        this.socket.off('exitLobby', null);
+    };
     WebSocketService.prototype.listenOnChannel = function (channel) {
         var _this = this;
         return new Observable_1.Observable(function (observer) {

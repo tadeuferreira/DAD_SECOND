@@ -22,6 +22,7 @@ var GameLobbyComponent = (function () {
         this.players = [];
         this.team1 = [];
         this.team2 = [];
+        this.gameIsStarting = false;
     }
     GameLobbyComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -35,6 +36,9 @@ var GameLobbyComponent = (function () {
                         case '"joined"':
                             _this.websocketService.sendInitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'joining' });
                             break;
+                        case '"start"':
+                            _this.websocketService.sendInitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'start' });
+                            break;
                         case '"already In"':
                             _this.websocketService.sendInitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'already In' });
                             break;
@@ -46,6 +50,11 @@ var GameLobbyComponent = (function () {
                             }, function (error) {
                                 console.log(error);
                             });
+                        }
+                        else if (p.msg == 'startGame') {
+                            _this.websocketService.unsubLobby();
+                            _this.gameIsStarting = true;
+                            _this.router.navigate(['game/playing']);
                         }
                     });
                     _this.websocketService.getExitLobby().subscribe(function (p) {
@@ -63,7 +72,8 @@ var GameLobbyComponent = (function () {
         }
     };
     GameLobbyComponent.prototype.ngOnDestroy = function () {
-        this.leave();
+        if (!this.gameIsStarting)
+            this.leave();
     };
     GameLobbyComponent.prototype.setPlayers = function (response) {
         var json = JSON.parse(response._body);
