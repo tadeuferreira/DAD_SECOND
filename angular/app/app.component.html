@@ -1,14 +1,19 @@
-<div class="container">
-	<h1>DAD - Websockets</h1>
-	<hr>
-	<div><span *ngIf="isLoggedIn()">{{getUsername()}}</span>
-		<img  *ngIf="isLoggedIn()" id="demo-image" src="{{getAvatar()}}" style="width: 30px; height: 30px; border-radius: 50%;" alt="demo-image"></div>
-		<nav>
-			<a routerLink="/dashboard">Dashboard</a>
-			<a *ngIf="!isLoggedIn()" routerLink="/login">Login</a>
-			<a  *ngIf="!isLoggedIn()" routerLink="/register">Register</a>
-			<a  *ngIf="isLoggedIn()" (click)="logout()">Logout</a>
-		</nav>
-	<hr>
-		<router-outlet></router-outlet>
-	</div>
+<nav class="navbar navbar-default">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#">Sueca</a>
+		</div>
+		<div id="navbar" class="collapse navbar-collapse">
+			<ul class="nav navbar-nav navbar-left">
+				<li class="active"><a routerLink="/home">Home</a></li>
+				<li class="active"><a routerLink="/dashboard">Dashboard</a></li>
+       </ul>
+       <ul class="nav navbar-nav navbar-right">
+       <li class="active"><a *ngIf="isLoggedIn()" (click)="logout()">Logout</a></li>
+       <span class="navbar-text" *ngIf="isLoggedIn()">{{getUsername()}}   <img src="{{getAvatar()}}" style="width: 18px; height: 18px; border-radius: 50%;" alt="">
+    </span>
+       	<li class="active"><a *ngIf="!isLoggedIn()" routerLink="/login">Login</a></li>
+       	<li class="active"><a  *ngIf="!isLoggedIn()" routerLink="/register">Register</a></li>
+       </ul>
+</div>
+</nav>
+<router-outlet></router-outlet>

@@ -1,8 +1,8 @@
-<h1>Lobby</h1>
-<hr>
+<div class="container">
+<h2>Lobby</h2>
 <h2>Team 1</h2>
 <div *ngFor="let m of team1">
-<span >{{m.username}}</span>
+<span >{{m.username}} </span>
 		<img id="demo-image" src="{{m.avatar}}" style="width: 60px; height: 60px; border-radius: 50%;" alt="demo-image">
 </div>
 <h2>Team 2</h2>
@@ -10,6 +10,6 @@
 <span >{{m.username}}</span>
 		<img id="demo-image" src="{{m.avatar}}" style="width: 60px; height: 60px; border-radius: 50%;" alt="demo-image">
 </div>
+</div>
 
-<div><button  (click)="changeTeam()" type="button" class="btn btn-danger">Change Team</button></div>
-<div><button  (click)="leave()" type="button" class="btn btn-danger">Leave</button></div>
+<div class="container"><button  (click)="changeTeam()" type="button" class="btn btn-danger">Change Team</button><button  (click)="leave()" type="button" class="btn btn-danger">Leave</button></div>

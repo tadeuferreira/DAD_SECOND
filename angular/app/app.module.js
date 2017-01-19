@@ -21,6 +21,7 @@ var aboard_component_1 = require("./game/aboard.component");
 var dboard_component_1 = require("./game/dboard.component");
 var menu_component_1 = require("./menu/menu.component");
 var dashboard_component_1 = require("./menu/dashboard.component");
+var home_component_1 = require("./menu/home.component");
 var top10Star_component_1 = require("./menu/top10Star.component");
 var top10Point_component_1 = require("./menu/top10Point.component");
 var login_component_1 = require("./auth/login.component");
@@ -79,10 +80,14 @@ AppModule = __decorate([
                 {
                     path: 'top10Points',
                     component: top10Point_component_1.Top10PointComponent
+                },
+                {
+                    path: 'home',
+                    component: home_component_1.HomeComponent
                 }
             ])
         ],
-        declarations: [app_component_1.AppComponent, top10Star_component_1.Top10StarComponent, top10Point_component_1.Top10PointComponent, gameSearch_component_1.GameSearchComponent, newGame_component_1.NewGameComponent, gameLobby_component_1.GameLobbyComponent, login_component_1.LoginComponent, register_component_1.RegisterComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
+        declarations: [app_component_1.AppComponent, home_component_1.HomeComponent, top10Star_component_1.Top10StarComponent, top10Point_component_1.Top10PointComponent, gameSearch_component_1.GameSearchComponent, newGame_component_1.NewGameComponent, gameLobby_component_1.GameLobbyComponent, login_component_1.LoginComponent, register_component_1.RegisterComponent, menu_component_1.MenuComponent, chat_component_1.ChatComponent, aboard_component_1.ABoardComponent, dboard_component_1.DBoardComponent, dashboard_component_1.DashboardComponent],
         providers: [websocket_service_1.WebSocketService, user_service_1.UserService, game_service_1.GameService],
         bootstrap: [app_component_1.AppComponent]
     }),

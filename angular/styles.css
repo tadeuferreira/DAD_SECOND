@@ -20,7 +20,7 @@ h1,h2{
   padding-bottom: 5px;
 }
 
-.player>div{
+.player div{
   display: inline-block;
   font-size: 2.5em;
 }
