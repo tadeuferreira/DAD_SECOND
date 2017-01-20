@@ -10,8 +10,36 @@ var WebSocketServer = (function () {
             _this.initBoard();
             _this.io = io.listen(server);
             _this.io.sockets.on('connection', function (client) {
+                //chat 
+                client.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false,
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric" }) + ': Welcome to Sueca (card game) Chat');
+                client.broadcast.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false,
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric" }) + ': A new player has arrived');
+                client.on('chat', function (data) { return _this.io.emit('chat', data); });
+                client.on('chatGame', function (msgData) {
+                    this.join(msgData.game_id);
+                    this.emit('chatGame', new Date().toLocaleTimeString('en-US', { hour12: false,
+                        hour: "numeric",
+                        minute: "numeric",
+                        second: "numeric" }) + ': ' + msgData.username + ': ' + msgData.msg);
+                    this.to(msgData.game_id).emit('chatGame', new Date().toLocaleTimeString('en-US', { hour12: false,
+                        hour: "numeric",
+                        minute: "numeric",
+                        second: "numeric" }) + ': ' + msgData.username + ': ' + msgData.msg);
+                });
+                client.on('gameNotification', function (msgData) {
+                    this.join(msgData.game_id);
+                    this.emit('gameNotification', msgData.username + ': Welcome to game Room ' + msgData.game_id);
+                    this.broadcast.to(msgData.game_id).emit('gameNotification', new Date().toLocaleTimeString('en-US', { hour12: false,
+                        hour: "numeric",
+                        minute: "numeric",
+                        second: "numeric" }) + ': ' + msgData.username + ' has arrived');
+                });
                 client.on('exitLobby', function (msgData) {
-                    console.log(msgData);
                     switch (msgData.msg) {
                         case 'left':
                             this.join(msgData._id);

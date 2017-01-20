@@ -12,7 +12,7 @@ import { Game } from '../gameEngine/game';
 
 })
 export class GameComponent implements OnInit, OnDestroy{
-
+	private game_id: string = sessionStorage.getItem('game_id');
 	game : Game;
 
 	constructor(private websocketService: WebSocketService, private gameService: GameService ,private userService: UserService, private router: Router) {}
@@ -25,7 +25,7 @@ export class GameComponent implements OnInit, OnDestroy{
 			this.gameService.getGame().subscribe(
             response => {
                 this.game = new Game(response.json());
-                this.websocketService.sendGame({_id: sessionStorage.getItem('game_id'), msg: 'ready start'});
+                this.websocketService.sendGame({_id: this.game_id, msg: 'ready start'});
                 this.websocketService.getGame().subscribe((p: any) => { 	
 							if(p.msg == 'yourturn'){
 								this.router.navigate(['dashboard']);
@@ -43,5 +43,9 @@ export class GameComponent implements OnInit, OnDestroy{
 
 	ngOnDestroy(){
 
+	}
+
+	getGameId(){
+		return this.game_id;
 	}
 }

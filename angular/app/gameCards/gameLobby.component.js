@@ -23,6 +23,7 @@ var GameLobbyComponent = (function () {
         this.team1 = [];
         this.team2 = [];
         this.gameIsStarting = false;
+        this.game_id = sessionStorage.getItem('game_id');
     }
     GameLobbyComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -34,13 +35,13 @@ var GameLobbyComponent = (function () {
                 if (response.ok) {
                     switch (response._body) {
                         case '"joined"':
-                            _this.websocketService.sendInitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'joining' });
+                            _this.websocketService.sendInitLobby({ _id: _this.game_id, msg: 'joining' });
                             break;
                         case '"start"':
-                            _this.websocketService.sendInitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'start' });
+                            _this.websocketService.sendInitLobby({ _id: _this.game_id, msg: 'start' });
                             break;
                         case '"already In"':
-                            _this.websocketService.sendInitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'already In' });
+                            _this.websocketService.sendInitLobby({ _id: _this.game_id, msg: 'already In' });
                             break;
                     }
                     _this.websocketService.getInitLobby().subscribe(function (p) {
@@ -79,7 +80,6 @@ var GameLobbyComponent = (function () {
         var json = JSON.parse(response._body);
         this.team1 = json.team1;
         this.team2 = json.team2;
-        console.log(json);
     };
     GameLobbyComponent.prototype.changeTeam = function () {
         var _this = this;
@@ -87,7 +87,7 @@ var GameLobbyComponent = (function () {
             if (response.ok) {
                 switch (response._body) {
                     case '"changed"':
-                        _this.websocketService.sendInitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'changed' });
+                        _this.websocketService.sendInitLobby({ _id: _this.game_id, msg: 'changed' });
                         break;
                     case '"full"':
                         alert('The other team is full');
@@ -104,10 +104,10 @@ var GameLobbyComponent = (function () {
             if (response.ok) {
                 switch (response._body) {
                     case '"terminated"':
-                        _this.websocketService.sendExitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'terminated' });
+                        _this.websocketService.sendExitLobby({ _id: _this.game_id, msg: 'terminated' });
                         break;
                     case '"left"':
-                        _this.websocketService.sendExitLobby({ _id: sessionStorage.getItem('game_id'), msg: 'left' });
+                        _this.websocketService.sendExitLobby({ _id: _this.game_id, msg: 'left' });
                         break;
                 }
                 _this.router.navigate(['dashboard']);
@@ -115,6 +115,9 @@ var GameLobbyComponent = (function () {
         }, function (error) {
             console.log(error);
         });
+    };
+    GameLobbyComponent.prototype.getGameId = function () {
+        return this.game_id;
     };
     return GameLobbyComponent;
 }());

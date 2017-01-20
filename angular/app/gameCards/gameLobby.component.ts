@@ -15,6 +15,8 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 	public team1: string[] = [];
 	public team2: string[] = [];
 	private gameIsStarting = false;
+	private game_id: string = sessionStorage.getItem('game_id');
+
 	constructor(private websocketService: WebSocketService, private gameService: GameService ,private userService: UserService, private router: Router) {}
 
 	ngOnInit() {
@@ -25,13 +27,13 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 				if (response.ok) {
 					switch (response._body) {
 						case '"joined"':
-						this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'joining'});
+						this.websocketService.sendInitLobby({_id: this.game_id, msg: 'joining'});
 						break;
 						case '"start"':
-						this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'start'});
+						this.websocketService.sendInitLobby({_id: this.game_id, msg: 'start'});
 						break;	
 						case '"already In"':
-						this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'already In'});
+						this.websocketService.sendInitLobby({_id: this.game_id, msg: 'already In'});
 						break;
 					}
 					this.websocketService.getInitLobby().subscribe((p: any) => 
@@ -74,7 +76,6 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 		var json = JSON.parse(response._body);
 		this.team1 = json.team1;
 		this.team2 = json.team2;
-		console.log(json);
 	}
 
 	changeTeam(){
@@ -82,7 +83,7 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 				if (response.ok) {
 					switch (response._body) {
 						case '"changed"':
-							this.websocketService.sendInitLobby({_id: sessionStorage.getItem('game_id'), msg: 'changed'});
+							this.websocketService.sendInitLobby({_id: this.game_id, msg: 'changed'});
 							break;					
 						case '"full"':			
 							alert('The other team is full');
@@ -100,11 +101,11 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 				if (response.ok) {
 					switch (response._body) {
 						case '"terminated"':
-							this.websocketService.sendExitLobby({_id: sessionStorage.getItem('game_id'), msg: 'terminated'});
+							this.websocketService.sendExitLobby({_id: this.game_id, msg: 'terminated'});
 							break;
 						
 						case '"left"':
-							this.websocketService.sendExitLobby({_id: sessionStorage.getItem('game_id'), msg: 'left'});
+							this.websocketService.sendExitLobby({_id: this.game_id, msg: 'left'});
 							break;
 					}
 					this.router.navigate(['dashboard']);
@@ -114,6 +115,10 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 				console.log(error);
 			}
 			);
+	}
+
+	getGameId(){
+		return this.game_id;
 	}
 
 }

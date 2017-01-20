@@ -18,17 +18,30 @@ var WebSocketService = (function () {
         }
     }
     WebSocketService.prototype.sendChatMessage = function (message) {
-        this.socket.emit('chat', message);
+        this.socket.emit('chat', new Date().toLocaleTimeString('en-US', { hour12: false,
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric" }) + ': ' + sessionStorage.getItem('username') + ': ' + message);
+    };
+    WebSocketService.prototype.getChatMessages = function () {
+        return this.listenOnChannel('chat');
+    };
+    WebSocketService.prototype.getPlayersMessages = function () {
+        return this.listenOnChannel('players');
+    };
+    WebSocketService.prototype.sendGameChatMessage = function (message) {
+        this.socket.emit('chatGame', message);
+    };
+    WebSocketService.prototype.getGameChatMessages = function () {
+        return this.listenOnChannel('chatGame');
+    };
+    WebSocketService.prototype.sendGamePlayersMessage = function (msgData) {
+        this.socket.emit('gameNotification', msgData);
+    };
+    WebSocketService.prototype.getGamePlayersMessages = function () {
+        return this.listenOnChannel('gameNotification');
     };
     /*
-        getPlayersMessages(): Observable<any> {
-            return this.listenOnChannel('players');
-        }
-    
-        getChatMessages(): Observable<any> {
-            return this.listenOnChannel('chat');
-        }
-    
         // Extra Exercise
         sendClickElementMessage(index: number, board: string) {
             this.socket.emit('clickElement%'+board, index);

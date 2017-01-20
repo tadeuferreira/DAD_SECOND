@@ -4,12 +4,13 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule }   from '@angular/forms';
 import { AppComponent }  from './app.component';
 import { RouterModule } from '@angular/router';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { WebSocketService } from './notifications/websocket.service';
 import { NotificationModule } from './notifications/notifications.module';
 
 import { ChatComponent } from './chat.component';
+import { GameChatComponent } from './gameCards/gameChat.component';
 
 import { ABoardComponent } from './game/aboard.component';
 import { DBoardComponent } from './game/dboard.component';
@@ -50,7 +51,8 @@ import { Routing } from './app.routing';
                   LoginComponent, 
                   RegisterComponent, 
                   MenuComponent, 
-                  ChatComponent, 
+                  ChatComponent,
+                  GameChatComponent, 
                   ABoardComponent, 
                   DBoardComponent, 
                   DashboardComponent

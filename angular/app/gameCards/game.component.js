@@ -20,6 +20,7 @@ var GameComponent = (function () {
         this.gameService = gameService;
         this.userService = userService;
         this.router = router;
+        this.game_id = sessionStorage.getItem('game_id');
     }
     GameComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -29,7 +30,7 @@ var GameComponent = (function () {
         else {
             this.gameService.getGame().subscribe(function (response) {
                 _this.game = new game_1.Game(response.json());
-                _this.websocketService.sendGame({ _id: sessionStorage.getItem('game_id'), msg: 'ready start' });
+                _this.websocketService.sendGame({ _id: _this.game_id, msg: 'ready start' });
                 _this.websocketService.getGame().subscribe(function (p) {
                     if (p.msg == 'yourturn') {
                         _this.router.navigate(['dashboard']);
@@ -41,6 +42,9 @@ var GameComponent = (function () {
         }
     };
     GameComponent.prototype.ngOnDestroy = function () {
+    };
+    GameComponent.prototype.getGameId = function () {
+        return this.game_id;
     };
     return GameComponent;
 }());

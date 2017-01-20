@@ -13,3 +13,9 @@
 </div>
 
 <div class="container"><button  (click)="changeTeam()" type="button" class="btn btn-danger">Change Team</button><button  (click)="leave()" type="button" class="btn btn-danger">Leave</button></div>
+
+
+<div class="container">
+    <gameChat [game_id]="getGameId()"></gameChat>
+</div>
+

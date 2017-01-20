@@ -16,17 +16,34 @@ export class WebSocketService {
     }
 
     sendChatMessage(message: any) {
-        this.socket.emit('chat', message);
+        this.socket.emit('chat', new Date().toLocaleTimeString('en-US', { hour12: false, 
+                                                                          hour: "numeric", 
+                                                                          minute: "numeric",
+                                                                          second: "numeric"}) +': ' +sessionStorage.getItem('username') + ': ' + message);
     }
-/*
-    getPlayersMessages(): Observable<any> {
-        return this.listenOnChannel('players');
-    }
-
     getChatMessages(): Observable<any> {
         return this.listenOnChannel('chat');
     }
+    getPlayersMessages(): Observable<any> {
+        return this.listenOnChannel('players');
+    }
+    
 
+    sendGameChatMessage(message: any) {
+        this.socket.emit('chatGame', message);
+    }
+    getGameChatMessages(): Observable<any> {
+        return this.listenOnChannel('chatGame');
+    }
+    sendGamePlayersMessage(msgData: any) {
+        this.socket.emit('gameNotification', msgData);
+    }
+    getGamePlayersMessages(): Observable<any> {
+        return this.listenOnChannel('gameNotification');
+    }
+
+
+/*
     // Extra Exercise
     sendClickElementMessage(index: number, board: string) {
         this.socket.emit('clickElement%'+board, index);
@@ -35,6 +52,8 @@ export class WebSocketService {
         return this.listenOnChannel(channel);
     }
     */
+
+    
     getInitLobbyErr(): Observable<any> {
         return this.listenOnChannel('initLobbyErr');
     }
