@@ -24,9 +24,14 @@ export class GameComponent implements OnInit, OnDestroy{
 		}else{
 			this.gameService.getGame().subscribe(
             response => {
-            	console.log(response.json());
-            	console.log(response.json().pack);
                 this.game = new Game(response.json());
+                this.websocketService.sendGame({_id: sessionStorage.getItem('game_id'), msg: 'ready start'});
+                this.websocketService.getGame().subscribe((p: any) => { 	
+							if(p.msg == 'yourturn'){
+								this.router.navigate(['dashboard']);
+					}});
+
+
             },
             error => {
                 console.log(error.text());

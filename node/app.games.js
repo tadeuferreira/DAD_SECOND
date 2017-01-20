@@ -87,8 +87,10 @@ var Game = (function () {
                         owner: null,
                         team1: [{ id: null, avatar: null, username: null }, { id: null, avatar: null, username: null }],
                         team2: [{ id: null, avatar: null, username: null }, { id: null, avatar: null, username: null }],
+                        order: [{ id: null }, { id: null }, { id: null }, { id: null }],
                         state: null,
-                        first: null,
+                        renounce1: false,
+                        renounce2: false,
                         count: 0,
                         creationDate: null,
                         pack: {}
@@ -150,13 +152,32 @@ var Game = (function () {
                             game.state = 'in Progress';
                             var team = _this.getRandomInt(1, 2);
                             var pos = _this.getRandomInt(0, 1);
+                            var first_team = -1;
+                            var first_pos = -1;
+                            var first;
                             //selects the first player to play;
                             if (team == 1) {
-                                game.first = game.team1[pos].id;
+                                first = game.team1[pos].id;
                             }
                             else if (team == 2) {
-                                game.first = game.team2[pos].id;
+                                first = game.team2[pos].id;
                             }
+                            for (i = 0; i < 2; ++i) {
+                                if (game.team1[i].id == first) {
+                                    first_team = 1;
+                                    first_pos = i;
+                                }
+                                if (game.team2[i].id == first) {
+                                    first_team = 2;
+                                    first_pos = i;
+                                }
+                            }
+                            var player_list = [];
+                            // third player is first's friend
+                            game.order[0] = (first_team == 1 ? game.team1[first_pos].id : game.team2[first_pos].id);
+                            game.order[1] = (first_team == 1 ? (first_pos == 0 ? game.team2[1].id : game.team2[0].id) : (first_pos == 0 ? game.team1[1].id : game.team1[0].id));
+                            game.order[2] = (first_team == 1 ? (first_pos == 0 ? game.team1[1].id : game.team1[0].id) : (first_pos == 0 ? game.team2[1].id : game.team2[0].id));
+                            game.order[3] = (first_team == 1 ? (first_pos == 0 ? game.team2[0].id : game.team2[1].id) : (first_pos == 0 ? game.team1[0].id : game.team1[1].id));
                         }
                         var game_id = game._id;
                         delete game._id;

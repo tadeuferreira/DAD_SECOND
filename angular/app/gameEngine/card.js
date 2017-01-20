@@ -1,82 +1,74 @@
 "use strict";
 var TypeCard;
 (function (TypeCard) {
-    TypeCard[TypeCard["Hidden"] = 0] = "Hidden";
-    TypeCard[TypeCard["Two"] = 1] = "Two";
-    TypeCard[TypeCard["Three"] = 2] = "Three";
-    TypeCard[TypeCard["Four"] = 3] = "Four";
-    TypeCard[TypeCard["Five"] = 4] = "Five";
-    TypeCard[TypeCard["Six"] = 5] = "Six";
-    TypeCard[TypeCard["Seven"] = 6] = "Seven";
-    TypeCard[TypeCard["Queen"] = 7] = "Queen";
-    TypeCard[TypeCard["Jack"] = 8] = "Jack";
-    TypeCard[TypeCard["King"] = 9] = "King";
-    TypeCard[TypeCard["Ace"] = 10] = "Ace"; //9
+    TypeCard[TypeCard["Two"] = 0] = "Two";
+    TypeCard[TypeCard["Three"] = 1] = "Three";
+    TypeCard[TypeCard["Four"] = 2] = "Four";
+    TypeCard[TypeCard["Five"] = 3] = "Five";
+    TypeCard[TypeCard["Six"] = 4] = "Six";
+    TypeCard[TypeCard["Seven"] = 5] = "Seven";
+    TypeCard[TypeCard["Queen"] = 6] = "Queen";
+    TypeCard[TypeCard["Jack"] = 7] = "Jack";
+    TypeCard[TypeCard["King"] = 8] = "King";
+    TypeCard[TypeCard["Ace"] = 9] = "Ace"; //9
 })(TypeCard = exports.TypeCard || (exports.TypeCard = {}));
-var Suit;
-(function (Suit) {
-    Suit[Suit["Hidden"] = 0] = "Hidden";
-    Suit[Suit["Hearts"] = 1] = "Hearts";
-    Suit[Suit["Spades"] = 2] = "Spades";
-    Suit[Suit["Clubs"] = 3] = "Clubs";
-    Suit[Suit["Diamonds"] = 4] = "Diamonds";
-})(Suit = exports.Suit || (exports.Suit = {}));
+var SuitType;
+(function (SuitType) {
+    SuitType[SuitType["Hearts"] = 0] = "Hearts";
+    SuitType[SuitType["Spades"] = 1] = "Spades";
+    SuitType[SuitType["Clubs"] = 2] = "Clubs";
+    SuitType[SuitType["Diamonds"] = 3] = "Diamonds";
+})(SuitType = exports.SuitType || (exports.SuitType = {}));
 var Card = (function () {
-    function Card(type, suit, isOnHand, isUsed, playerOwner, isFirstTrump) {
+    function Card(type, suit, isOnHand, isUsed, player_id, isFirstTrump) {
         this.isOnHand = isOnHand;
         this.isUsed = isUsed;
-        this.playerOwner = playerOwner;
+        this.player_id = player_id;
         this.isFirstTrump = isFirstTrump;
         switch (type) {
             case 0:
-                this.type = TypeCard.Two;
+                this.ctype = TypeCard.Two;
                 break;
             case 1:
-                this.type = TypeCard.Three;
+                this.ctype = TypeCard.Three;
                 break;
             case 2:
-                this.type = TypeCard.Four;
+                this.ctype = TypeCard.Four;
                 break;
             case 3:
-                this.type = TypeCard.Five;
+                this.ctype = TypeCard.Five;
                 break;
             case 4:
-                this.type = TypeCard.Six;
+                this.ctype = TypeCard.Six;
                 break;
             case 5:
-                this.type = TypeCard.Seven;
+                this.ctype = TypeCard.Seven;
                 break;
             case 6:
-                this.type = TypeCard.Queen;
+                this.ctype = TypeCard.Queen;
                 break;
             case 7:
-                this.type = TypeCard.Jack;
+                this.ctype = TypeCard.Jack;
                 break;
             case 8:
-                this.type = TypeCard.King;
+                this.ctype = TypeCard.King;
                 break;
             case 9:
-                this.type = TypeCard.Ace;
-                break;
-            default:
-                this.type = TypeCard.Hidden;
+                this.ctype = TypeCard.Ace;
                 break;
         }
         switch (suit) {
             case 0:
-                this.suit = Suit.Hearts;
+                this.stype = SuitType.Hearts;
                 break;
             case 1:
-                this.suit = Suit.Spades;
+                this.stype = SuitType.Spades;
                 break;
             case 2:
-                this.suit = Suit.Clubs;
+                this.stype = SuitType.Clubs;
                 break;
             case 3:
-                this.suit = Suit.Diamonds;
-                break;
-            default:
-                this.suit = Suit.Hidden;
+                this.stype = SuitType.Diamonds;
                 break;
         }
     }

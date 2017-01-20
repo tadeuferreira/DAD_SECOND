@@ -94,8 +94,10 @@ export class Game {
                     owner : null,
                     team1 : [{id : null, avatar: null, username: null},{id : null, avatar: null, username: null}],
                     team2 : [{id : null, avatar: null, username: null},{id : null, avatar: null, username: null}],
+                    order : [{id : null},{id : null},{id : null},{id : null}],
                     state : null,
-                    first : null,
+                    renounce1 : false,
+                    renounce2 : false,
                     count : 0,
                     creationDate : null,
                     pack : {}
@@ -161,16 +163,35 @@ export class Game {
 
                         var team = this.getRandomInt(1,2);  
                         var pos = this.getRandomInt(0,1);
+                        var first_team = -1;
+                        var first_pos = -1;
+                        var first;
                         //selects the first player to play;
                         if(team == 1){
-                            game.first = game.team1[pos].id;
+                            first = game.team1[pos].id;
                         }else if(team == 2){
-                            game.first = game.team2[pos].id;
-                        }  
+                            first = game.team2[pos].id;
+                        } 
 
+                        for (i = 0; i < 2; ++i) {
+                            if(game.team1[i].id ==  first){
+                                first_team = 1;
+                                first_pos = i;
+                            }
+                            if(game.team2[i].id ==  first){
+                                first_team = 2;
+                                first_pos = i;
+                            }
+                        }
+
+                        let player_list : any[] = [];
+                        // third player is first's friend
+                        game.order[0] = (first_team == 1 ?  game.team1[first_pos].id :  game.team2[first_pos].id);
+                        game.order[1] = (first_team == 1 ?( first_pos == 0 ? game.team2[1].id : game.team2[0].id) : ( first_pos == 0 ? game.team1[1].id : game.team1[0].id));
+                        game.order[2] = (first_team == 1 ?( first_pos == 0 ? game.team1[1].id : game.team1[0].id) : ( first_pos == 0 ? game.team2[1].id : game.team2[0].id));
+                        game.order[3] = (first_team == 1 ?( first_pos == 0 ? game.team2[0].id : game.team2[1].id) : ( first_pos == 0 ? game.team1[0].id : game.team1[1].id));
                     }
-
-
+                    
                     var game_id = game._id;
                     delete game._id;
                     database.db.collection('games')
@@ -203,68 +224,142 @@ export class Game {
                 return next();
             }
         }).catch(err => this.handleError(err, response, next));
-    }
+}
 
-    public playersGame =  (request: any, response: any, next: any) => {
-        const id = new mongodb.ObjectID(request.params.id);
-        console.log(id);
-        database.db.collection('games')
-        .findOne({
-            _id: id
-        })
-        .then(game => {
-            if (game != null) {
+public playersGame =  (request: any, response: any, next: any) => {
+    const id = new mongodb.ObjectID(request.params.id);
+    console.log(id);
+    database.db.collection('games')
+    .findOne({
+        _id: id
+    })
+    .then(game => {
+        if (game != null) {
+            database.db.collection('players')
+            .find({ $or : [{_id : new mongodb.ObjectID(game.team1[0].id)},{_id : new mongodb.ObjectID(game.team1[1].id)}]})
+            .toArray()
+            .then(team1u => {
                 database.db.collection('players')
-                .find({ $or : [{_id : new mongodb.ObjectID(game.team1[0].id)},{_id : new mongodb.ObjectID(game.team1[1].id)}]})
+                .find({ $or : [{_id : new mongodb.ObjectID(game.team2[0].id)},{_id : new mongodb.ObjectID(game.team2[1].id)}]})
                 .toArray()
-                .then(team1u => {
-                    database.db.collection('players')
-                    .find({ $or : [{_id : new mongodb.ObjectID(game.team2[0].id)},{_id : new mongodb.ObjectID(game.team2[1].id)}]})
-                    .toArray()
-                    .then(team2u => {
-                        let team1p:any = [];
-                        let team2p:any = [];
-                        for (var j = 0; j < team1u.length; ++j) {
-                            team1p.push({id : team1u[j]._id, username : team1u[j].username,  avatar : team1u[j].avatar});
-                        }for (var k = 0; k < team2u.length; ++k) {
-                            team2p.push({id : team2u[k]._id, username : team2u[k].username,  avatar : team2u[k].avatar});
-                        }
-                        response.json({team1 : team1p, team2 : team2p });
-                    }).catch(err => this.handleError(err, response, next));
+                .then(team2u => {
+                    let team1p:any = [];
+                    let team2p:any = [];
+                    for (var j = 0; j < team1u.length; ++j) {
+                        team1p.push({id : team1u[j]._id, username : team1u[j].username,  avatar : team1u[j].avatar});
+                    }for (var k = 0; k < team2u.length; ++k) {
+                        team2p.push({id : team2u[k]._id, username : team2u[k].username,  avatar : team2u[k].avatar});
+                    }
+                    response.json({team1 : team1p, team2 : team2p });
                 }).catch(err => this.handleError(err, response, next));
+            }).catch(err => this.handleError(err, response, next));
 
-            } else {
-                response.send(404, 'No game found');
-            }
-            next();
-        })
-        .catch(err => this.handleError(err, response, next));
-    }
+        } else {
+            response.send(404, 'No game found');
+        }
+        next();
+    })
+    .catch(err => this.handleError(err, response, next));
+}
 
-    public leaveGame =  (request: any, response: any, next: any) => {
-        var info = request.body;
-        console.log(info);
-        database.db.collection('games')
-        .findOne({
-            _id: new mongodb.ObjectID(info._id)
-        })
-        .then(game => {
-            var ownerPresent = false;
-            if (game !== null) {
-                if(game.owner == info.player_id){
-                    ownerPresent = true;
-                    game.state = 'terminated';
-                }else{
-                    ownerPresent = false;
-                    for (var i = 0; i < 2; ++i) {
-                        if(game.team1[i].id == info.player_id){
-                            game.team1[i].id = null;
-                        }
-                        if( game.team2[i].id == info.player_id){
-                            game.team2[i].id = null;
-                        }
+public leaveGame =  (request: any, response: any, next: any) => {
+    var info = request.body;
+    console.log(info);
+    database.db.collection('games')
+    .findOne({
+        _id: new mongodb.ObjectID(info._id)
+    })
+    .then(game => {
+        var ownerPresent = false;
+        if (game !== null) {
+            if(game.owner == info.player_id){
+                ownerPresent = true;
+                game.state = 'terminated';
+            }else{
+                ownerPresent = false;
+                for (var i = 0; i < 2; ++i) {
+                    if(game.team1[i].id == info.player_id){
+                        game.team1[i].id = null;
+                    }
+                    if( game.team2[i].id == info.player_id){
+                        game.team2[i].id = null;
                     }
                 }
+            }
+            delete game._id;
+            database.db.collection('games')
+            .updateOne({
+                _id: new mongodb.ObjectID(info._id)
+            }, {
+                $set: game
+            })
+            .then(result => {
+                if(ownerPresent){
+                    response.send(200, 'terminated');
+                }else{
+                    response.send(200, 'left');
+                }
+            })
+            .catch(err => this.handleError(err, response, next));    
+        } else {
+            response.send(404, 'No game found');
+        }
+        next();
+    })
+    .catch(err => this.handleError(err, response, next));
+}
+public changeTeamGame =  (request: any, response: any, next: any) => {
+    var info = request.body;
+    console.log(info);
+    database.db.collection('games')
+    .findOne({
+        _id: new mongodb.ObjectID(info._id)
+    })
+    .then(game => {
+        if (game !== null) {
+            var team = 0;
+            for (var i = 0; i < 2; ++i) {
+                if(game.team1[i].id == info.player_id){
+                    team = 1;
+                }
+                if( game.team2[i].id == info.player_id){
+                    team = 2;
+                }
+            }
+            console.log(info.player_id);
+            console.log(team);
+            var isChanged = false;
+            if(team === 1){
+                for (var j = 0; j < 2; ++j) {
+                    if( game.team2[j].id == null){
+                        game.team2[j].id = info.player_id;
+                        isChanged = true;
+                        for (var l = 0; l < 2; ++l) {
+                            if(game.team1[l].id == info.player_id){
+                                game.team1[l].id = null;
+                            }
+                        }
+                        j=0;
+                        break;
+                    }
+                }
+            }else if(team === 2){
+                for (var k = 0; k < 2; ++k) {
+                    if( game.team1[k].id == null){
+                        game.team1[k].id = info.player_id;
+                        isChanged = true;
+                        for (var d = 0; d < 2; ++d) {
+                            if(game.team2[d].id == info.player_id){
+                                game.team2[d].id = null;
+                            }
+                        }
+                        k = 0;
+                        break;
+                    }
+                } 
+            }
+
+            if(isChanged){
                 delete game._id;
                 database.db.collection('games')
                 .updateOne({
@@ -273,158 +368,84 @@ export class Game {
                     $set: game
                 })
                 .then(result => {
-                    if(ownerPresent){
-                        response.send(200, 'terminated');
-                    }else{
-                        response.send(200, 'left');
-                    }
+                    response.send(200, 'changed');
                 })
-                .catch(err => this.handleError(err, response, next));    
-            } else {
-                response.send(404, 'No game found');
-            }
-            next();
-        })
-        .catch(err => this.handleError(err, response, next));
-    }
-    public changeTeamGame =  (request: any, response: any, next: any) => {
-        var info = request.body;
-        console.log(info);
-        database.db.collection('games')
-        .findOne({
-            _id: new mongodb.ObjectID(info._id)
-        })
-        .then(game => {
-            if (game !== null) {
-                var team = 0;
-                for (var i = 0; i < 2; ++i) {
-                    if(game.team1[i].id == info.player_id){
-                        team = 1;
-                    }
-                    if( game.team2[i].id == info.player_id){
-                        team = 2;
-                    }
-                }
-                console.log(info.player_id);
-                console.log(team);
-                var isChanged = false;
-                if(team === 1){
-                    for (var j = 0; j < 2; ++j) {
-                        if( game.team2[j].id == null){
-                            game.team2[j].id = info.player_id;
-                            isChanged = true;
-                            for (var l = 0; l < 2; ++l) {
-                                if(game.team1[l].id == info.player_id){
-                                    game.team1[l].id = null;
-                                }
-                            }
-                            j=0;
-                            break;
-                        }
-                    }
-                }else if(team === 2){
-                    for (var k = 0; k < 2; ++k) {
-                        if( game.team1[k].id == null){
-                            game.team1[k].id = info.player_id;
-                            isChanged = true;
-                            for (var d = 0; d < 2; ++d) {
-                                if(game.team2[d].id == info.player_id){
-                                    game.team2[d].id = null;
-                                }
-                            }
-                            k = 0;
-                            break;
-                        }
-                    } 
-                }
-
-                if(isChanged){
-                    delete game._id;
-                    database.db.collection('games')
-                    .updateOne({
-                        _id: new mongodb.ObjectID(info._id)
-                    }, {
-                        $set: game
-                    })
-                    .then(result => {
-                        response.send(200, 'changed');
-                    })
-                    .catch(err => this.handleError(err, response, next)); 
-                }else{
-                    response.send(200, 'full');
-                }  
-            } else {
-                response.send(404, 'No game found');
-            }
-            next();
-        })
-        .catch(err => this.handleError(err, response, next));
-    }
-
-    private endGame =  (game: any, response: any, next: any) => {
-        const id = game._id;
-        game.state = 'terminated';
-        delete game._id;
-        database.db.collection('games')
-        .updateOne({
-            _id: id
-        }, {
-            $set: game
-        })
-        .then(result => response.send(200,'terminated'))
-        .catch(err => this.handleError(err, response, next));  
-
-    }
-
-
-
-
-    // Routes for the games
-    public init = (server: any, settings: HandlerSettings) => {
-        server.get(settings.prefix + 'games', settings.security.authorize, this.getGames);
-
-        server.get(settings.prefix + 'games/:id', settings.security.authorize, this.getGame);
-        server.put(settings.prefix + 'games/:id', settings.security.authorize, this.updateGame);
-
-        server.post(settings.prefix + 'games', settings.security.authorize, this.createGame);
-
-        server.post(settings.prefix + 'games/join', settings.security.authorize, this.joinGame);
-        server.post(settings.prefix + 'games/leave', settings.security.authorize, this.leaveGame);
-        server.post(settings.prefix + 'games/change', settings.security.authorize, this.changeTeamGame);
-        server.get(settings.prefix + 'games/players/:id', settings.security.authorize, this.playersGame);
-
-        server.del(settings.prefix + 'games/:id', settings.security.authorize, this.deleteGame);
-        console.log("Games routes registered");
-    };    
-
-
-
-    private createCards() {
-        var pack = {
-            suitTrump: -1,
-            cards : {}
-        };
-        var cards = [];
-        for (var i = 0; i < 4; ++i) {
-            for (var j = 0; j < 10; ++j) {
-                cards.push({type:j , suit: i , isOnHand: false, isUsed: false, playerOwner: null, isTrump: false});
-            }
+                .catch(err => this.handleError(err, response, next)); 
+            }else{
+                response.send(200, 'full');
+            }  
+        } else {
+            response.send(404, 'No game found');
         }
-        cards = this.shuffleArray(cards);
-        pack.cards = cards;
-        return pack;
-    }
+        next();
+    })
+    .catch(err => this.handleError(err, response, next));
+}
 
-    private shuffleArray(array) {
-        for (var i = array.length - 1; i > 0; i--) {
-            var j = Math.floor(Math.random() * (i + 1));
-            var temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
+private endGame =  (game: any, response: any, next: any) => {
+    const id = game._id;
+    game.state = 'terminated';
+    delete game._id;
+    database.db.collection('games')
+    .updateOne({
+        _id: id
+    }, {
+        $set: game
+    })
+    .then(result => response.send(200,'terminated'))
+    .catch(err => this.handleError(err, response, next));  
+
+}
+
+
+
+
+// Routes for the games
+public init = (server: any, settings: HandlerSettings) => {
+    server.get(settings.prefix + 'games', settings.security.authorize, this.getGames);
+
+    server.get(settings.prefix + 'games/:id', settings.security.authorize, this.getGame);
+    server.put(settings.prefix + 'games/:id', settings.security.authorize, this.updateGame);
+
+    server.post(settings.prefix + 'games', settings.security.authorize, this.createGame);
+
+    server.post(settings.prefix + 'games/join', settings.security.authorize, this.joinGame);
+    server.post(settings.prefix + 'games/leave', settings.security.authorize, this.leaveGame);
+    server.post(settings.prefix + 'games/change', settings.security.authorize, this.changeTeamGame);
+    server.get(settings.prefix + 'games/players/:id', settings.security.authorize, this.playersGame);
+
+    server.del(settings.prefix + 'games/:id', settings.security.authorize, this.deleteGame);
+    console.log("Games routes registered");
+};    
+
+
+
+private createCards() {
+    var pack = {
+        suitTrump: -1,
+        cards : {}
+    };
+    var cards = [];
+    for (var i = 0; i < 4; ++i) {
+        for (var j = 0; j < 10; ++j) {
+            cards.push({type:j , suit: i , isOnHand: false, isUsed: false, playerOwner: null, isTrump: false});
         }
-        return array;
     }
-    private getRandomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+    cards = this.shuffleArray(cards);
+    pack.cards = cards;
+    return pack;
+}
+
+private shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
     }
+    return array;
+}
+private getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 }

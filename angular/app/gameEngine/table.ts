@@ -3,12 +3,12 @@ import {Hand} from "./hand";
 
 export class Table{
 
-	public gameArea: Hand;
+	public gameArea: Card[];
 	public trump: Card;
 
-	public constructor(){
-	this.gameArea = [];
-	this.trump = null;
+	public constructor(trump : Card){
+	this.gameArea = [null,null,null,null];
+	this.trump = trump;
 	}
 
 

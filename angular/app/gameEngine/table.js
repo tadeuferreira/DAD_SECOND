@@ -1,8 +1,8 @@
 "use strict";
 var Table = (function () {
-    function Table() {
-        this.gameArea = [];
-        this.trump = null;
+    function Table(trump) {
+        this.gameArea = [null, null, null, null];
+        this.trump = trump;
     }
     return Table;
 }());

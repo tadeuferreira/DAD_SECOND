@@ -1,6 +1,4 @@
-import { GamePlayer } from './gamePlayer';
 export enum TypeCard {
-    Hidden,
     Two,//0
     Three,//1
     Four,//2
@@ -13,8 +11,7 @@ export enum TypeCard {
     Ace//9
 }
 
-export enum Suit{
-	Hidden,
+export enum SuitType{
 	Hearts,
 	Spades,
 	Clubs,
@@ -24,53 +21,50 @@ export enum Suit{
 
 export class Card{
 
-	public type : TypeCard;
-	public suit: Suit;
+	public ctype : TypeCard;
+	public stype: SuitType;
   public isOnHand: boolean;
   public isUsed: boolean;
-  public playerOwner: GamePlayer;
+  public player_id: string;
   public isFirstTrump: boolean;
 
-	public constructor (type: number, suit: number, isOnHand: boolean, isUsed: boolean, playerOwner: GamePlayer, isFirstTrump: boolean){
+	public constructor (type: number, suit: number, isOnHand: boolean, isUsed: boolean, player_id: string, isFirstTrump: boolean){
        this.isOnHand = isOnHand;
        this.isUsed = isUsed;
-       this.playerOwner = playerOwner;
+       this.player_id = player_id;
        this.isFirstTrump = isFirstTrump;
        switch (type) {
-       	case 0: this.type = TypeCard.Two;
+       	case 0: this.ctype = TypeCard.Two;
        	break;
-       	case 1: this.type = TypeCard.Three;
+       	case 1: this.ctype = TypeCard.Three;
        	break;
-       	case 2: this.type = TypeCard.Four;
+       	case 2: this.ctype = TypeCard.Four;
        	break;
-       	case 3: this.type = TypeCard.Five;
+       	case 3: this.ctype = TypeCard.Five;
        	break;
-       	case 4: this.type = TypeCard.Six;
+       	case 4: this.ctype = TypeCard.Six;
        	break;
-       	case 5: this.type = TypeCard.Seven;
+       	case 5: this.ctype = TypeCard.Seven;
        	break;
-       	case 6: this.type = TypeCard.Queen;
+       	case 6: this.ctype = TypeCard.Queen;
        	break;
-       	case 7: this.type = TypeCard.Jack;
+       	case 7: this.ctype = TypeCard.Jack;
        	break;
-       	case 8: this.type = TypeCard.King;
+       	case 8: this.ctype = TypeCard.King;
        	break;
-       	case 9: this.type = TypeCard.Ace;
-       	break;
-       	default: this.type = TypeCard.Hidden;
+       	case 9: this.ctype = TypeCard.Ace;
        	break;
        }
        switch (suit) {
-       	case 0: this.suit = Suit.Hearts;
+       	case 0: this.stype = SuitType.Hearts;
        	break;
-       	case 1: this.suit = Suit.Spades;
+       	case 1: this.stype = SuitType.Spades;
        	break;
-       	case 2: this.suit = Suit.Clubs;
+       	case 2: this.stype = SuitType.Clubs;
        	break;
-       	case 3: this.suit = Suit.Diamonds;
-       	break;
-       	default: this.suit = Suit.Hidden;
+       	case 3: this.stype = SuitType.Diamonds;
        	break;
        }
+     
     }
 }
