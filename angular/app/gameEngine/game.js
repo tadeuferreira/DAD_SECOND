@@ -1,6 +1,5 @@
 "use strict";
 var card_1 = require("./card");
-var hand_1 = require("./hand");
 var gamePlayer_1 = require("./gamePlayer");
 var table_1 = require("./table");
 var Game = (function () {
@@ -68,12 +67,12 @@ var Game = (function () {
         console.log(this.players);
     };
     Game.prototype.getHand = function (deck, pos, player_id) {
-        var hand = new hand_1.Hand();
+        var hand = [];
         for (var k = pos * 10; k < 9 + (pos * 10); ++k) {
             var card = deck[k];
             card.isOnHand = true;
             card.player_id = player_id;
-            hand.cards.push(card);
+            hand.push(card);
         }
         return hand;
     };
@@ -94,6 +93,22 @@ var Game = (function () {
         var p = new gamePlayer_1.GamePlayer(player_type, player.avatar, player.username, player.id, player.team, player.team_pos);
         p.hand = this.getHand(deck, i, p.id);
         this.players[i] = p;
+    };
+    Game.prototype.getHandCards = function (type) {
+        for (var i = 0; i < 4; ++i) {
+            if (this.players[i].type == type) {
+                return this.players[i].hand;
+            }
+        }
+        return null;
+    };
+    Game.prototype.getTableCard = function (type) {
+        for (var i = 0; i < 4; ++i) {
+            if (this.players[i].type == type) {
+                return this.players[i].tableCard;
+            }
+        }
+        return null;
     };
     return Game;
 }());

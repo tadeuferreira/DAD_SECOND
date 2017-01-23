@@ -11,6 +11,10 @@ export class Table{
 	this.trump = trump;
 	}
 
+	addCard(index:number, item:Card){
+		this.gameArea.splice(index, 0, item);
+	}
+
 
 
 

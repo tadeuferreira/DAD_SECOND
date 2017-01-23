@@ -8,7 +8,7 @@ var PlayerType;
 })(PlayerType = exports.PlayerType || (exports.PlayerType = {}));
 var GamePlayer = (function () {
     function GamePlayer(type, avatar, username, id, team, team_pos) {
-        this.hand = null;
+        this.hand = [];
         this.type = type;
         this.isTurn = false;
         this.id = id;
@@ -16,6 +16,7 @@ var GamePlayer = (function () {
         this.username = username;
         this.team = team;
         this.team_pos = team_pos;
+        this.tableCard = null;
     }
     return GamePlayer;
 }());

@@ -1,5 +1,4 @@
 import {Card, SuitType} from "./card";
-import {Hand} from "./hand";
 import {GamePlayer, PlayerType} from "./gamePlayer";
 import {Table} from "./table";
 
@@ -82,14 +81,14 @@ export class Game{
 		console.log(this.players);
 	}
 
-	private getHand(deck: Card[], pos: number, player_id : string) : Hand{
-		let hand : Hand = new Hand();
+	private getHand(deck: Card[], pos: number, player_id : string) : Card[]{
+		let hand : Card[] = [];
 
 		for (var k = pos * 10; k < 9 +(pos*10); ++k) {
 			let card: Card = deck[k];
 			card.isOnHand = true;
 			card.player_id = player_id;
-			hand.cards.push(card);
+			hand.push(card);
 		}
 		return hand;
 	}
@@ -111,6 +110,23 @@ export class Game{
 		let p : GamePlayer = new GamePlayer(player_type, player.avatar, player.username, player.id, player.team,player.team_pos);
 		p.hand = this.getHand(deck, i, p.id);
 		this.players[i] = p;
+	}
+
+	public getHandCards(type:number){
+		for (var i = 0; i < 4; ++i) {
+			if(this.players[i].type == type){
+				return this.players[i].hand;
+			}
+		}
+		return null;
+	}
+	public getTableCard(type:number){
+		for (var i = 0; i < 4; ++i) {
+			if(this.players[i].type == type){
+				return this.players[i].tableCard;
+			}
+		}
+		return null;
 	}
 
 

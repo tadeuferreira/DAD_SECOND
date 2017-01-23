@@ -8,12 +8,14 @@ import { Game } from '../gameEngine/game';
 @Component({
 	moduleId: module.id,
 	selector: 'game-playing',
-	templateUrl:'game.component.html'
+	templateUrl:'game.component.html',
+	styleUrls:['../gameCards/game.component.css']
 
 })
 export class GameComponent implements OnInit, OnDestroy{
 	private game_id: string = sessionStorage.getItem('game_id');
 	game : Game;
+	public isGameReady : boolean = false;
 
 	constructor(private websocketService: WebSocketService, private gameService: GameService ,private userService: UserService, private router: Router) {}
 
@@ -23,20 +25,21 @@ export class GameComponent implements OnInit, OnDestroy{
 			this.router.navigate(['login']);
 		}else{
 			this.gameService.getGame().subscribe(
-            response => {
-                this.game = new Game(response.json());
-                this.websocketService.sendGame({_id: this.game_id, msg: 'ready start'});
+				response => {
+					this.game = new Game(response.json());
+					this.isGameReady = true;
+             /*   this.websocketService.sendGame({_id: this.game_id, msg: 'ready start'});
                 this.websocketService.getGame().subscribe((p: any) => { 	
 							if(p.msg == 'yourturn'){
 								this.router.navigate(['dashboard']);
-					}});
+							}});*/
 
 
-            },
-            error => {
-                console.log(error.text());
-            }
-            );
+						},
+						error => {
+							console.log(error.text());
+						}
+						);
 		}
 
 	}
@@ -47,5 +50,12 @@ export class GameComponent implements OnInit, OnDestroy{
 
 	getGameId(){
 		return this.game_id;
+	}
+
+	getHand(type: number){
+			return this.game.getHandCards(type);
+	}
+	getTableCard(type: number){
+			return this.game.getTableCard(type);
 	}
 }

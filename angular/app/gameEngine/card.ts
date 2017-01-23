@@ -1,14 +1,14 @@
 export enum TypeCard {
-    Two,//0
-    Three,//1
-    Four,//2
-    Five,//3
-    Six,//4
-    Seven,//5
-    Queen,//6
+    Ace,//0
+    Two,//1
+    Three,//2
+    Four,//3
+    Five,//4
+    Six,//5
+    Seven,//6
     Jack,//7
-    King,//8
-    Ace//9
+    Queen,//8
+    King,//9
 }
 
 export enum SuitType{
@@ -27,12 +27,29 @@ export class Card{
   public isUsed: boolean;
   public player_id: string;
   public isFirstTrump: boolean;
+  public imgUrl : string;
+
 
 	public constructor (type: number, suit: number, isOnHand: boolean, isUsed: boolean, player_id: string, isFirstTrump: boolean){
        this.isOnHand = isOnHand;
        this.isUsed = isUsed;
        this.player_id = player_id;
        this.isFirstTrump = isFirstTrump;
+
+       switch (suit) {
+         case 0: this.stype = SuitType.Hearts;
+         this.imgUrl = "/img/cards/c";
+         break;
+         case 1: this.stype = SuitType.Spades;
+         this.imgUrl = "/img/cards/e";
+         break;
+         case 2: this.stype = SuitType.Clubs;
+         this.imgUrl = "/img/cards/p";
+         break;
+         case 3: this.stype = SuitType.Diamonds;
+         this.imgUrl = "/img/cards/o";
+         break;
+       }
        switch (type) {
        	case 0: this.ctype = TypeCard.Two;
        	break;
@@ -55,16 +72,12 @@ export class Card{
        	case 9: this.ctype = TypeCard.Ace;
        	break;
        }
-       switch (suit) {
-       	case 0: this.stype = SuitType.Hearts;
-       	break;
-       	case 1: this.stype = SuitType.Spades;
-       	break;
-       	case 2: this.stype = SuitType.Clubs;
-       	break;
-       	case 3: this.stype = SuitType.Diamonds;
-       	break;
+       if(this.ctype <= 6){
+          this.imgUrl += (this.ctype+1)+'.png';
+       }else{
+          this.imgUrl += (this.ctype+4)+'.png';
        }
+       
      
     }
 }

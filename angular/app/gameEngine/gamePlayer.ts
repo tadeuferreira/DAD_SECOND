@@ -1,4 +1,4 @@
-import {Hand} from "./hand";
+import {Card} from "./card";
 
 
 export enum PlayerType{
@@ -9,7 +9,8 @@ export enum PlayerType{
 }
 export class GamePlayer{
 
-public hand: Hand;
+public hand: Card[];
+public tableCard: Card;
 public type: PlayerType;
 public isTurn: boolean;
 public avatar: string;
@@ -19,7 +20,7 @@ public team:number;
 public team_pos:number;
 
 public constructor(type: PlayerType, avatar: string, username: string, id: string, team:number, team_pos:number){
-	this.hand = null;
+	this.hand = [];
 	this.type = type;
 	this.isTurn = false;
 	this.id = id;
@@ -27,5 +28,6 @@ public constructor(type: PlayerType, avatar: string, username: string, id: strin
 	this.username = username;
 	this.team = team;
 	this.team_pos = team_pos;
+	this.tableCard = null;
 }
 }

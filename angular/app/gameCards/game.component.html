@@ -1,5 +1,47 @@
-<div class="container"><h1> The game is loading ...</h1></div>
- 
-<div class="container">
-    <gameChat [game_id]="getGameId()"></gameChat>
+<div class="container" *ngIf="!isGameReady"><h1> The game is loading ...</h1></div>
+
+<div class="container" *ngIf="isGameReady">
+	<div class="row">
+		<div class="col-lg-3"></div>
+		<div class="col-lg-6"><div *ngFor="let c of getHand(1)"><img class="card card-inline" src="{{c.isFirstTrump ? c.imgUrl : '/img/cards/semFace.png'}}"/></div>
+	</div> 
+	<div class="col-lg-3"></div>
 </div>
+<div class="row" >
+	<div class="col-lg-3"><div *ngFor="let c of getHand(2)"><img class="card card-rotated" src="{{c.isFirstTrump ? c.imgUrl : '/img/cards/semFace.png'}}"/></div></div>
+	<div class="col-lg-6">
+		<div class="row">
+			<div class="col-lg-3"></div>
+			<div class="col-lg-6"><img class="card card-inline" src="{{getTableCard(1) ? getTableCard(1).imgUrl : ''}}"/></div>
+			<div class="col-lg-3"></div>
+		</div>
+		<div class="row">
+			<div class="col-lg-3"><img class="card card-rotated" src="{{getTableCard(2) ? getTableCard(2).imgUrl : ''}}"/></div>
+			<div class="col-lg-6"></div>
+			<div class="col-lg-3"><img class="card card-rotated" src="{{getTableCard(3) ? getTableCard(3).imgUrl : ''}}"/></div>
+		</div>
+		<div class="row">
+			<div class="col-lg-3"></div>
+			<div class="col-lg-6"><img class="card card-inline" src="{{getTableCard(0) ? getTableCard(0).imgUrl : ''}}"/></div>
+			<div class="col-lg-3"></div>
+		</div>	
+	</div>
+	<div class="col-lg-3">
+		<div *ngFor="let c of getHand(3)"><img  class="card card-rotated" src="{{c.isFirstTrump ? c.imgUrl : '/img/cards/semFace.png'}}" /></div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-lg-3"></div>
+	<div class="col-lg-6"><div *ngFor="let c of getHand(0)"><img class="{{c.isFirstTrump ? 'card card-inline trump' : 'card card-inline'}}" src="{{c.imgUrl}}"/></div>
+</div>
+<div class="col-lg-3"></div>
+</div>
+&nbsp;
+<div class="row">
+	<gameChat [game_id]="getGameId"></gameChat>
+</div>
+</div>
+
+
+
+

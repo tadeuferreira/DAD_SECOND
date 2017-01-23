@@ -1,16 +1,16 @@
 "use strict";
 var TypeCard;
 (function (TypeCard) {
-    TypeCard[TypeCard["Two"] = 0] = "Two";
-    TypeCard[TypeCard["Three"] = 1] = "Three";
-    TypeCard[TypeCard["Four"] = 2] = "Four";
-    TypeCard[TypeCard["Five"] = 3] = "Five";
-    TypeCard[TypeCard["Six"] = 4] = "Six";
-    TypeCard[TypeCard["Seven"] = 5] = "Seven";
-    TypeCard[TypeCard["Queen"] = 6] = "Queen";
+    TypeCard[TypeCard["Ace"] = 0] = "Ace";
+    TypeCard[TypeCard["Two"] = 1] = "Two";
+    TypeCard[TypeCard["Three"] = 2] = "Three";
+    TypeCard[TypeCard["Four"] = 3] = "Four";
+    TypeCard[TypeCard["Five"] = 4] = "Five";
+    TypeCard[TypeCard["Six"] = 5] = "Six";
+    TypeCard[TypeCard["Seven"] = 6] = "Seven";
     TypeCard[TypeCard["Jack"] = 7] = "Jack";
-    TypeCard[TypeCard["King"] = 8] = "King";
-    TypeCard[TypeCard["Ace"] = 9] = "Ace"; //9
+    TypeCard[TypeCard["Queen"] = 8] = "Queen";
+    TypeCard[TypeCard["King"] = 9] = "King";
 })(TypeCard = exports.TypeCard || (exports.TypeCard = {}));
 var SuitType;
 (function (SuitType) {
@@ -25,6 +25,24 @@ var Card = (function () {
         this.isUsed = isUsed;
         this.player_id = player_id;
         this.isFirstTrump = isFirstTrump;
+        switch (suit) {
+            case 0:
+                this.stype = SuitType.Hearts;
+                this.imgUrl = "/img/cards/c";
+                break;
+            case 1:
+                this.stype = SuitType.Spades;
+                this.imgUrl = "/img/cards/e";
+                break;
+            case 2:
+                this.stype = SuitType.Clubs;
+                this.imgUrl = "/img/cards/p";
+                break;
+            case 3:
+                this.stype = SuitType.Diamonds;
+                this.imgUrl = "/img/cards/o";
+                break;
+        }
         switch (type) {
             case 0:
                 this.ctype = TypeCard.Two;
@@ -57,19 +75,11 @@ var Card = (function () {
                 this.ctype = TypeCard.Ace;
                 break;
         }
-        switch (suit) {
-            case 0:
-                this.stype = SuitType.Hearts;
-                break;
-            case 1:
-                this.stype = SuitType.Spades;
-                break;
-            case 2:
-                this.stype = SuitType.Clubs;
-                break;
-            case 3:
-                this.stype = SuitType.Diamonds;
-                break;
+        if (this.ctype <= 6) {
+            this.imgUrl += (this.ctype + 1) + '.png';
+        }
+        else {
+            this.imgUrl += (this.ctype + 4) + '.png';
         }
     }
     return Card;

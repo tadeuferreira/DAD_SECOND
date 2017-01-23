@@ -21,6 +21,7 @@ var GameComponent = (function () {
         this.userService = userService;
         this.router = router;
         this.game_id = sessionStorage.getItem('game_id');
+        this.isGameReady = false;
     }
     GameComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -30,12 +31,12 @@ var GameComponent = (function () {
         else {
             this.gameService.getGame().subscribe(function (response) {
                 _this.game = new game_1.Game(response.json());
-                _this.websocketService.sendGame({ _id: _this.game_id, msg: 'ready start' });
-                _this.websocketService.getGame().subscribe(function (p) {
-                    if (p.msg == 'yourturn') {
-                        _this.router.navigate(['dashboard']);
-                    }
-                });
+                _this.isGameReady = true;
+                /*   this.websocketService.sendGame({_id: this.game_id, msg: 'ready start'});
+                   this.websocketService.getGame().subscribe((p: any) => {
+                               if(p.msg == 'yourturn'){
+                                   this.router.navigate(['dashboard']);
+                               }});*/
             }, function (error) {
                 console.log(error.text());
             });
@@ -46,13 +47,20 @@ var GameComponent = (function () {
     GameComponent.prototype.getGameId = function () {
         return this.game_id;
     };
+    GameComponent.prototype.getHand = function (type) {
+        return this.game.getHandCards(type);
+    };
+    GameComponent.prototype.getTableCard = function (type) {
+        return this.game.getTableCard(type);
+    };
     return GameComponent;
 }());
 GameComponent = __decorate([
     core_1.Component({
         moduleId: module.id,
         selector: 'game-playing',
-        templateUrl: 'game.component.html'
+        templateUrl: 'game.component.html',
+        styleUrls: ['../gameCards/game.component.css']
     }),
     __metadata("design:paramtypes", [websocket_service_1.WebSocketService, game_service_1.GameService, user_service_1.UserService, router_1.Router])
 ], GameComponent);

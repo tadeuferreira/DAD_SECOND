@@ -428,7 +428,7 @@ private createCards() {
     var cards = [];
     for (var i = 0; i < 4; ++i) {
         for (var j = 0; j < 10; ++j) {
-            cards.push({type:j , suit: i , isOnHand: false, isUsed: false, playerOwner: null, isTrump: false});
+            cards.push({type:j , suit: i , isOnHand: false, isOnTable:false, isUsed: false, playerOwner: null, isTrump: false});
         }
     }
     cards = this.shuffleArray(cards);

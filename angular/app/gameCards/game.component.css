@@ -1,0 +1,28 @@
+
+.card{
+	width: 60px; 
+	height: 86px;
+}
+
+.card-inline{
+	float: left; 
+}
+
+.card-rotated{
+    display: block;
+	-webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+    margin-top: -11px;
+    margin-right: auto;
+    margin-bottom: -11px;
+    margin-left: auto;
+}
+
+.trump { 
+    outline: none;
+    border-color: #9ecaed;
+    box-shadow: 0 0 10px #9ecaed;
+}
