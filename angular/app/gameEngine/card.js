@@ -20,9 +20,11 @@ var SuitType;
     SuitType[SuitType["Diamonds"] = 3] = "Diamonds";
 })(SuitType = exports.SuitType || (exports.SuitType = {}));
 var Card = (function () {
-    function Card(type, suit, isOnHand, isUsed, player_id, isFirstTrump) {
+    function Card(id, type, suit, isOnHand, isOnTable, isUsed, player_id, isFirstTrump) {
+        this.id = id;
         this.isOnHand = isOnHand;
         this.isUsed = isUsed;
+        this.isOnTable = isOnTable;
         this.player_id = player_id;
         this.isFirstTrump = isFirstTrump;
         switch (suit) {
@@ -81,6 +83,7 @@ var Card = (function () {
         else {
             this.imgUrl += (this.ctype + 4) + '.png';
         }
+        console.log(this.imgUrl + ' ' + this.id);
     }
     return Card;
 }());

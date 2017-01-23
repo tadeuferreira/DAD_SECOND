@@ -41,18 +41,6 @@ export class WebSocketService {
     getGamePlayersMessages(): Observable<any> {
         return this.listenOnChannel('gameNotification');
     }
-
-
-/*
-    // Extra Exercise
-    sendClickElementMessage(index: number, board: string) {
-        this.socket.emit('clickElement%'+board, index);
-    }
-    getBoardMessages(channel: string): Observable<any> {
-        return this.listenOnChannel(channel);
-    }
-    */
-
     
     getInitLobbyErr(): Observable<any> {
         return this.listenOnChannel('initLobbyErr');
@@ -72,6 +60,13 @@ export class WebSocketService {
     unsubLobby(){
         this.socket.off('initLobby', null);
         this.socket.off('exitLobby', null);
+    }
+    sendGame(msgData: any){
+        this.socket.emit('gamePlay', msgData);
+    }
+    
+    getGame(): Observable<any> {
+        return this.listenOnChannel('gamePlay');
     }
 
     

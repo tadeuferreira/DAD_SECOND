@@ -85,8 +85,8 @@ var Game = (function () {
                     var game = {
                         ownername: '',
                         owner: null,
-                        team1: [{ id: null, avatar: null, username: null }, { id: null, avatar: null, username: null }],
-                        team2: [{ id: null, avatar: null, username: null }, { id: null, avatar: null, username: null }],
+                        team1: [{ id: null, avatar: null, username: null, ready: false }, { id: null, avatar: null, username: null, ready: false }],
+                        team2: [{ id: null, avatar: null, username: null, ready: false }, { id: null, avatar: null, username: null, ready: false }],
                         order: [{ id: null }, { id: null }, { id: null }, { id: null }],
                         state: null,
                         renounce1: false,
@@ -374,17 +374,73 @@ var Game = (function () {
             })
                 .catch(function (err) { return _this.handleError(err, response, next); });
         };
-        this.endGame = function (game, response, next) {
-            var id = game._id;
+        /*
+        private endGame =  (request: any, response: any, next: any) => {
+            var game = request.body._id;
+            const id = game._id;
             game.state = 'terminated';
             delete game._id;
-            app_database_1.databaseConnection.db.collection('games')
-                .updateOne({
+            database.db.collection('games')
+            .updateOne({
                 _id: id
             }, {
                 $set: game
             })
-                .then(function (result) { return response.send(200, 'terminated'); })
+            .then(result => response.send(200,'terminated'))
+            .catch(err => this.handleError(err, response, next));
+        
+        }*/
+        this.readyToPlay = function (request, response, next) {
+            var game_id = request.body._id;
+            var player_id = request.body.player_id;
+            app_database_1.databaseConnection.db.collection('games')
+                .findOne({
+                _id: new mongodb.ObjectID(game_id)
+            })
+                .then(function (game) {
+                if (game != null) {
+                    for (var i = 0; i < 2; ++i) {
+                        if (game.team1[i].id == player_id) {
+                            game.team1[i].ready = true;
+                        }
+                        if (game.team2[i].id == player_id) {
+                            game.team2[i].ready = true;
+                        }
+                    }
+                    var isGameReady = false;
+                    var count = 0;
+                    for (var i = 0; i < 2; ++i) {
+                        if (game.team1[i].ready) {
+                            count++;
+                        }
+                        if (game.team2[i].ready) {
+                            count++;
+                        }
+                    }
+                    if (count == 4) {
+                        isGameReady = true;
+                    }
+                    delete game._id;
+                    app_database_1.databaseConnection.db.collection('games')
+                        .updateOne({
+                        _id: new mongodb.ObjectID(game_id)
+                    }, {
+                        $set: game
+                    })
+                        .then(function (result) {
+                        if (isGameReady) {
+                            response.send(200, 'gameReady');
+                        }
+                        else {
+                            response.send(200, 'ready');
+                        }
+                    })
+                        .catch(function (err) { return _this.handleError(err, response, next); });
+                }
+                else {
+                    response.send(404, 'No Game found');
+                }
+            })
                 .catch(function (err) { return _this.handleError(err, response, next); });
         };
         // Routes for the games
@@ -397,6 +453,7 @@ var Game = (function () {
             server.post(settings.prefix + 'games/leave', settings.security.authorize, _this.leaveGame);
             server.post(settings.prefix + 'games/change', settings.security.authorize, _this.changeTeamGame);
             server.get(settings.prefix + 'games/players/:id', settings.security.authorize, _this.playersGame);
+            server.post(settings.prefix + 'games/ready', settings.security.authorize, _this.readyToPlay);
             server.del(settings.prefix + 'games/:id', settings.security.authorize, _this.deleteGame);
             console.log("Games routes registered");
         };
@@ -409,7 +466,7 @@ var Game = (function () {
         var cards = [];
         for (var i = 0; i < 4; ++i) {
             for (var j = 0; j < 10; ++j) {
-                cards.push({ type: j, suit: i, isOnHand: false, isUsed: false, playerOwner: null, isTrump: false });
+                cards.push({ type: j, suit: i, isOnHand: false, isOnTable: false, isUsed: false, playerOwner: null, isTrump: false });
             }
         }
         cards = this.shuffleArray(cards);

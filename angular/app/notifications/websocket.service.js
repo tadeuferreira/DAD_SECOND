@@ -41,15 +41,6 @@ var WebSocketService = (function () {
     WebSocketService.prototype.getGamePlayersMessages = function () {
         return this.listenOnChannel('gameNotification');
     };
-    /*
-        // Extra Exercise
-        sendClickElementMessage(index: number, board: string) {
-            this.socket.emit('clickElement%'+board, index);
-        }
-        getBoardMessages(channel: string): Observable<any> {
-            return this.listenOnChannel(channel);
-        }
-        */
     WebSocketService.prototype.getInitLobbyErr = function () {
         return this.listenOnChannel('initLobbyErr');
     };
@@ -68,6 +59,12 @@ var WebSocketService = (function () {
     WebSocketService.prototype.unsubLobby = function () {
         this.socket.off('initLobby', null);
         this.socket.off('exitLobby', null);
+    };
+    WebSocketService.prototype.sendGame = function (msgData) {
+        this.socket.emit('gamePlay', msgData);
+    };
+    WebSocketService.prototype.getGame = function () {
+        return this.listenOnChannel('gamePlay');
     };
     WebSocketService.prototype.listenOnChannel = function (channel) {
         var _this = this;

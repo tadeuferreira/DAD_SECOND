@@ -12,17 +12,17 @@
 	<div class="col-lg-6">
 		<div class="row">
 			<div class="col-lg-3"></div>
-			<div class="col-lg-6"><img class="card card-inline" src="{{getTableCard(1) ? getTableCard(1).imgUrl : ''}}"/></div>
+			<div class="col-lg-6"><img class="card card-inline" src="{{getTableCard(1) != null ? getTableCard(1).imgUrl : ''}}"/></div>
 			<div class="col-lg-3"></div>
 		</div>
 		<div class="row">
-			<div class="col-lg-3"><img class="card card-rotated" src="{{getTableCard(2) ? getTableCard(2).imgUrl : ''}}"/></div>
+			<div class="col-lg-3"><img class="card card-rotated" src="{{getTableCard(2) != null ? getTableCard(2).imgUrl : ''}}"/></div>
 			<div class="col-lg-6"></div>
-			<div class="col-lg-3"><img class="card card-rotated" src="{{getTableCard(3) ? getTableCard(3).imgUrl : ''}}"/></div>
+			<div class="col-lg-3"><img class="card card-rotated" src="{{getTableCard(3) != null? getTableCard(3).imgUrl : ''}}"/></div>
 		</div>
 		<div class="row">
 			<div class="col-lg-3"></div>
-			<div class="col-lg-6"><img class="card card-inline" src="{{getTableCard(0) ? getTableCard(0).imgUrl : ''}}"/></div>
+			<div class="col-lg-6"><img class="card card-inline" src="{{getTableCard(0) != null ? getTableCard(0).imgUrl : ''}}"/></div>
 			<div class="col-lg-3"></div>
 		</div>	
 	</div>
@@ -32,7 +32,7 @@
 </div>
 <div class="row">
 	<div class="col-lg-3"></div>
-	<div class="col-lg-6"><div *ngFor="let c of getHand(0)"><img class="{{c.isFirstTrump ? 'card card-inline trump' : 'card card-inline'}}" src="{{c.imgUrl}}"/></div>
+	<div class="col-lg-6"><div *ngFor="let c of getHand(0)"><img (click)="playCard($event)" id="{{c.id}}" class="{{c.isFirstTrump ? 'card card-inline trump' : 'card card-inline'}}" src="{{c.imgUrl}}"/></div>
 </div>
 <div class="col-lg-3"></div>
 </div>

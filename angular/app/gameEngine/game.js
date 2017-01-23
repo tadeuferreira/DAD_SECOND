@@ -7,6 +7,7 @@ var Game = (function () {
         this.players = [null, null, null, null];
         this.initializeGame(json);
         this.jsonGame = json;
+        this.isMyTurn = false;
     }
     Game.prototype.initializeGame = function (json) {
         var first_id = json.first;
@@ -19,7 +20,7 @@ var Game = (function () {
         var my_id = sessionStorage.getItem('id');
         this.isFirst = (json.order[0] == my_id);
         for (i = 0; i < 40; ++i) {
-            deck.splice(i, 0, new card_1.Card(json.pack.cards[i].type, json.pack.cards[i].suit, json.pack.cards[i].isOnHand, json.pack.cards[i].isUsed, null, false));
+            deck.splice(i, 0, new card_1.Card(i, json.pack.cards[i].type, json.pack.cards[i].suit, json.pack.cards[i].isOnHand, json.pack.cards[i].isOnTable, json.pack.cards[i].isUsed, null, false));
         }
         deck[0].isFirstTrump = true;
         this.TrumpSuit = deck[0].stype;
@@ -109,6 +110,31 @@ var Game = (function () {
             }
         }
         return null;
+    };
+    Game.prototype.played = function (pos, card) {
+        this.players[pos].updateCard(card);
+    };
+    Game.prototype.play = function (pos) {
+        this.onTurn = pos;
+        if (this.onTurn == this.myTurnNumber) {
+            this.isMyTurn = true;
+        }
+    };
+    Game.prototype.getPlayedCard = function (pos) {
+        return this.players[pos].tableCard;
+    };
+    Game.prototype.playCard = function (pos) {
+        if (this.isMyTurn) {
+            this.players[this.myTurnNumber].playCard(pos);
+            this.isMyTurn = false;
+            this.checkGame();
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    Game.prototype.checkGame = function () {
     };
     return Game;
 }());

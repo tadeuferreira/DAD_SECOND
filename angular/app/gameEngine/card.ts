@@ -21,18 +21,22 @@ export enum SuitType{
 
 export class Card{
 
-	public ctype : TypeCard;
+	public id:number;
+  public ctype : TypeCard;
 	public stype: SuitType;
   public isOnHand: boolean;
+  public isOnTable : boolean;
   public isUsed: boolean;
   public player_id: string;
   public isFirstTrump: boolean;
   public imgUrl : string;
 
 
-	public constructor (type: number, suit: number, isOnHand: boolean, isUsed: boolean, player_id: string, isFirstTrump: boolean){
+	public constructor (id:number, type: number, suit: number, isOnHand: boolean, isOnTable: boolean,isUsed: boolean, player_id: string, isFirstTrump: boolean){
+       this.id = id;
        this.isOnHand = isOnHand;
        this.isUsed = isUsed;
+       this.isOnTable = isOnTable;
        this.player_id = player_id;
        this.isFirstTrump = isFirstTrump;
 
@@ -78,6 +82,6 @@ export class Card{
           this.imgUrl += (this.ctype+4)+'.png';
        }
        
-     
+     console.log(this.imgUrl+' '+this.id);
     }
 }

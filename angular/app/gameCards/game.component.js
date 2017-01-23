@@ -21,6 +21,7 @@ var GameComponent = (function () {
         this.userService = userService;
         this.router = router;
         this.game_id = sessionStorage.getItem('game_id');
+        this.player_id = sessionStorage.getItem('id');
         this.isGameReady = false;
     }
     GameComponent.prototype.ngOnInit = function () {
@@ -32,13 +33,30 @@ var GameComponent = (function () {
             this.gameService.getGame().subscribe(function (response) {
                 _this.game = new game_1.Game(response.json());
                 _this.isGameReady = true;
-                /*   this.websocketService.sendGame({_id: this.game_id, msg: 'ready start'});
-                   this.websocketService.getGame().subscribe((p: any) => {
-                               if(p.msg == 'yourturn'){
-                                   this.router.navigate(['dashboard']);
-                               }});*/
-            }, function (error) {
-                console.log(error.text());
+                _this.gameService.ready().subscribe(function (response) {
+                    if (response.ok) {
+                        switch (response._body) {
+                            case '"gameReady"':
+                                _this.websocketService.sendGame({ _id: _this.game_id, player_id: _this.player_id, msg: 'startGame' });
+                                break;
+                            case '"ready"':
+                                //do nothing maybe an alert
+                                break;
+                        }
+                        _this.websocketService.getGame().subscribe(function (p) {
+                            if (p.msg == 'update') {
+                                _this.game.played(p.pos, p.card);
+                            }
+                            else if (p.msg == 'play') {
+                                _this.game.play(p.pos);
+                                if (_this.game.isMyTurn)
+                                    alert("PLAY");
+                            }
+                        }, function (error) {
+                            console.log(error.text());
+                        });
+                    }
+                });
             });
         }
     };
@@ -52,6 +70,17 @@ var GameComponent = (function () {
     };
     GameComponent.prototype.getTableCard = function (type) {
         return this.game.getTableCard(type);
+    };
+    GameComponent.prototype.playCard = function (event) {
+        console.log(event);
+        if (this.game.playCard(event.target.id)) {
+            var my = this.game.myTurnNumber;
+            var next = this.game.myTurnNumber + 1;
+            if (next > 4) {
+            }
+            else
+                this.websocketService.sendGame({ _id: this.game_id, player_id: this.player_id, msg: 'next', my_pos: this.game.myTurnNumber, next_pos: next, card: this.game.getPlayedCard(my) });
+        }
     };
     return GameComponent;
 }());

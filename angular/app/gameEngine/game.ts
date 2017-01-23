@@ -9,6 +9,7 @@ export class Game{
 	public TrumpSuit : SuitType;
 	public onTurn : number;
 	public myTurnNumber : number;
+	public isMyTurn : boolean;
 	public isFirst : boolean;
 	public jsonGame : any;
 
@@ -17,6 +18,7 @@ export class Game{
 		this.players = [null,null,null,null];
 		this.initializeGame(json);
 		this.jsonGame = json;
+		this.isMyTurn = false;
 	}
 
 
@@ -33,7 +35,7 @@ export class Game{
 		this.isFirst = (json.order[0] == my_id);
 
 		for (i = 0; i < 40; ++i) {
-			deck.splice(i, 0, new Card(json.pack.cards[i].type, json.pack.cards[i].suit, json.pack.cards[i].isOnHand, json.pack.cards[i].isUsed, null, false));
+			deck.splice(i, 0, new Card(i,json.pack.cards[i].type, json.pack.cards[i].suit, json.pack.cards[i].isOnHand, json.pack.cards[i].isOnTable,json.pack.cards[i].isUsed, null, false));
 		}
 		deck[0].isFirstTrump = true;
 		this.TrumpSuit = deck[0].stype;
@@ -127,6 +129,33 @@ export class Game{
 			}
 		}
 		return null;
+	}
+	public played(pos:number , card:Card){
+		this.players[pos].updateCard(card);
+	}
+	public play(pos:number){
+		this.onTurn = pos;
+		if(this.onTurn == this.myTurnNumber){
+			this.isMyTurn = true;
+		}
+	}
+	public getPlayedCard(pos:number){
+		return this.players[pos].tableCard;
+
+	}
+	public playCard(pos:number){
+		if(this.isMyTurn){
+			this.players[this.myTurnNumber].playCard(pos);
+			this.isMyTurn = false;
+			this.checkGame();
+			return true;
+		}else{
+			return false;
+		}
+		
+	}
+	public checkGame(){
+		
 	}
 
 

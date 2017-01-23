@@ -92,8 +92,8 @@ export class Game {
                 var game = {
                     ownername: '',
                     owner : null,
-                    team1 : [{id : null, avatar: null, username: null},{id : null, avatar: null, username: null}],
-                    team2 : [{id : null, avatar: null, username: null},{id : null, avatar: null, username: null}],
+                    team1 : [{id : null, avatar: null, username: null, ready: false},{id : null, avatar: null, username: null, ready: false}],
+                    team2 : [{id : null, avatar: null, username: null, ready: false},{id : null, avatar: null, username: null, ready: false}],
                     order : [{id : null},{id : null},{id : null},{id : null}],
                     state : null,
                     renounce1 : false,
@@ -381,8 +381,9 @@ public changeTeamGame =  (request: any, response: any, next: any) => {
     })
     .catch(err => this.handleError(err, response, next));
 }
-
-private endGame =  (game: any, response: any, next: any) => {
+/*
+private endGame =  (request: any, response: any, next: any) => {
+    var game = request.body._id;
     const id = game._id;
     game.state = 'terminated';
     delete game._id;
@@ -395,6 +396,63 @@ private endGame =  (game: any, response: any, next: any) => {
     .then(result => response.send(200,'terminated'))
     .catch(err => this.handleError(err, response, next));  
 
+}*/
+
+private readyToPlay =  (request: any, response: any, next: any) => {
+
+    const game_id = request.body._id;
+    const player_id = request.body.player_id;
+
+    database.db.collection('games')
+    .findOne({
+        _id: new mongodb.ObjectID(game_id)
+    })
+    .then(game => {
+        if(game != null){
+            for (var i = 0; i < 2; ++i) {
+                if(game.team1[i].id == player_id){
+                    game.team1[i].ready = true;
+                }
+                if( game.team2[i].id == player_id){
+                    game.team2[i].ready = true;
+                }
+            }
+            var isGameReady = false;
+            var count = 0;
+            for (var i = 0; i < 2; ++i) {
+                if(game.team1[i].ready){
+                    count++;
+                }
+                if( game.team2[i].ready){
+                    count++;
+                }
+            }
+            if(count == 4){
+                isGameReady = true;
+            }
+            delete game._id;
+            database.db.collection('games')
+            .updateOne({
+                _id: new mongodb.ObjectID(game_id)
+            }, {
+                $set: game
+            })
+            .then(result => {
+                if(isGameReady){
+                    response.send(200, 'gameReady');
+                }else{
+                    response.send(200, 'ready');
+                }
+            })
+            .catch(err => this.handleError(err, response, next));  
+
+
+
+        }else{
+            response.send(404,'No Game found');
+        }
+    })
+    .catch(err => this.handleError(err, response, next));
 }
 
 
@@ -413,6 +471,7 @@ public init = (server: any, settings: HandlerSettings) => {
     server.post(settings.prefix + 'games/leave', settings.security.authorize, this.leaveGame);
     server.post(settings.prefix + 'games/change', settings.security.authorize, this.changeTeamGame);
     server.get(settings.prefix + 'games/players/:id', settings.security.authorize, this.playersGame);
+    server.post(settings.prefix + 'games/ready', settings.security.authorize, this.readyToPlay);
 
     server.del(settings.prefix + 'games/:id', settings.security.authorize, this.deleteGame);
     console.log("Games routes registered");
