@@ -22,7 +22,7 @@ var GamePlayer = (function () {
     GamePlayer.prototype.updateCard = function (card) {
         var card_pos = -1;
         for (var i = 0; i < this.hand.length; ++i) {
-            if (this.hand[i].id = card.id) {
+            if (this.hand[i].id == card.id) {
                 card_pos = i;
             }
         }
@@ -41,7 +41,6 @@ var GamePlayer = (function () {
         this.tableCard.isOnHand = false;
         this.tableCard.isOnTable = true;
         this.tableCard.isUsed = false;
-        console.log(this.tableCard);
     };
     return GamePlayer;
 }());

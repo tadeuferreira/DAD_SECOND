@@ -83,7 +83,6 @@ var Card = (function () {
         else {
             this.imgUrl += (this.ctype + 4) + '.png';
         }
-        console.log(this.imgUrl + ' ' + this.id);
     }
     return Card;
 }());

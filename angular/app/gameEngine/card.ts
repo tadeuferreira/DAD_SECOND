@@ -81,7 +81,5 @@ export class Card{
        }else{
           this.imgUrl += (this.ctype+4)+'.png';
        }
-       
-     console.log(this.imgUrl+' '+this.id);
     }
 }

@@ -86,11 +86,12 @@ export class Game{
 	private getHand(deck: Card[], pos: number, player_id : string) : Card[]{
 		let hand : Card[] = [];
 
-		for (var k = pos * 10; k < 9 +(pos*10); ++k) {
+		for (var k = pos * 10; k < (9 +(pos*10))+1; ++k) {
 			let card: Card = deck[k];
 			card.isOnHand = true;
 			card.player_id = player_id;
 			hand.push(card);
+			console.log(k);
 		}
 		return hand;
 	}
@@ -155,7 +156,7 @@ export class Game{
 		
 	}
 	public checkGame(){
-		
+
 	}
 
 

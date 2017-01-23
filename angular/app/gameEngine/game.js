@@ -69,11 +69,12 @@ var Game = (function () {
     };
     Game.prototype.getHand = function (deck, pos, player_id) {
         var hand = [];
-        for (var k = pos * 10; k < 9 + (pos * 10); ++k) {
+        for (var k = pos * 10; k < (9 + (pos * 10)) + 1; ++k) {
             var card = deck[k];
             card.isOnHand = true;
             card.player_id = player_id;
             hand.push(card);
+            console.log(k);
         }
         return hand;
     };
