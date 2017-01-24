@@ -61,6 +61,9 @@ export class WebSocketService {
         this.socket.off('initLobby', null);
         this.socket.off('exitLobby', null);
     }
+    unsubGame(){
+        this.socket.off('gamePlay', null);
+    }
     sendGame(msgData: any){
         this.socket.emit('gamePlay', msgData);
     }

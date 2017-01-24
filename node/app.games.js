@@ -19,7 +19,6 @@ var Game = (function () {
                     response.send(404, 'Game not found');
                 }
                 else {
-                    console.log(game);
                     response.json(game);
                 }
                 next();
@@ -87,7 +86,7 @@ var Game = (function () {
                         owner: null,
                         team1: [{ id: null, avatar: null, username: null, ready: false }, { id: null, avatar: null, username: null, ready: false }],
                         team2: [{ id: null, avatar: null, username: null, ready: false }, { id: null, avatar: null, username: null, ready: false }],
-                        order: [{ id: null }, { id: null }, { id: null }, { id: null }],
+                        basicOrder: [{ id: null }, { id: null }, { id: null }, { id: null }],
                         state: null,
                         renounce1: false,
                         renounce2: false,
@@ -174,10 +173,10 @@ var Game = (function () {
                             }
                             var player_list = [];
                             // third player is first's friend
-                            game.order[0] = (first_team == 1 ? game.team1[first_pos].id : game.team2[first_pos].id);
-                            game.order[1] = (first_team == 1 ? (first_pos == 0 ? game.team2[1].id : game.team2[0].id) : (first_pos == 0 ? game.team1[1].id : game.team1[0].id));
-                            game.order[2] = (first_team == 1 ? (first_pos == 0 ? game.team1[1].id : game.team1[0].id) : (first_pos == 0 ? game.team2[1].id : game.team2[0].id));
-                            game.order[3] = (first_team == 1 ? (first_pos == 0 ? game.team2[0].id : game.team2[1].id) : (first_pos == 0 ? game.team1[0].id : game.team1[1].id));
+                            game.basicOrder[0] = (first_team == 1 ? game.team1[first_pos].id : game.team2[first_pos].id);
+                            game.basicOrder[1] = (first_team == 1 ? (first_pos == 0 ? game.team2[1].id : game.team2[0].id) : (first_pos == 0 ? game.team1[1].id : game.team1[0].id));
+                            game.basicOrder[2] = (first_team == 1 ? (first_pos == 0 ? game.team1[1].id : game.team1[0].id) : (first_pos == 0 ? game.team2[1].id : game.team2[0].id));
+                            game.basicOrder[3] = (first_team == 1 ? (first_pos == 0 ? game.team2[0].id : game.team2[1].id) : (first_pos == 0 ? game.team1[0].id : game.team1[1].id));
                         }
                         var game_id = game._id;
                         delete game._id;
@@ -216,7 +215,6 @@ var Game = (function () {
         };
         this.playersGame = function (request, response, next) {
             var id = new mongodb.ObjectID(request.params.id);
-            console.log(id);
             app_database_1.databaseConnection.db.collection('games')
                 .findOne({
                 _id: id
@@ -252,7 +250,6 @@ var Game = (function () {
         };
         this.leaveGame = function (request, response, next) {
             var info = request.body;
-            console.log(info);
             app_database_1.databaseConnection.db.collection('games')
                 .findOne({
                 _id: new mongodb.ObjectID(info._id)
@@ -301,7 +298,6 @@ var Game = (function () {
         };
         this.changeTeamGame = function (request, response, next) {
             var info = request.body;
-            console.log(info);
             app_database_1.databaseConnection.db.collection('games')
                 .findOne({
                 _id: new mongodb.ObjectID(info._id)
@@ -317,8 +313,6 @@ var Game = (function () {
                             team = 2;
                         }
                     }
-                    console.log(info.player_id);
-                    console.log(team);
                     var isChanged = false;
                     if (team === 1) {
                         for (var j = 0; j < 2; ++j) {
@@ -399,11 +393,16 @@ var Game = (function () {
             })
                 .then(function (game) {
                 if (game != null) {
+                    var alreadyReady = false;
                     for (var i = 0; i < 2; ++i) {
                         if (game.team1[i].id == player_id) {
+                            if (game.team1[i].ready)
+                                alreadyReady = true;
                             game.team1[i].ready = true;
                         }
                         if (game.team2[i].id == player_id) {
+                            if (game.team2[i].ready)
+                                alreadyReady = true;
                             game.team2[i].ready = true;
                         }
                     }
@@ -429,7 +428,10 @@ var Game = (function () {
                     })
                         .then(function (result) {
                         if (isGameReady) {
-                            response.send(200, 'gameReady');
+                            if (alreadyReady)
+                                response.send(200, 'gameStartedAlready');
+                            else
+                                response.send(200, 'gameReady');
                         }
                         else {
                             response.send(200, 'ready');

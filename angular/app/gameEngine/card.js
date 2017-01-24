@@ -1,16 +1,16 @@
 "use strict";
 var TypeCard;
 (function (TypeCard) {
-    TypeCard[TypeCard["Ace"] = 0] = "Ace";
-    TypeCard[TypeCard["Two"] = 1] = "Two";
-    TypeCard[TypeCard["Three"] = 2] = "Three";
-    TypeCard[TypeCard["Four"] = 3] = "Four";
-    TypeCard[TypeCard["Five"] = 4] = "Five";
-    TypeCard[TypeCard["Six"] = 5] = "Six";
-    TypeCard[TypeCard["Seven"] = 6] = "Seven";
-    TypeCard[TypeCard["Jack"] = 7] = "Jack";
-    TypeCard[TypeCard["Queen"] = 8] = "Queen";
-    TypeCard[TypeCard["King"] = 9] = "King";
+    TypeCard[TypeCard["Two"] = 0] = "Two";
+    TypeCard[TypeCard["Three"] = 1] = "Three";
+    TypeCard[TypeCard["Four"] = 2] = "Four";
+    TypeCard[TypeCard["Five"] = 3] = "Five";
+    TypeCard[TypeCard["Six"] = 4] = "Six";
+    TypeCard[TypeCard["Jack"] = 5] = "Jack";
+    TypeCard[TypeCard["Queen"] = 6] = "Queen";
+    TypeCard[TypeCard["King"] = 7] = "King";
+    TypeCard[TypeCard["Seven"] = 8] = "Seven";
+    TypeCard[TypeCard["Ace"] = 9] = "Ace"; //9
 })(TypeCard = exports.TypeCard || (exports.TypeCard = {}));
 var SuitType;
 (function (SuitType) {
@@ -45,43 +45,18 @@ var Card = (function () {
                 this.imgUrl = "/img/cards/o";
                 break;
         }
-        switch (type) {
-            case 0:
-                this.ctype = TypeCard.Two;
-                break;
-            case 1:
-                this.ctype = TypeCard.Three;
-                break;
-            case 2:
-                this.ctype = TypeCard.Four;
-                break;
-            case 3:
-                this.ctype = TypeCard.Five;
-                break;
-            case 4:
-                this.ctype = TypeCard.Six;
-                break;
-            case 5:
-                this.ctype = TypeCard.Seven;
-                break;
-            case 6:
-                this.ctype = TypeCard.Queen;
-                break;
-            case 7:
-                this.ctype = TypeCard.Jack;
-                break;
-            case 8:
-                this.ctype = TypeCard.King;
-                break;
-            case 9:
-                this.ctype = TypeCard.Ace;
-                break;
+        this.ctype = type;
+        if (this.ctype <= 4) {
+            this.imgUrl += (this.ctype + 2) + '.png';
         }
-        if (this.ctype <= 6) {
-            this.imgUrl += (this.ctype + 1) + '.png';
+        else if (this.ctype <= 7) {
+            this.imgUrl += (this.ctype + 6) + '.png';
         }
-        else {
-            this.imgUrl += (this.ctype + 4) + '.png';
+        else if (this.ctype == 9) {
+            this.imgUrl += 1 + '.png';
+        }
+        else if (this.ctype == 8) {
+            this.imgUrl += 7 + '.png';
         }
     }
     return Card;

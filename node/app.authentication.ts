@@ -4,7 +4,6 @@ export class Authentication{
    
     public login = (request: any, response: any, next: any) => {
         let player = request.user;
-        console.log(player);
         response.json(player);
         return next();
     }

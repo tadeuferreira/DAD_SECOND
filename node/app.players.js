@@ -60,7 +60,6 @@ var Player = (function () {
         };
         this.createPlayer = function (request, response, next) {
             var player = request.body;
-            console.log(player);
             if (player === undefined) {
                 response.send(400, 'No player data');
                 return next();

@@ -60,6 +60,9 @@ var WebSocketService = (function () {
         this.socket.off('initLobby', null);
         this.socket.off('exitLobby', null);
     };
+    WebSocketService.prototype.unsubGame = function () {
+        this.socket.off('gamePlay', null);
+    };
     WebSocketService.prototype.sendGame = function (msgData) {
         this.socket.emit('gamePlay', msgData);
     };

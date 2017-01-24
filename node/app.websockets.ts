@@ -53,35 +53,45 @@ export class WebSocketServer {
           hour: "numeric", 
           minute: "numeric",
           second: "numeric"})  + ': ' + msgData.username + ' has arrived');
-
-
       });
 
       client.on('gamePlay', function (msgData) {
 
         switch(msgData.msg){
+
           case 'startGame':
           this.join(msgData._id);
           this.emit('gamePlay', {_id: msgData._id, msg: 'play', pos : 0});
           this.to(msgData._id).emit('gamePlay',  {_id: msgData._id, msg: 'play', pos : 0});
           break;
 
+          case 'startRound':
+          this.join(msgData._id);
+          console.log(msgData.pos);
+          this.emit('gamePlay', {_id: msgData._id, msg: 'play', pos : msgData.pos});
+          this.to(msgData._id).emit('gamePlay',  {_id: msgData._id, msg: 'play', pos : msgData.pos});
+          break;
+
           case 'next':
           this.join(msgData._id);
-
+          console.log(msgData);
           this.emit('gamePlay', {_id: msgData._id , msg : 'update' , pos: msgData.my_pos, card: msgData.card});
           this.to(msgData._id).emit('gamePlay', {_id: msgData._id , msg : 'update' , pos: msgData.my_pos, card: msgData.card});
 
           this.emit('gamePlay', {_id: msgData._id , msg : 'play' , pos: msgData.next_pos});
           this.to(msgData._id).emit('gamePlay', {_id: msgData._id , msg : 'play' , pos: msgData.next_pos});
           break;
-          /*
-          case 'endTurn':
+          
+          case 'endRound':
           this.join(msgData._id);
-          this.emit('gamePlay', {_id: msgData._id , msg : 'terminated'});
-          this.to(msgData._id).emit('gamePlay', {_id: msgData._id , msg : 'terminated'});
+          console.log('end Round');
+          this.emit('gamePlay', {_id: msgData._id , msg : 'updateRound' , pos: msgData.my_pos, card: msgData.card, firstToPlay : msgData.firstToPlay,
+              lastToPlay : msgData.lastToPlay });
+          this.to(msgData._id).emit('gamePlay', {_id: msgData._id , msg : 'updateRound' , pos: msgData.my_pos, card: msgData.card, firstToPlay : msgData.firstToPlay,
+              lastToPlay : msgData.lastToPlay });
           break;
 
+          /*
           case 'endGame':
           this.join(msgData._id);
           this.emit('gamePlay', {_id: msgData._id , msg : 'terminated'});

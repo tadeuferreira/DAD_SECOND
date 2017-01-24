@@ -19,7 +19,6 @@ export class Game {
             if (game === null) {
                 response.send(404, 'Game not found');
             } else {
-                console.log(game);
                 response.json(game);
             }
             next();
@@ -94,7 +93,7 @@ export class Game {
                     owner : null,
                     team1 : [{id : null, avatar: null, username: null, ready: false},{id : null, avatar: null, username: null, ready: false}],
                     team2 : [{id : null, avatar: null, username: null, ready: false},{id : null, avatar: null, username: null, ready: false}],
-                    order : [{id : null},{id : null},{id : null},{id : null}],
+                    basicOrder : [{id : null},{id : null},{id : null},{id : null}],
                     state : null,
                     renounce1 : false,
                     renounce2 : false,
@@ -186,10 +185,10 @@ export class Game {
 
                         let player_list : any[] = [];
                         // third player is first's friend
-                        game.order[0] = (first_team == 1 ?  game.team1[first_pos].id :  game.team2[first_pos].id);
-                        game.order[1] = (first_team == 1 ?( first_pos == 0 ? game.team2[1].id : game.team2[0].id) : ( first_pos == 0 ? game.team1[1].id : game.team1[0].id));
-                        game.order[2] = (first_team == 1 ?( first_pos == 0 ? game.team1[1].id : game.team1[0].id) : ( first_pos == 0 ? game.team2[1].id : game.team2[0].id));
-                        game.order[3] = (first_team == 1 ?( first_pos == 0 ? game.team2[0].id : game.team2[1].id) : ( first_pos == 0 ? game.team1[0].id : game.team1[1].id));
+                        game.basicOrder[0] = (first_team == 1 ?  game.team1[first_pos].id :  game.team2[first_pos].id);
+                        game.basicOrder[1] = (first_team == 1 ?( first_pos == 0 ? game.team2[1].id : game.team2[0].id) : ( first_pos == 0 ? game.team1[1].id : game.team1[0].id));
+                        game.basicOrder[2] = (first_team == 1 ?( first_pos == 0 ? game.team1[1].id : game.team1[0].id) : ( first_pos == 0 ? game.team2[1].id : game.team2[0].id));
+                        game.basicOrder[3] = (first_team == 1 ?( first_pos == 0 ? game.team2[0].id : game.team2[1].id) : ( first_pos == 0 ? game.team1[0].id : game.team1[1].id));
                     }
                     
                     var game_id = game._id;
@@ -228,7 +227,6 @@ export class Game {
 
 public playersGame =  (request: any, response: any, next: any) => {
     const id = new mongodb.ObjectID(request.params.id);
-    console.log(id);
     database.db.collection('games')
     .findOne({
         _id: id
@@ -264,7 +262,6 @@ public playersGame =  (request: any, response: any, next: any) => {
 
 public leaveGame =  (request: any, response: any, next: any) => {
     var info = request.body;
-    console.log(info);
     database.db.collection('games')
     .findOne({
         _id: new mongodb.ObjectID(info._id)
@@ -310,7 +307,6 @@ public leaveGame =  (request: any, response: any, next: any) => {
 }
 public changeTeamGame =  (request: any, response: any, next: any) => {
     var info = request.body;
-    console.log(info);
     database.db.collection('games')
     .findOne({
         _id: new mongodb.ObjectID(info._id)
@@ -326,8 +322,6 @@ public changeTeamGame =  (request: any, response: any, next: any) => {
                     team = 2;
                 }
             }
-            console.log(info.player_id);
-            console.log(team);
             var isChanged = false;
             if(team === 1){
                 for (var j = 0; j < 2; ++j) {
@@ -409,11 +403,16 @@ private readyToPlay =  (request: any, response: any, next: any) => {
     })
     .then(game => {
         if(game != null){
+            var alreadyReady = false;
             for (var i = 0; i < 2; ++i) {
                 if(game.team1[i].id == player_id){
+                    if(game.team1[i].ready)
+                        alreadyReady = true;
                     game.team1[i].ready = true;
                 }
                 if( game.team2[i].id == player_id){
+                    if(game.team2[i].ready)
+                        alreadyReady = true;
                     game.team2[i].ready = true;
                 }
             }
@@ -439,7 +438,10 @@ private readyToPlay =  (request: any, response: any, next: any) => {
             })
             .then(result => {
                 if(isGameReady){
-                    response.send(200, 'gameReady');
+                    if(alreadyReady)
+                        response.send(200, 'gameStartedAlready');
+                    else
+                        response.send(200, 'gameReady');
                 }else{
                     response.send(200, 'ready');
                 }
@@ -454,9 +456,6 @@ private readyToPlay =  (request: any, response: any, next: any) => {
     })
     .catch(err => this.handleError(err, response, next));
 }
-
-
-
 
 // Routes for the games
 public init = (server: any, settings: HandlerSettings) => {
@@ -476,8 +475,6 @@ public init = (server: any, settings: HandlerSettings) => {
     server.del(settings.prefix + 'games/:id', settings.security.authorize, this.deleteGame);
     console.log("Games routes registered");
 };    
-
-
 
 private createCards() {
     var pack = {
@@ -504,7 +501,9 @@ private shuffleArray(array) {
     }
     return array;
 }
+
 private getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 }

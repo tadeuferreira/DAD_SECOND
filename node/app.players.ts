@@ -67,7 +67,6 @@ export class Player {
     
     public createPlayer = (request: any, response: any, next: any) => {
         const player = request.body;
-        console.log(player);
         if (player === undefined) {
             response.send(400, 'No player data');
             return next();

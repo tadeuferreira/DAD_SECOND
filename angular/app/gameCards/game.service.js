@@ -22,10 +22,8 @@ var GameService = (function () {
         var playerInfo = { _id: sessionStorage.getItem('id'), username: sessionStorage.getItem('username') };
         var body = JSON.stringify({ player: playerInfo, state: 'pending', creationDate: Date.now() });
         var headers = new http_1.Headers();
-        console.log(sessionStorage.getItem('token'));
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
-        console.log(body);
         this.http
             .post('http://localhost:7777/api/v1/games', body, { headers: headers, withCredentials: false })
             .subscribe(function (response) {
@@ -39,7 +37,6 @@ var GameService = (function () {
     };
     GameService.prototype.getGames = function () {
         var headers = new http_1.Headers();
-        console.log(sessionStorage.getItem('token'));
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
         return this.http.get('http://localhost:7777/api/v1/games', { headers: headers, withCredentials: false });
@@ -58,7 +55,6 @@ var GameService = (function () {
         return this.http.get('http://localhost:7777/api/v1/games/players/' + sessionStorage.getItem('game_id'), { headers: headers, withCredentials: false });
     };
     GameService.prototype.leaveGame = function () {
-        console.log(sessionStorage.getItem('game_id'));
         var body = JSON.stringify({ _id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id') });
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/json');
@@ -66,7 +62,6 @@ var GameService = (function () {
         return this.http.post('http://localhost:7777/api/v1/games/leave', body, { headers: headers, withCredentials: false });
     };
     GameService.prototype.ready = function () {
-        console.log(sessionStorage.getItem('game_id'));
         var body = JSON.stringify({ _id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id') });
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/json');
@@ -85,6 +80,12 @@ var GameService = (function () {
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
         return this.http.get('http://localhost:7777/api/v1/games/' + sessionStorage.getItem('game_id'), { headers: headers, withCredentials: false });
+    };
+    GameService.prototype.updateGame = function (game) {
+        var headers = new http_1.Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
+        return this.http.put('http://localhost:7777/api/v1/games/' + game._id, game, { headers: headers, withCredentials: false });
     };
     return GameService;
 }());

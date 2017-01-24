@@ -1,14 +1,14 @@
 export enum TypeCard {
-    Ace,//0
-    Two,//1
-    Three,//2
-    Four,//3
-    Five,//4
-    Six,//5
-    Seven,//6
-    Jack,//7
-    Queen,//8
-    King,//9
+    Two,//0
+    Three,//1
+    Four,//2
+    Five,//3
+    Six,//4
+    Jack,//5
+    Queen,//6
+    King,//7
+    Seven,//8
+    Ace//9
 }
 
 export enum SuitType{
@@ -54,32 +54,16 @@ export class Card{
          this.imgUrl = "/img/cards/o";
          break;
        }
-       switch (type) {
-       	case 0: this.ctype = TypeCard.Two;
-       	break;
-       	case 1: this.ctype = TypeCard.Three;
-       	break;
-       	case 2: this.ctype = TypeCard.Four;
-       	break;
-       	case 3: this.ctype = TypeCard.Five;
-       	break;
-       	case 4: this.ctype = TypeCard.Six;
-       	break;
-       	case 5: this.ctype = TypeCard.Seven;
-       	break;
-       	case 6: this.ctype = TypeCard.Queen;
-       	break;
-       	case 7: this.ctype = TypeCard.Jack;
-       	break;
-       	case 8: this.ctype = TypeCard.King;
-       	break;
-       	case 9: this.ctype = TypeCard.Ace;
-       	break;
-       }
-       if(this.ctype <= 6){
-          this.imgUrl += (this.ctype+1)+'.png';
-       }else{
-          this.imgUrl += (this.ctype+4)+'.png';
+
+       this.ctype = type;
+       if(this.ctype <= 4){
+          this.imgUrl += (this.ctype+2)+'.png';
+       }else if(this.ctype <= 7 ){
+          this.imgUrl += (this.ctype+6)+'.png';
+       }else if(this.ctype == 9){
+         this.imgUrl += 1+'.png';
+       }else if(this.ctype == 8){
+         this.imgUrl += 7+'.png';
        }
     }
 }
