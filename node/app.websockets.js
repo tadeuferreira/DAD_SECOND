@@ -11,15 +11,26 @@ var WebSocketServer = (function () {
             _this.io = io.listen(server);
             _this.io.sockets.on('connection', function (client) {
                 //chat 
-                client.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false,
-                    hour: "numeric",
-                    minute: "numeric",
-                    second: "numeric" }) + ': Welcome to Sueca (card game) Chat');
+                /*client.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false,
+                  hour: "numeric",
+                  minute: "numeric",
+                  second: "numeric"}) + ': Welcome to Sueca (card game) Global Chat');
+          
                 client.broadcast.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false,
-                    hour: "numeric",
-                    minute: "numeric",
-                    second: "numeric" }) + ': A new player has arrived');
+                  hour: "numeric",
+                  minute: "numeric",
+                  second: "numeric"})  + ': A new player has arrived');*/
                 client.on('chat', function (data) { return _this.io.emit('chat', data); });
+                client.on('players', function (msgData) {
+                    this.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false,
+                        hour: "numeric",
+                        minute: "numeric",
+                        second: "numeric" }) + ': Welcome to Sueca (card game) Global Chat');
+                    this.broadcast.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false,
+                        hour: "numeric",
+                        minute: "numeric",
+                        second: "numeric" }) + ': ' + msgData.username + ' has enter the chat');
+                });
                 client.on('chatGame', function (msgData) {
                     this.join(msgData.game_id);
                     this.emit('chatGame', new Date().toLocaleTimeString('en-US', { hour12: false,
@@ -33,7 +44,10 @@ var WebSocketServer = (function () {
                 });
                 client.on('gameNotification', function (msgData) {
                     this.join(msgData.game_id);
-                    this.emit('gameNotification', msgData.username + ': Welcome to game Room ' + msgData.game_id);
+                    this.emit('gameNotification', new Date().toLocaleTimeString('en-US', { hour12: false,
+                        hour: "numeric",
+                        minute: "numeric",
+                        second: "numeric" }) + ': ' + msgData.username + ': Welcome to Game Room');
                     this.broadcast.to(msgData.game_id).emit('gameNotification', new Date().toLocaleTimeString('en-US', { hour12: false,
                         hour: "numeric",
                         minute: "numeric",

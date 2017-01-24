@@ -18,7 +18,7 @@ var GameChatComponent = (function () {
         this.http = http;
         this.websocketService = websocketService;
         this.playersCChannel = [];
-        this.chatCChannel = [];
+        this.chatGameChannel = [];
         this.username = sessionStorage.getItem('username');
     }
     GameChatComponent.prototype.send = function () {
@@ -27,8 +27,8 @@ var GameChatComponent = (function () {
     };
     GameChatComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.websocketService.getGameChatMessages().subscribe(function (m) { return _this.chatCChannel.push(m); });
-        this.websocketService.getGamePlayersMessages().subscribe(function (m) { return _this.playersCChannel.push(m); });
+        this.websocketService.getGameChatMessages().subscribe(function (m) { return _this.chatGameChannel.push(m); });
+        this.websocketService.getGamePlayersMessages().subscribe(function (m) { return _this.chatGameChannel.push(m); });
         this.websocketService.sendGamePlayersMessage({ game_id: this.game_id, msg: '', username: this.username });
     };
     return GameChatComponent;
@@ -41,7 +41,8 @@ GameChatComponent = __decorate([
     core_1.Component({
         moduleId: module.id,
         selector: 'gameChat',
-        templateUrl: 'gameChat.component.html'
+        templateUrl: 'gameChat.component.html',
+        styleUrls: ['../gameCards/gameChat.component.css']
     }),
     __metadata("design:paramtypes", [router_1.Router, http_1.Http, websocket_service_1.WebSocketService])
 ], GameChatComponent);

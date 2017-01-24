@@ -24,6 +24,9 @@ export class WebSocketService {
     getChatMessages(): Observable<any> {
         return this.listenOnChannel('chat');
     }
+    sendPlayersMessages(message: any){
+        this.socket.emit('players', message);
+    }
     getPlayersMessages(): Observable<any> {
         return this.listenOnChannel('players');
     }
