@@ -26,6 +26,9 @@ var WebSocketService = (function () {
     WebSocketService.prototype.getChatMessages = function () {
         return this.listenOnChannel('chat');
     };
+    WebSocketService.prototype.sendPlayersMessages = function (message) {
+        this.socket.emit('players', message);
+    };
     WebSocketService.prototype.getPlayersMessages = function () {
         return this.listenOnChannel('players');
     };

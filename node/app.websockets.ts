@@ -19,19 +19,30 @@ export class WebSocketServer {
     this.io.sockets.on('connection', (client: any) => {
 
       //chat 
-      client.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false, 
+      /*client.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false, 
         hour: "numeric", 
         minute: "numeric",
-        second: "numeric"}) + ': Welcome to Sueca (card game) Chat');
+        second: "numeric"}) + ': Welcome to Sueca (card game) Global Chat');
 
       client.broadcast.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false, 
         hour: "numeric", 
         minute: "numeric",
-        second: "numeric"})  + ': A new player has arrived');
+        second: "numeric"})  + ': A new player has arrived');*/
 
       client.on('chat', (data) => this.io.emit('chat', data));
 
+      client.on('players', function  (msgData) {
 
+        this.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false, 
+                                                                      hour: "numeric", 
+                                                                      minute: "numeric",
+                                                                      second: "numeric"}) + ': Welcome to Sueca (card game) Global Chat');
+
+        this.broadcast.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false, 
+                                                                                hour: "numeric", 
+                                                                                minute: "numeric",
+                                                                                second: "numeric"}) +': ' + msgData.username +' has enter the chat');
+      });
 
       client.on('chatGame', function (msgData) {
         this.join(msgData.game_id);
@@ -48,7 +59,10 @@ export class WebSocketServer {
 
       client.on('gameNotification', function (msgData) {
         this.join(msgData.game_id);
-        this.emit('gameNotification', msgData.username + ': Welcome to game Room ' + msgData.game_id);
+        this.emit('gameNotification', new Date().toLocaleTimeString('en-US', { hour12: false, 
+          hour: "numeric", 
+          minute: "numeric",
+          second: "numeric"})  + ': '+msgData.username + ': Welcome to Game Room');
         this.broadcast.to(msgData.game_id).emit('gameNotification', new Date().toLocaleTimeString('en-US', { hour12: false, 
           hour: "numeric", 
           minute: "numeric",

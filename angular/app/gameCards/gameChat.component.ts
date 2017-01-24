@@ -7,14 +7,15 @@ import { Router } from '@angular/router';
 @Component({
     moduleId: module.id,
     selector: 'gameChat',
-    templateUrl: 'gameChat.component.html'
+    templateUrl: 'gameChat.component.html',
+    styleUrls: [ '../gameCards/gameChat.component.css' ]
 })
 
 export class GameChatComponent {
     @Input() game_id: string;
     public message: string;
     public playersCChannel: string[] = [];
-    public chatCChannel: string[] = [];
+    public chatGameChannel: string[] = [];
     public username: string = sessionStorage.getItem('username');
 
 
@@ -26,8 +27,8 @@ export class GameChatComponent {
     }
 
     ngOnInit() {
-        this.websocketService.getGameChatMessages().subscribe((m: any) => this.chatCChannel.push(<string>m));
-        this.websocketService.getGamePlayersMessages().subscribe((m: any) => this.playersCChannel.push(<string>m));
+        this.websocketService.getGameChatMessages().subscribe((m: any) => this.chatGameChannel.push(<string>m));
+        this.websocketService.getGamePlayersMessages().subscribe((m: any) => this.chatGameChannel.push(<string>m));
         this.websocketService.sendGamePlayersMessage({game_id: this.game_id, msg: '', username: this.username});
     }
 }

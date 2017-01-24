@@ -1,14 +1,13 @@
+<h2>Chat</h2>
+<div class="chatbox">
+    <p *ngFor="let m of chatGameChannel">{{m}}</p>
+</div>
+
 <form #messageForm="ngForm">
-    <input name="message" placeholder="Type a message" size="50" required
-            [(ngModel)]="message"
-        >
-    <button class="btn btn-primary"
-        [disabled]="!messageForm.form.valid"
-        (click)="send()">Send</button>
+    <input name="message" placeholder="Type a message" size="50" required [(ngModel)]="message">
+    <button class="btn btn-primary" [disabled]="!messageForm.form.valid" (click)="send()">Send</button>
 </form>
 
-<h2>Player Notifications</h2>
+<!--<h2>Player Notifications</h2>
 <p *ngFor="let m of playersCChannel">{{m}}</p>
-
-<h2>Chat history</h2>
-<p *ngFor="let m of chatCChannel">{{m}}</p>
+-->

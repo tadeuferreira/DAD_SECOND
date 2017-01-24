@@ -15,11 +15,13 @@ var NotificationComponent = (function () {
         this.websocketService = websocketService;
         this.playersChannel = [];
         this.chatChannel = [];
+        this.username = sessionStorage.getItem('username');
     }
     NotificationComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.websocketService.getChatMessages().subscribe(function (m) { return _this.chatChannel.push(m); });
-        this.websocketService.getPlayersMessages().subscribe(function (m) { return _this.playersChannel.push(m); });
+        this.websocketService.getPlayersMessages().subscribe(function (m) { return _this.chatChannel.push(m); });
+        this.websocketService.sendPlayersMessages({ username: this.username, msg: '' });
     };
     return NotificationComponent;
 }());
@@ -27,7 +29,8 @@ NotificationComponent = __decorate([
     core_1.Component({
         moduleId: module.id,
         selector: 'notification-panel',
-        templateUrl: 'notification.component.html'
+        templateUrl: 'notification.component.html',
+        styleUrls: ['../notifications/notification.component.css']
     }),
     __metadata("design:paramtypes", [websocket_service_1.WebSocketService])
 ], NotificationComponent);
