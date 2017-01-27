@@ -72,6 +72,7 @@ export class WebSocketServer {
     switch (response) {
       case 'changed':
       case 'joined':
+      case 'left':
       data = {msg: 'update'};
       break;
       case 'start':
@@ -296,6 +297,16 @@ export class WebSocketServer {
             }
           }
         }
+        var count = 0;
+        for (var i = 0; i < 2; ++i) {
+          if(game.team1[i].id != null){
+              count++;
+            }
+            if( game.team2[i].id != null){
+              count++;
+            }
+        }
+        game.count = count;
         delete game._id;
         database.db.collection('games')
         .updateOne({
@@ -307,7 +318,7 @@ export class WebSocketServer {
           if(ownerPresent){
             this.responseGame(msgData,client,'terminated');
           }else{
-            this.responseGame(msgData,client,'update');
+            this.responseGame(msgData,client,'left');
           }
         })
         .catch(err => console.log(err.msg));    

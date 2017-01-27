@@ -64,6 +64,7 @@ var WebSocketServer = (function () {
             switch (response) {
                 case 'changed':
                 case 'joined':
+                case 'left':
                     data = { msg: 'update' };
                     break;
                 case 'start':
@@ -283,6 +284,16 @@ var WebSocketServer = (function () {
                             }
                         }
                     }
+                    var count = 0;
+                    for (var i = 0; i < 2; ++i) {
+                        if (game.team1[i].id != null) {
+                            count++;
+                        }
+                        if (game.team2[i].id != null) {
+                            count++;
+                        }
+                    }
+                    game.count = count;
                     delete game._id;
                     app_database_1.databaseConnection.db.collection('games')
                         .updateOne({
@@ -295,7 +306,7 @@ var WebSocketServer = (function () {
                             _this.responseGame(msgData, client, 'terminated');
                         }
                         else {
-                            _this.responseGame(msgData, client, 'update');
+                            _this.responseGame(msgData, client, 'left');
                         }
                     })
                         .catch(function (err) { return console.log(err.msg); });
