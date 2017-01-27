@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { UserService } from '../auth/user.service';
 import { GameService } from '../gameCards/game.service';
 import { WebSocketService } from '../notifications/websocket.service';
-import { Game } from '../gameEngine/game';
+
 
 @Component({
 	moduleId: module.id,
@@ -15,7 +15,7 @@ import { Game } from '../gameEngine/game';
 export class GameComponent implements OnInit, OnDestroy{
 	private game_id: string = sessionStorage.getItem('game_id');
 	private player_id: string = sessionStorage.getItem('id');
-	game : Game;
+	game : any;
 	public isGameReady:boolean = false;
 	public message : string = 'Wait';
 
@@ -29,7 +29,7 @@ export class GameComponent implements OnInit, OnDestroy{
 			this.gameService.getGame().subscribe(
 				response => {
 					console.log(this.game_id);
-					this.game = new Game(response.json());
+					//this.game = new Game(response.json());
 					this.isGameReady = true;
 					this.gameService.ready().subscribe(response => {
 						if(response.ok){

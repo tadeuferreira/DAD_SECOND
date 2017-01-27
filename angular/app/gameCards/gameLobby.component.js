@@ -22,8 +22,9 @@ var GameLobbyComponent = (function () {
         this.players = [];
         this.team1 = [];
         this.team2 = [];
-        this.gameIsStarting = false;
         this.game_id = sessionStorage.getItem('game_id');
+        this.player_id = sessionStorage.getItem('id');
+        this.gameIsStarting = false;
     }
     GameLobbyComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -31,50 +32,35 @@ var GameLobbyComponent = (function () {
             this.router.navigate(['login']);
         }
         else {
-            this.gameService.joinGame().subscribe(function (response) {
-                if (response.ok) {
-                    switch (response._body) {
-                        case '"joined"':
-                            _this.websocketService.sendInitLobby({ _id: _this.game_id, msg: 'joining' });
-                            break;
-                        case '"start"':
-                            _this.websocketService.sendInitLobby({ _id: _this.game_id, msg: 'start' });
-                            break;
-                        case '"already In"':
-                            _this.websocketService.sendInitLobby({ _id: _this.game_id, msg: 'already In' });
-                            break;
-                    }
-                    _this.websocketService.getInitLobby().subscribe(function (p) {
-                        if (p.msg == 'refresh') {
-                            _this.gameService.getPlayersGame().subscribe(function (response) {
+            //join game 
+            this.websocketService.sendLobby({ _id: this.game_id, player_id: this.player_id, player_avatar: sessionStorage.getItem('avatar'), player_username: sessionStorage.getItem('username'), msg: 'join' });
+            this.websocketService.subLobby().subscribe(function (response) {
+                switch (response.msg) {
+                    case 'update':
+                        _this.gameService.getPlayersGame().subscribe(function (response) {
+                            if (response.ok)
                                 _this.setPlayers(response);
-                            }, function (error) {
-                                console.log(error);
-                            });
-                        }
-                        else if (p.msg == 'startGame') {
-                            _this.websocketService.unsubLobby();
-                            _this.gameIsStarting = true;
-                            _this.router.navigate(['game/playing']);
-                        }
-                    });
-                    _this.websocketService.getExitLobby().subscribe(function (p) {
-                        if (p.msg == 'terminated') {
-                            _this.router.navigate(['dashboard']);
-                        }
-                    });
+                        }, function (error) {
+                            console.log(error.text());
+                        });
+                        break;
+                    case 'start':
+                        _this.gameIsStarting = true;
+                        _this.router.navigate(['game/playing']);
+                        break;
+                    case 'switch_fail':
+                        alert('cant switch team');
+                        break;
+                    case 'terminated':
+                        _this.end();
+                        break;
                 }
-                else {
-                    _this.router.navigate(['dashboard']);
-                }
-            }, function (error) {
-                console.log(error);
             });
         }
     };
     GameLobbyComponent.prototype.ngOnDestroy = function () {
         if (!this.gameIsStarting)
-            this.leave();
+            this.websocketService.sendLobby({ _id: this.game_id, player_id: this.player_id, msg: 'leave' });
     };
     GameLobbyComponent.prototype.setPlayers = function (response) {
         var json = JSON.parse(response._body);
@@ -82,42 +68,18 @@ var GameLobbyComponent = (function () {
         this.team2 = json.team2;
     };
     GameLobbyComponent.prototype.changeTeam = function () {
-        var _this = this;
-        this.gameService.changeTeamGame().subscribe(function (response) {
-            if (response.ok) {
-                switch (response._body) {
-                    case '"changed"':
-                        _this.websocketService.sendInitLobby({ _id: _this.game_id, msg: 'changed' });
-                        break;
-                    case '"full"':
-                        alert('The other team is full');
-                        break;
-                }
-            }
-        }, function (error) {
-            console.log(error);
-        });
+        this.websocketService.sendLobby({ _id: this.game_id, player_id: this.player_id, msg: 'switch' });
     };
     GameLobbyComponent.prototype.leave = function () {
-        var _this = this;
-        this.gameService.leaveGame().subscribe(function (response) {
-            if (response.ok) {
-                switch (response._body) {
-                    case '"terminated"':
-                        _this.websocketService.sendExitLobby({ _id: _this.game_id, msg: 'terminated' });
-                        break;
-                    case '"left"':
-                        _this.websocketService.sendExitLobby({ _id: _this.game_id, msg: 'left' });
-                        break;
-                }
-                _this.router.navigate(['dashboard']);
-            }
-        }, function (error) {
-            console.log(error);
-        });
+        this.websocketService.sendLobby({ _id: this.game_id, player_id: this.player_id, msg: 'leave' });
+        this.end();
     };
     GameLobbyComponent.prototype.getGameId = function () {
         return this.game_id;
+    };
+    GameLobbyComponent.prototype.end = function () {
+        this.websocketService.unsubLobby();
+        this.router.navigate(['dashboard']);
     };
     return GameLobbyComponent;
 }());

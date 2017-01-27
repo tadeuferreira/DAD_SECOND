@@ -44,26 +44,20 @@ export class WebSocketService {
     getGamePlayersMessages(): Observable<any> {
         return this.listenOnChannel('gameNotification');
     }
-    
-    getInitLobbyErr(): Observable<any> {
-        return this.listenOnChannel('initLobbyErr');
+
+    sendLobby(msgData: any){
+        this.socket.emit('gameLobby', msgData);
     }
-    getInitLobby(): Observable<any> {
-        return this.listenOnChannel('initLobby');
+
+    subLobby(): Observable<any> {
+        return this.listenOnChannel('gameLobby');
     }
-    sendInitLobby(msgData: any){
-        this.socket.emit('initLobby', msgData);
-    }
-    sendExitLobby(msgData: any){
-        this.socket.emit('exitLobby', msgData);
-    }
-    getExitLobby(): Observable<any> {
-        return this.listenOnChannel('exitLobby');
-    }
+
     unsubLobby(){
-        this.socket.off('initLobby', null);
-        this.socket.off('exitLobby', null);
+        this.socket.off('gameLobby', null);
     }
+
+    
     unsubGame(){
         this.socket.off('gamePlay', null);
     }

@@ -12,9 +12,6 @@ import { NotificationModule } from './notifications/notifications.module';
 import { ChatComponent } from './chat.component';
 import { GameChatComponent } from './gameCards/gameChat.component';
 
-import { ABoardComponent } from './game/aboard.component';
-import { DBoardComponent } from './game/dboard.component';
-
 import { MenuComponent } from './menu/menu.component';
 import { DashboardComponent } from './menu/dashboard.component';
 import { HomeComponent } from './menu/home.component';
@@ -53,8 +50,6 @@ import { Routing } from './app.routing';
                   MenuComponent, 
                   ChatComponent,
                   GameChatComponent, 
-                  ABoardComponent, 
-                  DBoardComponent, 
                   DashboardComponent
   ],
   providers:    [ WebSocketService, UserService, GameService],

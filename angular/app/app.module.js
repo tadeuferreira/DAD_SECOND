@@ -5,6 +5,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var core_1 = require("@angular/core");
 var forms_1 = require("@angular/forms");
 var platform_browser_1 = require("@angular/platform-browser");
@@ -14,8 +17,6 @@ var websocket_service_1 = require("./notifications/websocket.service");
 var notifications_module_1 = require("./notifications/notifications.module");
 var chat_component_1 = require("./chat.component");
 var gameChat_component_1 = require("./gameCards/gameChat.component");
-var aboard_component_1 = require("./game/aboard.component");
-var dboard_component_1 = require("./game/dboard.component");
 var menu_component_1 = require("./menu/menu.component");
 var dashboard_component_1 = require("./menu/dashboard.component");
 var home_component_1 = require("./menu/home.component");
@@ -56,13 +57,12 @@ AppModule = __decorate([
             menu_component_1.MenuComponent,
             chat_component_1.ChatComponent,
             gameChat_component_1.GameChatComponent,
-            aboard_component_1.ABoardComponent,
-            dboard_component_1.DBoardComponent,
             dashboard_component_1.DashboardComponent
         ],
         providers: [websocket_service_1.WebSocketService, user_service_1.UserService, game_service_1.GameService],
         bootstrap: [app_component_1.AppComponent]
-    })
+    }),
+    __metadata("design:paramtypes", [])
 ], AppModule);
 exports.AppModule = AppModule;
 //# sourceMappingURL=app.module.js.map

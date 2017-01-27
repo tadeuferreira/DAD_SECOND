@@ -44,24 +44,14 @@ var WebSocketService = (function () {
     WebSocketService.prototype.getGamePlayersMessages = function () {
         return this.listenOnChannel('gameNotification');
     };
-    WebSocketService.prototype.getInitLobbyErr = function () {
-        return this.listenOnChannel('initLobbyErr');
+    WebSocketService.prototype.sendLobby = function (msgData) {
+        this.socket.emit('gameLobby', msgData);
     };
-    WebSocketService.prototype.getInitLobby = function () {
-        return this.listenOnChannel('initLobby');
-    };
-    WebSocketService.prototype.sendInitLobby = function (msgData) {
-        this.socket.emit('initLobby', msgData);
-    };
-    WebSocketService.prototype.sendExitLobby = function (msgData) {
-        this.socket.emit('exitLobby', msgData);
-    };
-    WebSocketService.prototype.getExitLobby = function () {
-        return this.listenOnChannel('exitLobby');
+    WebSocketService.prototype.subLobby = function () {
+        return this.listenOnChannel('gameLobby');
     };
     WebSocketService.prototype.unsubLobby = function () {
-        this.socket.off('initLobby', null);
-        this.socket.off('exitLobby', null);
+        this.socket.off('gameLobby', null);
     };
     WebSocketService.prototype.unsubGame = function () {
         this.socket.off('gamePlay', null);
