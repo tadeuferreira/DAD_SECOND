@@ -53,6 +53,9 @@ export class GameComponent implements OnInit, OnDestroy{
 					case 'wonRound':
 					this.loadRoundWon(response);
 					break;
+					case 'gameEnded':
+					console.log(response.game_history_id);
+					break;
 				}
 			},
 			error => {
@@ -85,6 +88,7 @@ export class GameComponent implements OnInit, OnDestroy{
 
 	loadHands(response : any){
 		console.log(response);
+		console.log(response);
 
 		this.me.cards = this.loadMyCard(response.me.cards);
 		this.me.order = response.me.order;
@@ -101,10 +105,6 @@ export class GameComponent implements OnInit, OnDestroy{
 		this.foe2.cards = this.loadOthersHand(response.foe2.cards);
 		this.foe2.order = response.foe2.order;
 		this.foe2.tableCard = this.cardToImage(response.table.foe2);
-		console.log(this.me.tableCard);
-		console.log(this.friend.tableCard);
-		console.log(this.foe1.tableCard);
-		console.log(this.foe2.tableCard);
 
 		this.isGameReady = true;
 	}
@@ -115,7 +115,7 @@ export class GameComponent implements OnInit, OnDestroy{
 			this.message = 'you won the round !!!';
 			setTimeout(() => {  
 				this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, msg:'startRound'});
-			}, 5000);	
+			}, 3000);	
 		}else{
 			this.message = response.order + ' won the round !!!';
 			console.log(this.message);
@@ -126,6 +126,7 @@ export class GameComponent implements OnInit, OnDestroy{
 		console.log(response)
 		if(this.me.order == response.order){
 			this.me.tableCard = response.card;
+			this.message = 'Wait!';
 		}if(this.friend.order == response.order){
 			this.friend.tableCard = response.card;
 		}if(this.foe1.order == response.order){

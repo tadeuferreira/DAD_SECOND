@@ -135,13 +135,14 @@ export class WebSocketServer {
       case 'wonRound':
       data = response;
       break;
-      case 'wonGame':
+      case 'gameEnded':
+      data = response;
       break;
       case 'update':
       data = response;
       break;
     }
-    console.log(data);
+   // console.log(data);
     client.join(msgData._id);
     client.emit('gamePlay', data); 
     if(response.msg != 'hand')
@@ -427,7 +428,6 @@ export class WebSocketServer {
 
           }
           this.responseGamePlay(msgData,client,{ msg : 'hand', me: me, friend: friend, foe1: foe1, foe2: foe2, stash: stash, table: table})
-
           if(game.onPlay == my_order)
             this.play(msgData,client);
         }
@@ -493,7 +493,7 @@ export class WebSocketServer {
     game.table[my_order] = sentCard;
     let gameWon : boolean = false;
     let roundWon : boolean = false;
-    let finalWinner : number = -1;
+    let roundWinner : number = -1;
 
     //check win
     let player_pos : number = -1;
@@ -503,6 +503,13 @@ export class WebSocketServer {
         break;
       }
     }
+
+    game.history.push({order: player_pos ,msg:'played', card: sentCard, round: game.round});
+
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+    console.log(player_pos);
+    console.log(game.lastToPlay);
+    console.log(player_pos == game.lastToPlay);
     if(player_pos == game.lastToPlay){
       let gameSuit : number = game.table[game.firstToPlay].suit;
       let trumpSuit : number = game.pack.suitTrump;
@@ -528,8 +535,11 @@ export class WebSocketServer {
           } 
         }
       }
+      //check who won
       for (var i = 0; i < game.table.length; ++i) {
+
         let card = game.table[i];
+
         if(card.suit == gameSuit ){
           if(winnerNormal == -1){
             winnerNormal = i;
@@ -538,63 +548,310 @@ export class WebSocketServer {
           }
         }else if(card.suit == trumpSuit){
           if(winnerTrump == -1){
-            winnerNormal = i;
+            winnerTrump = i;
           }else if(game.table[winnerTrump].type < card.type){
             winnerTrump = i;
           }
         }
       }
-      finalWinner = (winnerTrump != -1 ? winnerTrump : winnerNormal);
+      //define who won
+      console.log(winnerTrump);
+      console.log(winnerNormal);
+      roundWinner = (winnerTrump == -1 ? winnerNormal : winnerTrump);
+      console.log(roundWinner);
       roundWon = true;
-      for (var i = 0; i < game.pack.cards; ++i) {
+      //get cards on table
+      console.log('stash start');
+      for (var i = 0; i < game.pack.cards.length; ++i) {
         let card = game.pack.cards[i];
-        if(card.id == game.table[0]){
-          card.playerOwner = game.baseOrder[finalWinner]
+
+          if(card.isOnTable){
+          card.playerOwner = game.basicOrder[roundWinner]
           card.isUsed = true;
           card.isOnHand = false;
           card.isOnTable = false;
           game.pack.cards[i] = card;
-        }else if(card.id == game.table[1]){
-          card.playerOwner = game.baseOrder[finalWinner]
-          card.isUsed = true;
-          card.isOnHand = false;
-          card.isOnTable = false;
-          game.pack.cards[i] = card;
-        }else if(card.id == game.table[2]){
-          card.playerOwner = game.baseOrder[finalWinner]
-          card.isUsed = true;
-          card.isOnHand = false;
-          card.isOnTable = false;
-          game.pack.cards[i] = card;
-        }else if(card.id == game.table[3]){
-          card.playerOwner = game.baseOrder[finalWinner]
-          card.isUsed = true;
-          card.isOnHand = false;
-          card.isOnTable = false;
-          game.pack.cards[i] = card;
-        }
+          } 
       }
+      console.log('stash done');
       game.table = [null, null, null, null];
-      game.onPlay = finalWinner;
-      game.firstToPlay = finalWinner
-      game.lastToPlay = ( finalWinner - 1 < 0 ? 3 : finalWinner - 1);
+      game.onPlay = roundWinner;
+      game.firstToPlay = roundWinner
+      game.lastToPlay = ( roundWinner - 1 < 0 ? 3 : roundWinner - 1);
+      game.history.push({order: roundWinner ,msg:'won', round:game.round});
+      game.round++;
     }else{
       game.onPlay = (game.onPlay + 1 > 3 ? 0 : game.onPlay + 1);
     }
     //end check win
-    delete game._id;
-    database.db.collection('games')
-    .updateOne({
-      _id: new mongodb.ObjectID(msgData._id)
-    }, {
-      $set: game
-    })
-    .then(result => {
-      this.responseGamePlay(msgData,client,{ msg : 'played', _id : game._id, order: player_pos ,card: sentCard});
-      if(roundWon)
-        this.responseGamePlay(msgData,client,{ msg : 'wonRound', _id : game._id, order : finalWinner});
-    })
-    .catch(err => console.log(err.msg));  
+
+    // check for end game 
+    if(game.round < 10){
+      delete game._id;
+      database.db.collection('games')
+      .updateOne({
+        _id: new mongodb.ObjectID(msgData._id)
+      }, {
+        $set: game
+      })
+      .then(result => {
+        this.responseGamePlay(msgData,client,{ msg : 'played', _id : game._id, order: player_pos ,card: sentCard});
+        if(roundWon)
+          this.responseGamePlay(msgData,client,{ msg : 'wonRound', _id : game._id, order : roundWinner});
+      })
+      .catch(err => console.log(err.msg));  
+    }else{
+      console.log('start end game');
+      this.endGame(msgData, client, game);
+    } 
+  }
+
+  public endGame = (msgData : any, client : any , game :any) => {
+
+
+    //get both teams stashes 
+    let stash10 : any = [];
+    let stash11 : any = [];
+    let stash20 : any = [];
+    let stash21 : any = [];
+
+    for (var i = 0; i < game.pack.cards.length; ++i) {
+      let card = game.pack.cards[i];
+      console.log(game.pack.cards);
+      if(card.isUsed && !card.isOnTable && !card.isOnHand){
+        if(card.playerOwner == game.team1[0]){
+          stash10.push(card);
+        }else if(card.playerOwner == game.team1[1].id){
+          stash11.push(card);
+        }else if(card.playerOwner == game.team2[0].id){
+          stash20.push(card);
+        }else if(card.playerOwner == game.team2[1].id){
+          stash21.push(card);
+        }
+      }
+    }
+    console.log(stash10);
+    console.log(stash11);
+    console.log(stash21);
+    console.log(stash20);
+    console.log('stash end game');
+
+    // calculate points
+    let player10points : number = 0;
+    let player11points : number = 0;
+    let player20points : number = 0;
+    let player21points : number = 0;
+
+    player10points = this.getStashPoints(stash10);
+    player11points = this.getStashPoints(stash11);
+    player20points = this.getStashPoints(stash20);
+    player21points = this.getStashPoints(stash21);
+
+    let totalTeam1 : number = player10points + player11points;
+    let totalTeam2 : number = player20points + player21points;
+
+    console.log('points end game');
+
+    //give them the win
+    let isTeam1Winner : boolean = false;
+    let team1Stars: number = 0;
+    let isTeam2Winner : boolean = false;
+    let team2Stars: number = 0;
+
+    if(totalTeam1 > totalTeam2){
+      isTeam1Winner = true;
+      team1Stars = this.getStars(totalTeam1);
+    }else if( totalTeam1 < totalTeam2){
+      isTeam2Winner = true;
+      team2Stars = this.getStars(totalTeam2);
+    }else if(totalTeam1 == totalTeam2){
+       //draw
+      isTeam1Winner = true;
+      isTeam2Winner = true;
+      team1Stars = 1;
+      team2Stars = 1;
+    }
+    console.log('win end game');
+    console.log(totalTeam1);
+    console.log(totalTeam2);
+
+
+    //update the game and players 
+    database.db.collection('players')
+    .find({ $or : [{_id : new mongodb.ObjectID(game.team1[0].id)},{_id : new mongodb.ObjectID(game.team1[1].id)}]})
+    .toArray()
+    .then( team1players => {
+      console.log('team1 end game');
+      database.db.collection('players')
+      .find({ $or : [{_id : new mongodb.ObjectID(game.team2[0].id)},{_id : new mongodb.ObjectID(game.team2[1].id)}]})
+      .toArray()
+      .then( team2players => {
+        console.log('team2 end game');
+          let gamehistory : any =
+          {
+            owner : null,
+            state: '',
+            startData: null,
+            endDate: null,
+            isDraw: false,
+            winner1: null,
+            winner2: null,
+            points : 0,
+            players : [null,null,null,null],
+            history: []
+          };
+          if(isTeam2Winner && isTeam1Winner){
+            console.log('draw');
+            team1players[0].totalPoints = player10points;
+            team1players[0].totalStars = team1Stars;
+            console.log('draw 1');
+            team1players[1].totalPoints = player11points;
+            team1players[1].totalPoints = team1Stars;
+console.log('draw 2');
+            team2players[0].totalPoints = player20points;
+            team2players[0].totalStars = team2Stars;
+console.log('draw 3');
+            team2players[1].totalPoints = player21points;
+            team2players[1].totalPoints = team2Stars;
+            gamehistory.isDraw = true;
+            console.log('draw end');
+
+          }else if(isTeam2Winner){
+             console.log('team 2');
+             console.log(team2players[0]);
+            team2players[0].totalPoints = player20points;
+            team2players[0].totalStars = team2Stars;
+            console.log('team 2 1');
+            team2players[1].totalPoints = player21points;
+            team2players[1].totalPoints = team2Stars;
+            console.log('team 2 2');
+            gamehistory.winner1 = team2players[0];
+            gamehistory.winner2 = team2players[1];
+            gamehistory.points = totalTeam1;
+            console.log('team 2 end');
+
+          }else if(isTeam1Winner){
+            console.log('team 1');
+            team1players[0].totalPoints = player10points;
+            team1players[0].totalStars = team1Stars;
+            console.log('team 1 1');
+            team1players[1].totalPoints = player11points;
+            team1players[1].totalPoints = team1Stars;
+            console.log('team 1 2');
+            gamehistory.winner1 = team1players[0];
+            gamehistory.winner2 = team1players[1];
+            gamehistory.points = totalTeam1;
+            console.log('team 1 end');
+
+          }
+          console.log('win end game history');
+          gamehistory.state = 'Ended';
+          gamehistory.owner = game.owner;
+          gamehistory.startDate = game.creationDate;
+          gamehistory.endDate = Date.now();
+          gamehistory.players = game.basicOrder;
+          gamehistory.history = game.history;
+          console.log('game history end game');
+       
+        //delete old game
+        database.db.collection('games')
+        .deleteOne({
+            _id: new mongodb.ObjectID(msgData._id)
+        })
+        .then(result => {
+          console.log('deleted end game');
+            if (result.deletedCount === 1) {
+              //update players
+
+              this.updatePlayer(team1players[0]);
+              this.updatePlayer(team1players[1]);
+              this.updatePlayer(team2players[0]);
+              this.updatePlayer(team2players[1]);
+              console.log('update p end game');
+              //create game history
+               database.db.collection('gamesHistory')
+                .insertOne(gamehistory)
+                .then(result => {
+                  this.responseGamePlay(msgData,client,{ msg : 'gameEnded', _id : game._id, game_history_id: result.insertedId}); 
+                }).catch(err => console.log(err.msg));
+            } else {
+                console.log(404, 'No game found');
+            }
+        }).catch(err =>  console.log(err.msg));
+      }).catch(err => console.log(err.msg)); 
+    }).catch(err => console.log(err.msg)); 
+
+
+
+    //create a new object( game history ) ????
+  }
+
+  private updatePlayer(player:any){
+    const id = new mongodb.ObjectID(player._id);
+    delete player._id;
+     database.db.collection('players')
+      .updateOne({
+        _id: id
+      }, {
+        $set: player
+      })
+      .then(result => {
+        console.log(result);
+      })
+      .catch(err => console.log(err.msg)); 
+  }
+
+  private getStars(totalPoints : number ) : number{
+    let stars : number = 0;
+
+    if(totalPoints == 120){
+      stars = 5;
+    }else if(totalPoints >= 91 && totalPoints <= 119){
+      stars = 4;
+    }else if(totalPoints >= 61 && totalPoints <= 90){
+      stars = 4;
+    }
+    return stars;
+  }
+
+  private getStashPoints(stash:any) : number{
+    let total : number = 0;
+
+    for (var i = 0; i < stash.length; ++i) {
+      total += this.getCardPoints(stash[i]);
+    }
+
+    return total;
+  }
+
+  private getCardPoints(card:any) : number{
+    let points : number = 0;
+    switch (card.type) {
+      case 9:
+      // Ace 
+      points = 11;
+      break;
+      case 8:
+      // Seven
+      points = 10;
+      break;
+      case 7:
+      // King
+      points = 4;
+      break;
+      case 6:
+      // Jack
+      points = 3;
+      break;
+      case 5:
+      // Queen
+      points = 2;
+      break;
+      default:
+      points = 0;
+      break;
+    }
+    return points;
   }
 
   private getTeam(game:any , id:string) : number{

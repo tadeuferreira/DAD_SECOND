@@ -114,7 +114,8 @@ var Game = (function () {
                         table: [null, null, null, null],
                         creationDate: null,
                         firstTrump: null,
-                        pack: null
+                        pack: null,
+                        history: []
                     };
                     game.ownername = player.username;
                     game.pack = [];

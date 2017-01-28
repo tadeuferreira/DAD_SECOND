@@ -57,6 +57,9 @@ var GameComponent = (function () {
                     case 'wonRound':
                         _this.loadRoundWon(response);
                         break;
+                    case 'gameEnded':
+                        console.log(response.game_history_id);
+                        break;
                 }
             }, function (error) {
                 console.log(error.text());
@@ -84,6 +87,7 @@ var GameComponent = (function () {
     };
     GameComponent.prototype.loadHands = function (response) {
         console.log(response);
+        console.log(response);
         this.me.cards = this.loadMyCard(response.me.cards);
         this.me.order = response.me.order;
         this.me.tableCard = this.cardToImage(response.table.me);
@@ -96,10 +100,6 @@ var GameComponent = (function () {
         this.foe2.cards = this.loadOthersHand(response.foe2.cards);
         this.foe2.order = response.foe2.order;
         this.foe2.tableCard = this.cardToImage(response.table.foe2);
-        console.log(this.me.tableCard);
-        console.log(this.friend.tableCard);
-        console.log(this.foe1.tableCard);
-        console.log(this.foe2.tableCard);
         this.isGameReady = true;
     };
     GameComponent.prototype.loadRoundWon = function (response) {
@@ -109,7 +109,7 @@ var GameComponent = (function () {
             this.message = 'you won the round !!!';
             setTimeout(function () {
                 _this.websocketService.sendGame({ _id: _this.game_id, player_id: _this.player_id, msg: 'startRound' });
-            }, 5000);
+            }, 3000);
         }
         else {
             this.message = response.order + ' won the round !!!';
@@ -120,6 +120,7 @@ var GameComponent = (function () {
         console.log(response);
         if (this.me.order == response.order) {
             this.me.tableCard = response.card;
+            this.message = 'Wait!';
         }
         if (this.friend.order == response.order) {
             this.friend.tableCard = response.card;
