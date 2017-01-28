@@ -124,8 +124,8 @@ var Player = (function () {
         };
         this.getTop10Star = function (request, response, next) {
             app_database_1.databaseConnection.db.collection('players')
-                .find({ totalEstrelas: { $exists: true } })
-                .sort({ totalEstrelas: -1 })
+                .find({ totalStars: { $exists: true } })
+                .sort({ totalStars: -1 })
                 .limit(10)
                 .toArray()
                 .then(function (players) {
@@ -137,8 +137,8 @@ var Player = (function () {
         };
         this.getTop10Point = function (request, response, next) {
             app_database_1.databaseConnection.db.collection('players')
-                .find({ totalPontos: { $exists: true } })
-                .sort({ totalPontos: -1 })
+                .find({ totalPoints: { $exists: true } })
+                .sort({ totalPoints: -1 })
                 .limit(10)
                 .toArray()
                 .then(function (players) {

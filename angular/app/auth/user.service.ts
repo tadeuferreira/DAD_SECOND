@@ -41,8 +41,8 @@ export class UserService {
     headers.append('Content-Type', 'application/json');
 
     let avatar = 'https://api.adorable.io/avatars/285/' + username + '.png';
-    let totalPoints = 0;
-    let totalStars = 0;
+    let totalPoints: number = 0;
+    let totalStars: number = 0;
 
     return this.http
       .post('http://localhost:7777/api/v1/register', JSON.stringify({ username, name, email, password, avatar, totalPoints, totalStars }), { headers })
