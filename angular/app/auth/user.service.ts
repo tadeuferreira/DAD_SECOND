@@ -65,7 +65,7 @@ export class UserService {
     let email = user.email;
     let password = user.password;
 
-    let body = JSON.stringify({ username, name, email, password, avatar });
+    let body = JSON.stringify({ avatar, username, name, email, password});
 
     return this.http
       .put('http://localhost:7777/api/v1/players/' + sessionStorage.getItem("id"), body, <RequestOptionsArgs>{ headers: headers, withCredentials: false })

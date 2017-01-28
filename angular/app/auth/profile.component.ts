@@ -25,6 +25,7 @@ export class ProfileComponent implements OnInit {
             .subscribe(response => {
                 this.userProfile = response.json();
                 this.isLoading = false;
+                console.log(this.userProfile.avatar);
             });
 
         this.myForm = this.fb.group({
@@ -35,6 +36,8 @@ export class ProfileComponent implements OnInit {
             password: ['', [<any>Validators.required]],
             passwordConfirmation: ['', [<any>Validators.required]],
         }, { validator: this.validateService.matchingPasswords('password', 'passwordConfirmation') });
+
+        
     }
 
     edit(user: User) {

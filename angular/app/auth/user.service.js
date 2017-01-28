@@ -66,7 +66,7 @@ var UserService = (function () {
         var name = user.name;
         var email = user.email;
         var password = user.password;
-        var body = JSON.stringify({ username: username, name: name, email: email, password: password, avatar: avatar });
+        var body = JSON.stringify({ avatar: avatar, username: username, name: name, email: email, password: password });
         return this.http
             .put('http://localhost:7777/api/v1/players/' + sessionStorage.getItem("id"), body, { headers: headers, withCredentials: false })
             .subscribe(function (response) {

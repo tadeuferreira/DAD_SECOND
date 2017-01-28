@@ -8,11 +8,13 @@
         <div class="row">
             <!-- left column -->
             <div class="col-md-4 col-sm-6 col-xs-12">
-                <div class="text-center">
-                    <img src="{{userProfile.avatar}}" class="avatar img-circle img-thumbnail" alt="avatar">
-                    <input type="hidden" class="form-control" value="{{userProfile.avatar}}" name="avatar" formControlName="avatar" #avatar>
-                    <h6>Chose a random avatar</h6>
-                    <input type="button" class="text-center center-block well well-sm" value="Change" (click)="changeAvatar()" >
+                <div class="form-group">
+                    <div class="text-center">
+                        <img src="{{userProfile.avatar}}" class="avatar img-circle img-thumbnail" alt="avatar">
+                        <input type="hidden" class="form-control" value="{{userProfile.avatar}}" name="avatar" formControlName="avatar" #avatar>
+                        <h6>Chose a random avatar</h6>
+                        <input type="button" class="text-center center-block well well-sm" value="Change" (click)="changeAvatar()">
+                    </div>
                 </div>
             </div>
             <div class="col-md-8 col-sm-6 col-xs-12 personal-info">
