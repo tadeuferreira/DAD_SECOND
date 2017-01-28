@@ -14,8 +14,6 @@ var websocket_service_1 = require("./notifications/websocket.service");
 var notifications_module_1 = require("./notifications/notifications.module");
 var chat_component_1 = require("./chat.component");
 var gameChat_component_1 = require("./gameCards/gameChat.component");
-var aboard_component_1 = require("./game/aboard.component");
-var dboard_component_1 = require("./game/dboard.component");
 var menu_component_1 = require("./menu/menu.component");
 var dashboard_component_1 = require("./menu/dashboard.component");
 var home_component_1 = require("./menu/home.component");
@@ -23,7 +21,9 @@ var top10Star_component_1 = require("./menu/top10Star.component");
 var top10Point_component_1 = require("./menu/top10Point.component");
 var login_component_1 = require("./auth/login.component");
 var register_component_1 = require("./auth/register.component");
+var profile_component_1 = require("./auth/profile.component");
 var user_service_1 = require("./auth/user.service");
+var validator_service_1 = require("./auth/validator.service");
 var game_service_1 = require("./gameCards/game.service");
 var gameLobby_component_1 = require("./gameCards/gameLobby.component");
 var newGame_component_1 = require("./gameCards/newGame.component");
@@ -53,14 +53,13 @@ AppModule = __decorate([
             gameLobby_component_1.GameLobbyComponent,
             login_component_1.LoginComponent,
             register_component_1.RegisterComponent,
+            profile_component_1.ProfileComponent,
             menu_component_1.MenuComponent,
             chat_component_1.ChatComponent,
             gameChat_component_1.GameChatComponent,
-            aboard_component_1.ABoardComponent,
-            dboard_component_1.DBoardComponent,
             dashboard_component_1.DashboardComponent
         ],
-        providers: [websocket_service_1.WebSocketService, user_service_1.UserService, game_service_1.GameService],
+        providers: [websocket_service_1.WebSocketService, user_service_1.UserService, validator_service_1.ValidatorService, game_service_1.GameService],
         bootstrap: [app_component_1.AppComponent]
     })
 ], AppModule);

@@ -12,25 +12,28 @@ var core_1 = require("@angular/core");
 var router_1 = require("@angular/router");
 var user_service_1 = require("./user.service");
 var forms_1 = require("@angular/forms");
+var validator_service_1 = require("./validator.service");
 var RegisterComponent = (function () {
-    function RegisterComponent(fb, userService, router) {
+    function RegisterComponent(fb, userService, validateService, router) {
         this.fb = fb;
         this.userService = userService;
+        this.validateService = validateService;
         this.router = router;
-        this.events = []; // use later to display form changes
     }
     RegisterComponent.prototype.ngOnInit = function () {
         // we will initialize our form model here
         this.myForm = this.fb.group({
             username: ['', [forms_1.Validators.required]],
-            email: ['', [forms_1.Validators.required]],
+            name: ['', [forms_1.Validators.required]],
+            email: ['', [forms_1.Validators.compose([forms_1.Validators.required, this.validateService.emailValidator])]],
             password: ['', [forms_1.Validators.required]],
-        });
+            passwordConfirmation: ['', [forms_1.Validators.required]],
+        }, { validator: this.validateService.matchingPasswords('password', 'passwordConfirmation') });
     };
     RegisterComponent.prototype.save = function (model, isValid) {
         this.submitted = true; // set form submit to true
         if (isValid) {
-            this.userService.register(model.username, model.email, model.password);
+            this.userService.register(model.username, model.name, model.email, model.password);
         }
     };
     return RegisterComponent;
@@ -41,7 +44,7 @@ RegisterComponent = __decorate([
         selector: 'Register',
         templateUrl: 'Register.component.html',
     }),
-    __metadata("design:paramtypes", [forms_1.FormBuilder, user_service_1.UserService, router_1.Router])
+    __metadata("design:paramtypes", [forms_1.FormBuilder, user_service_1.UserService, validator_service_1.ValidatorService, router_1.Router])
 ], RegisterComponent);
 exports.RegisterComponent = RegisterComponent;
 //# sourceMappingURL=register.component.js.map

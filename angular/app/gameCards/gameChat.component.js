@@ -17,7 +17,6 @@ var GameChatComponent = (function () {
         this.router = router;
         this.http = http;
         this.websocketService = websocketService;
-        this.playersCChannel = [];
         this.chatGameChannel = [];
         this.username = sessionStorage.getItem('username');
     }

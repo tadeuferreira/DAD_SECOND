@@ -17,7 +17,6 @@ var LoginComponent = (function () {
         this.fb = fb;
         this.userService = userService;
         this.router = router;
-        this.events = []; // use later to display form changes
     }
     LoginComponent.prototype.ngOnInit = function () {
         // we will initialize our form model here

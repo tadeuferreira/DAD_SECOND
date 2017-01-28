@@ -49,6 +49,7 @@ var Player = (function () {
                 return next();
             }
             delete player._id;
+            player.password = sha1(player.password);
             app_database_1.databaseConnection.db.collection('players')
                 .updateOne({
                 _id: id
@@ -66,6 +67,10 @@ var Player = (function () {
             }
             if (player.username === undefined || player.username === "") {
                 response.send(400, 'No player username');
+                return next();
+            }
+            if (player.name === undefined || player.name === "") {
+                response.send(400, 'No player name');
                 return next();
             }
             if (player.password === undefined || player.password === "") {

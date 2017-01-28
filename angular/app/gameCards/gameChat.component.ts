@@ -14,7 +14,6 @@ import { Router } from '@angular/router';
 export class GameChatComponent {
     @Input() game_id: string;
     public message: string;
-    public playersCChannel: string[] = [];
     public chatGameChannel: string[] = [];
     public username: string = sessionStorage.getItem('username');
 

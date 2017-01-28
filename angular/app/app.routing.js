@@ -6,6 +6,7 @@ var top10Star_component_1 = require("./menu/top10Star.component");
 var top10Point_component_1 = require("./menu/top10Point.component");
 var login_component_1 = require("./auth/login.component");
 var register_component_1 = require("./auth/register.component");
+var profile_component_1 = require("./auth/profile.component");
 var gameLobby_component_1 = require("./gameCards/gameLobby.component");
 var newGame_component_1 = require("./gameCards/newGame.component");
 var gameSearch_component_1 = require("./gameCards/gameSearch.component");
@@ -19,6 +20,10 @@ var appRoutes = [
     {
         path: 'dashboard',
         component: dashboard_component_1.DashboardComponent
+    },
+    {
+        path: 'profile',
+        component: profile_component_1.ProfileComponent
     },
     {
         path: 'login',

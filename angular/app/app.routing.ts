@@ -9,6 +9,7 @@ import { Top10PointComponent } from './menu/top10Point.component';
 
 import { LoginComponent } from './auth/login.component';
 import { RegisterComponent } from './auth/register.component';
+import { ProfileComponent } from './auth/profile.component';
 
 import { GameLobbyComponent } from './gameCards/gameLobby.component';
 import { NewGameComponent } from './gameCards/newGame.component';
@@ -24,6 +25,10 @@ const appRoutes: Routes = [
     {
         path: 'dashboard',
         component: DashboardComponent
+    },
+    {
+        path: 'profile',
+        component: ProfileComponent
     },
     {
         path: 'login',
