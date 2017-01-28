@@ -59,7 +59,7 @@ var WebSocketService = (function () {
     WebSocketService.prototype.sendGame = function (msgData) {
         this.socket.emit('gamePlay', msgData);
     };
-    WebSocketService.prototype.getGame = function () {
+    WebSocketService.prototype.subGame = function () {
         return this.listenOnChannel('gamePlay');
     };
     WebSocketService.prototype.listenOnChannel = function (channel) {

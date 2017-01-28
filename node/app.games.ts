@@ -114,9 +114,13 @@ export class Game {
                     renounce2 : false,
                     firstToPlay: 0,
                     lastToPlay: 3,
+                    onPlay: 0,
                     count : 0,
+                    round: 0,
+                    table: [null,null,null,null],
                     creationDate : null,
-                    pack : {}
+                    firstTrump : null,
+                    pack : null
                 };
                 game.ownername = player.username;
                 game.pack = [];
@@ -134,72 +138,6 @@ export class Game {
             }
         }).catch(err => this.handleError(err, response, next));
     }
-
-private readyToPlay =  (request: any, response: any, next: any) => {
-
-    const game_id = request.body._id;
-    const player_id = request.body.player_id;
-
-    database.db.collection('games')
-    .findOne({
-        _id: new mongodb.ObjectID(game_id)
-    })
-    .then(game => {
-        if(game != null){
-            var alreadyReady = false;
-            for (var i = 0; i < 2; ++i) {
-                if(game.team1[i].id == player_id){
-                    if(game.team1[i].ready)
-                        alreadyReady = true;
-                    game.team1[i].ready = true;
-                }
-                if( game.team2[i].id == player_id){
-                    if(game.team2[i].ready)
-                        alreadyReady = true;
-                    game.team2[i].ready = true;
-                }
-            }
-            var isGameReady = false;
-            var count = 0;
-            for (var i = 0; i < 2; ++i) {
-                if(game.team1[i].ready){
-                    count++;
-                }
-                if( game.team2[i].ready){
-                    count++;
-                }
-            }
-            if(count == 4){
-                isGameReady = true;
-            }
-            delete game._id;
-            database.db.collection('games')
-            .updateOne({
-                _id: new mongodb.ObjectID(game_id)
-            }, {
-                $set: game
-            })
-            .then(result => {
-                if(isGameReady){
-                    if(alreadyReady)
-                        response.send(200, 'gameStartedAlready');
-                    else
-                        response.send(200, 'gameReady');
-                }else{
-                    response.send(200, 'ready');
-                }
-            })
-            .catch(err => this.handleError(err, response, next));  
-
-
-
-        }else{
-            response.send(404,'No Game found');
-        }
-    })
-    .catch(err => this.handleError(err, response, next));
-}
-
 
 public getPlayers =  (request: any, response: any, next: any) => {
     const id = new mongodb.ObjectID(request.params.id);
@@ -243,8 +181,6 @@ public init = (server: any, settings: HandlerSettings) => {
     server.put(settings.prefix + 'games/:id', settings.security.authorize, this.updateGame);
 
     server.post(settings.prefix + 'games', settings.security.authorize, this.createGame);
-
-    server.post(settings.prefix + 'games/ready', settings.security.authorize, this.readyToPlay);
     server.get(settings.prefix + 'games/players/:id', settings.security.authorize, this.getPlayers);
 
     server.del(settings.prefix + 'games/:id', settings.security.authorize, this.deleteGame);

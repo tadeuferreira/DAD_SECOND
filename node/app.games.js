@@ -108,9 +108,13 @@ var Game = (function () {
                         renounce2: false,
                         firstToPlay: 0,
                         lastToPlay: 3,
+                        onPlay: 0,
                         count: 0,
+                        round: 0,
+                        table: [null, null, null, null],
                         creationDate: null,
-                        pack: {}
+                        firstTrump: null,
+                        pack: null
                     };
                     game.ownername = player.username;
                     game.pack = [];
@@ -127,67 +131,6 @@ var Game = (function () {
                     return next();
                 }
             }).catch(function (err) { return _this.handleError(err, response, next); });
-        };
-        this.readyToPlay = function (request, response, next) {
-            var game_id = request.body._id;
-            var player_id = request.body.player_id;
-            app_database_1.databaseConnection.db.collection('games')
-                .findOne({
-                _id: new mongodb.ObjectID(game_id)
-            })
-                .then(function (game) {
-                if (game != null) {
-                    var alreadyReady = false;
-                    for (var i = 0; i < 2; ++i) {
-                        if (game.team1[i].id == player_id) {
-                            if (game.team1[i].ready)
-                                alreadyReady = true;
-                            game.team1[i].ready = true;
-                        }
-                        if (game.team2[i].id == player_id) {
-                            if (game.team2[i].ready)
-                                alreadyReady = true;
-                            game.team2[i].ready = true;
-                        }
-                    }
-                    var isGameReady = false;
-                    var count = 0;
-                    for (var i = 0; i < 2; ++i) {
-                        if (game.team1[i].ready) {
-                            count++;
-                        }
-                        if (game.team2[i].ready) {
-                            count++;
-                        }
-                    }
-                    if (count == 4) {
-                        isGameReady = true;
-                    }
-                    delete game._id;
-                    app_database_1.databaseConnection.db.collection('games')
-                        .updateOne({
-                        _id: new mongodb.ObjectID(game_id)
-                    }, {
-                        $set: game
-                    })
-                        .then(function (result) {
-                        if (isGameReady) {
-                            if (alreadyReady)
-                                response.send(200, 'gameStartedAlready');
-                            else
-                                response.send(200, 'gameReady');
-                        }
-                        else {
-                            response.send(200, 'ready');
-                        }
-                    })
-                        .catch(function (err) { return _this.handleError(err, response, next); });
-                }
-                else {
-                    response.send(404, 'No Game found');
-                }
-            })
-                .catch(function (err) { return _this.handleError(err, response, next); });
         };
         this.getPlayers = function (request, response, next) {
             var id = new mongodb.ObjectID(request.params.id);
@@ -229,7 +172,6 @@ var Game = (function () {
             server.get(settings.prefix + 'games/:id', settings.security.authorize, _this.getGame);
             server.put(settings.prefix + 'games/:id', settings.security.authorize, _this.updateGame);
             server.post(settings.prefix + 'games', settings.security.authorize, _this.createGame);
-            server.post(settings.prefix + 'games/ready', settings.security.authorize, _this.readyToPlay);
             server.get(settings.prefix + 'games/players/:id', settings.security.authorize, _this.getPlayers);
             server.del(settings.prefix + 'games/:id', settings.security.authorize, _this.deleteGame);
             console.log("Games routes registered");

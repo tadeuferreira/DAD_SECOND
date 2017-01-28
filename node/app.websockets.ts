@@ -62,10 +62,33 @@ export class WebSocketServer {
           break;
         }
       });
+
+      client.on('gamePlay', (msgData) => {
+        console.log('gamePlay');
+        console.log(msgData);
+        switch (msgData.msg) {
+          case "gameJoin": this.hand(msgData, client);
+          break;  
+          case "play": this.play(msgData,client);
+          break;
+          case 'try': this.tryPlay(msgData,client);
+          break;
+          case 'leave':
+          break;
+          case 'startRound': this.hand(msgData, client);
+          this.responseGamePlay(msgData,client,{msg: 'update'});
+          this.play(msgData,client);
+          break;
+          case 'update':
+          this.hand(msgData, client);
+          break;
+        }
+
+      });
     });
   };
 
-  public responseGame = (msgData : any , client : any, response : any) =>{
+  public responseGameLobby = (msgData : any , client : any, response : any) =>{
     console.log('response');
     client.join(msgData._id);
     let data : any;
@@ -92,6 +115,37 @@ export class WebSocketServer {
     client.emit('gameLobby', data); 
     if(response != 'switch_fail')
       client.to(msgData._id).emit('gameLobby', data);
+  };
+
+  public responseGamePlay = (msgData : any , client : any, response : any) =>{
+    console.log('responseGamePlay');
+    console.log(response.msg);
+    let data : any = null;
+    switch (response.msg) {
+      case 'hand':
+      data = response;
+      break;
+      case 'play':
+      data = response;
+      break;
+      case 'played':
+      this.play(msgData,client);
+      data = response;
+      break;
+      case 'wonRound':
+      data = response;
+      break;
+      case 'wonGame':
+      break;
+      case 'update':
+      data = response;
+      break;
+    }
+    console.log(data);
+    client.join(msgData._id);
+    client.emit('gamePlay', data); 
+    if(response.msg != 'hand')
+      client.to(msgData._id).emit('gamePlay', data);
   };
 
   public notifyAll = (channel: string, message: any) => {
@@ -136,7 +190,34 @@ export class WebSocketServer {
             }
           }
           game.count++;           
-          game = this.startGame(game);
+          if(game.count == 4){
+            game.state = 'in Progress';
+
+            var first_team = this.getRandomInt(1,2);  
+            var first_pos = this.getRandomInt(0,1);
+            var first;
+
+            //selects the first player to play;
+            if(first_team == 1){
+              first = game.team1[first_pos].id;
+            }else if(first_team == 2){
+              first = game.team2[first_pos].id;
+            } 
+
+            // third player is first's friend
+            game.basicOrder[0] = (first_team == 1 ?  game.team1[first_pos].id :  game.team2[first_pos].id);
+            game.basicOrder[1] = (first_team == 1 ?( first_pos == 0 ? game.team2[1].id : game.team2[0].id) : ( first_pos == 0 ? game.team1[1].id : game.team1[0].id));
+            game.basicOrder[2] = (first_team == 1 ?( first_pos == 0 ? game.team1[1].id : game.team1[0].id) : ( first_pos == 0 ? game.team2[1].id : game.team2[0].id));
+            game.basicOrder[3] = (first_team == 1 ?( first_pos == 0 ? game.team2[0].id : game.team2[1].id) : ( first_pos == 0 ? game.team1[0].id : game.team1[1].id));
+
+            game.pack = this.createCards();
+            game.firstTrump = game.pack.cards[0];
+            this.updateCards(0, game.pack.cards,game.basicOrder[0]);
+            this.updateCards(1, game.pack.cards, game.basicOrder[1]);
+            this.updateCards(2, game.pack.cards, game.basicOrder[2]);
+            this.updateCards(3, game.pack.cards, game.basicOrder[3]);
+          }
+          console.log('after startGame');
 
           var game_id = game._id;
           delete game._id;
@@ -149,16 +230,16 @@ export class WebSocketServer {
           .then(result => {
 
             if(game.count == 4){
-              this.responseGame(msgData,client,'start');
+              this.responseGameLobby(msgData,client,'start');
             }else{
-              this.responseGame(msgData,client,'joined');
+              this.responseGameLobby(msgData,client,'joined');
             }  
           })
           .catch(err => console.log(err.msg));
         }else if(alreadyIn){
-          this.responseGame(msgData,client,'joined');
+          this.responseGameLobby(msgData,client,'joined');
         }else{
-          this.responseGame(msgData,client,'full');
+          this.responseGameLobby(msgData,client,'full');
         }
       }else{
         console.log('game not found or not on pending');
@@ -166,43 +247,15 @@ export class WebSocketServer {
     }).catch(err => console.log(err.msg)); 
   };
 
-  private startGame = (game:any) : any =>{
-    if(game.count == 4){
-      game.state = 'in Progress';
-
-      var team = this.getRandomInt(1,2);  
-      var pos = this.getRandomInt(0,1);
-      var first_team = -1;
-      var first_pos = -1;
-      var first;
-      //selects the first player to play;
-      if(team == 1){
-        first = game.team1[pos].id;
-      }else if(team == 2){
-        first = game.team2[pos].id;
-      } 
-
-      for (var i = 0; i < 2; ++i) {
-        if(game.team1[i].id ==  first){
-          first_team = 1;
-          first_pos = i;
-        }
-        if(game.team2[i].id ==  first){
-          first_team = 2;
-          first_pos = i;
-        }
+  public updateCards(pos:number , cards:any , owner: string){
+    for (var i = 0; i < cards.length; ++i) {
+      if( i >= pos * 10 && i < 10 +(pos*10)){
+        cards[i].playerOwner = owner;
+        cards[i].isOnHand = true;
       }
-
-      let player_list : any[] = [];
-      // third player is first's friend
-      game.basicOrder[0] = (first_team == 1 ?  game.team1[first_pos].id :  game.team2[first_pos].id);
-      game.basicOrder[1] = (first_team == 1 ?( first_pos == 0 ? game.team2[1].id : game.team2[0].id) : ( first_pos == 0 ? game.team1[1].id : game.team1[0].id));
-      game.basicOrder[2] = (first_team == 1 ?( first_pos == 0 ? game.team1[1].id : game.team1[0].id) : ( first_pos == 0 ? game.team2[1].id : game.team2[0].id));
-      game.basicOrder[3] = (first_team == 1 ?( first_pos == 0 ? game.team2[0].id : game.team2[1].id) : ( first_pos == 0 ? game.team1[0].id : game.team1[1].id));
-      game.pack = this.createCards();
     }
-    return game;
-  };
+    return cards;   
+  }
 
   public changeTeamGame = (msgData:any , client : any) =>{
     database.db.collection('games')
@@ -260,12 +313,12 @@ export class WebSocketServer {
             $set: game
           })
           .then(result => {
-            this.responseGame(msgData,client,'changed');
+            this.responseGameLobby(msgData,client,'changed');
           })
           .catch(err => console.log(err.msg)); 
         }else{
 
-          this.responseGame(msgData,client,'switch_fail');
+          this.responseGameLobby(msgData,client,'switch_fail');
 
         }  
       } else {          
@@ -300,11 +353,11 @@ export class WebSocketServer {
         var count = 0;
         for (var i = 0; i < 2; ++i) {
           if(game.team1[i].id != null){
-              count++;
-            }
-            if( game.team2[i].id != null){
-              count++;
-            }
+            count++;
+          }
+          if( game.team2[i].id != null){
+            count++;
+          }
         }
         game.count = count;
         delete game._id;
@@ -316,9 +369,9 @@ export class WebSocketServer {
         })
         .then(result => {
           if(ownerPresent){
-            this.responseGame(msgData,client,'terminated');
+            this.responseGameLobby(msgData,client,'terminated');
           }else{
-            this.responseGame(msgData,client,'left');
+            this.responseGameLobby(msgData,client,'left');
           }
         })
         .catch(err => console.log(err.msg));    
@@ -329,18 +382,268 @@ export class WebSocketServer {
     .catch(err => console.log(err.msg));
   };
 
+  public hand = (msgData:any, client : any) =>{
+    console.log('hand');
+    database.db.collection('games')
+    .findOne({
+      _id: new mongodb.ObjectID(msgData._id)
+    })
+    .then(game => {
+      if (game != null){
+        if(game.state == 'in Progress'){
+          let me : any;
+          let friend : any;
+          let foe1 : any;
+          let foe2 : any;
+          let my_order : number;
+          //create myself
+          for (var i = 0; i < game.basicOrder.length; ++i) {
+            if(game.basicOrder[i] == msgData.player_id){
+              my_order = i;
+              me = {cards : this.getHand(i,game.pack,game.basicOrder[i]), order : i};
+              break;
+            }
+          }
+          //rest
+          let stash : any = [];
+          let table : any = {me: game.table[my_order], friend: null, foe1: null, foe2: null};
+          let pos : number;
+
+
+          pos = ( my_order - 2 < 0 ? my_order + 2 : my_order - 2);
+          friend = {cards: this.switchOtherHand(this.getHand(pos,game.pack,game.basicOrder[pos])), order : pos};
+          table.friend = game.table[pos];
+          pos = (my_order + 1 > 3 ? 0 : my_order + 1);
+          foe1 = {cards: this.switchOtherHand(this.getHand(pos,game.pack,game.basicOrder[pos])), order : pos};
+          table.foe1 = game.table[pos];
+          pos = (my_order - 1 < 0 ? 3 : my_order - 1);
+          foe2 = {cards: this.switchOtherHand(this.getHand(pos,game.pack,game.basicOrder[pos])), order : pos};
+          table.foe2= game.table[pos];
+
+          for (var i = 0; i < game.pack.cards.length; ++i) {
+            let card = game.pack.cards[i];
+            if(card.playerOwner == msgData.player_id && card.isUsed)
+              stash.push(card);
+
+          }
+          this.responseGamePlay(msgData,client,{ msg : 'hand', me: me, friend: friend, foe1: foe1, foe2: foe2, stash: stash, table: table})
+
+          if(game.onPlay == my_order)
+            this.play(msgData,client);
+        }
+      }
+    }).catch(err => console.log(err.msg));
+  };
+
+  public play = (msgData:any, client : any) =>{
+    console.log('play');
+    database.db.collection('games')
+    .findOne({
+      _id: new mongodb.ObjectID(msgData._id)
+    })
+    .then(game => {
+      if (game != null){
+        if(game.state == 'in Progress'){
+          this.responseGamePlay(msgData,client,{ msg : 'play', _id : game._id, order : game.onPlay});
+        }
+      }
+    }).catch(err => console.log(err.msg));
+  };
+
+  public tryPlay = (msgData:any, client : any) =>{
+    console.log('tryPlay');
+    database.db.collection('games')
+    .findOne({
+      _id: new mongodb.ObjectID(msgData._id)
+    })
+    .then(game => {
+      if (game != null){
+        let originalCard : any;
+        let sentCard : any = msgData.card;
+        let cardPos : number = -1;
+        for (var i = 0; i < game.pack.cards.length; ++i) {
+          if(game.pack.cards[i].id == msgData.card.id){
+            originalCard = game.pack.cards[i];
+            cardPos = i;
+            break;
+          }
+        }
+        if(originalCard.playerOwner == sentCard.playerOwner && originalCard.playerOwner == msgData.player_id 
+          && originalCard.isOnHand && !originalCard.isUsed && !originalCard.isOnTable){
+          this.playCard(msgData,game,cardPos,client);
+      }
+    }
+  }).catch(err => console.log(err.msg));
+  };
+
+  private playCard = (msgData:any, game: any, cardPos:number ,client : any) =>{
+
+    let sentCard : any = msgData.card;
+    let my_order : number;
+    for (var i = 0; i < game.basicOrder.length; ++i) {
+      if(game.basicOrder[i] == msgData.player_id){
+        my_order = i;
+        break;
+      }
+    }
+
+    game.pack.cards[cardPos].isOnTable = true;
+    game.pack.cards[cardPos].isOnHand = false;
+    game.pack.cards[cardPos].isUsed = false;
+    game.table[my_order] = sentCard;
+    let gameWon : boolean = false;
+    let roundWon : boolean = false;
+    let finalWinner : number = -1;
+
+    //check win
+    let player_pos : number = -1;
+    for (var i = 0; i < game.basicOrder.length; ++i) {
+      if(game.basicOrder[i] == msgData.player_id){
+        player_pos = i;
+        break;
+      }
+    }
+    if(player_pos == game.lastToPlay){
+      let gameSuit : number = game.table[game.firstToPlay].suit;
+      let trumpSuit : number = game.pack.suitTrump;
+
+      let winnerNormal : number = -1;
+      let winnerTrump : number = -1;
+
+      //check for renounce
+      for (var i = 0; i < game.basicOrder.length; ++i) {
+        if(game.table[i].suit != gameSuit){
+          let hand : any = this.getHand(i, game.pack , game.basicOrder[i]);
+          let team : number = this.getTeam(game, game.basicOrder[i]);
+          let renounce : boolean = false;
+          for (var k = 0; k < hand.length; ++k) {
+            if(hand[k].suit == gameSuit)
+              renounce = true;
+          }
+          if(renounce){
+            if(team == 1)
+              game.renounce1 = true;
+            else if(team == 2)
+              game.renounce2 = true;
+          } 
+        }
+      }
+      for (var i = 0; i < game.table.length; ++i) {
+        let card = game.table[i];
+        if(card.suit == gameSuit ){
+          if(winnerNormal == -1){
+            winnerNormal = i;
+          }else if(game.table[winnerNormal].type < card.type){
+            winnerNormal = i;
+          }
+        }else if(card.suit == trumpSuit){
+          if(winnerTrump == -1){
+            winnerNormal = i;
+          }else if(game.table[winnerTrump].type < card.type){
+            winnerTrump = i;
+          }
+        }
+      }
+      finalWinner = (winnerTrump != -1 ? winnerTrump : winnerNormal);
+      roundWon = true;
+      for (var i = 0; i < game.pack.cards; ++i) {
+        let card = game.pack.cards[i];
+        if(card.id == game.table[0]){
+          card.playerOwner = game.baseOrder[finalWinner]
+          card.isUsed = true;
+          card.isOnHand = false;
+          card.isOnTable = false;
+          game.pack.cards[i] = card;
+        }else if(card.id == game.table[1]){
+          card.playerOwner = game.baseOrder[finalWinner]
+          card.isUsed = true;
+          card.isOnHand = false;
+          card.isOnTable = false;
+          game.pack.cards[i] = card;
+        }else if(card.id == game.table[2]){
+          card.playerOwner = game.baseOrder[finalWinner]
+          card.isUsed = true;
+          card.isOnHand = false;
+          card.isOnTable = false;
+          game.pack.cards[i] = card;
+        }else if(card.id == game.table[3]){
+          card.playerOwner = game.baseOrder[finalWinner]
+          card.isUsed = true;
+          card.isOnHand = false;
+          card.isOnTable = false;
+          game.pack.cards[i] = card;
+        }
+      }
+      game.table = [null, null, null, null];
+      game.onPlay = finalWinner;
+      game.firstToPlay = finalWinner
+      game.lastToPlay = ( finalWinner - 1 < 0 ? 3 : finalWinner - 1);
+    }else{
+      game.onPlay = (game.onPlay + 1 > 3 ? 0 : game.onPlay + 1);
+    }
+    //end check win
+    delete game._id;
+    database.db.collection('games')
+    .updateOne({
+      _id: new mongodb.ObjectID(msgData._id)
+    }, {
+      $set: game
+    })
+    .then(result => {
+      this.responseGamePlay(msgData,client,{ msg : 'played', _id : game._id, order: player_pos ,card: sentCard});
+      if(roundWon)
+        this.responseGamePlay(msgData,client,{ msg : 'wonRound', _id : game._id, order : finalWinner});
+    })
+    .catch(err => console.log(err.msg));  
+  }
+
+  private getTeam(game:any , id:string) : number{
+    let team : number;
+    for (var i = 0; i < game.team1.length; ++i) {
+      if(game.team1[i].id == id)
+        team = 1;
+      else if(game.team2[i].id == id)
+        team = 2;
+    }
+    return team;
+  }
+
+  public switchOtherHand(hand: any){
+    for (var i = 0; i < hand.length; ++i) {
+      if(!hand[i].isFirstTrump)
+        hand[i] = {dummy: true};
+      else
+        hand[i].dummy = false;
+    }
+    return hand;
+  }
+
+  public getHand(pos : number, pack:any , playerOwner : string){
+    let hand : any = [];
+    for (var k = pos * 10; k < 10 +(pos*10); ++k) {
+      let card = pack.cards[k];
+      if(card.isOnHand && !card.isOnTable && !card.isUsed && card.playerOwner == playerOwner)
+        hand.push(card);
+    }
+    return hand;
+  }
+
   public createCards() {
     var pack = {
       suitTrump: -1,
       cards : {}
     };
     var cards = [];
+    let count : number = 0;
     for (var i = 0; i < 4; ++i) {
       for (var j = 0; j < 10; ++j) {
-        cards.push({type:j , suit: i , isOnHand: false, isOnTable:false, isUsed: false, playerOwner: null, isTrump: false});
+        cards.push({id: count,type:j , suit: i , isOnHand: false, isOnTable:false, isUsed: false, playerOwner: null, isFirstTrump: false});
+        count++;
       }
     }
     cards = this.shuffleArray(cards);
+    cards[0].isFirstTrump = true;
+    pack.suitTrump =  cards[0].suit;
     pack.cards = cards;
     return pack;
   };

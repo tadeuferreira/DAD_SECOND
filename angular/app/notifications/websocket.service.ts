@@ -65,7 +65,7 @@ export class WebSocketService {
         this.socket.emit('gamePlay', msgData);
     }
     
-    getGame(): Observable<any> {
+    subGame(): Observable<any> {
         return this.listenOnChannel('gamePlay');
     }
 
