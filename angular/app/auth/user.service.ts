@@ -65,7 +65,7 @@ export class UserService {
     let email = user.email;
     let password = user.password;
 
-    let body = JSON.stringify({ avatar, username, name, email, password});
+    let body = JSON.stringify({ avatar, username, name, email, password });
 
     return this.http
       .put('http://localhost:7777/api/v1/players/' + sessionStorage.getItem("id"), body, <RequestOptionsArgs>{ headers: headers, withCredentials: false })
@@ -73,11 +73,11 @@ export class UserService {
         console.log(response);
         this.router.navigate(['dashboard']);
         sessionStorage.setItem('id', response.json()._id);
-          sessionStorage.setItem('token', response.json().token);
-          sessionStorage.setItem('username', response.json().username);
-          sessionStorage.setItem('name', response.json().name);
-          sessionStorage.setItem('email', response.json().email);
-          sessionStorage.setItem('avatar', response.json().avatar);
+        sessionStorage.setItem('token', response.json().token);
+        sessionStorage.setItem('username', response.json().username);
+        sessionStorage.setItem('name', response.json().name);
+        sessionStorage.setItem('email', response.json().email);
+        sessionStorage.setItem('avatar', response.json().avatar);
       },
       error => {
         console.log(error.text());
