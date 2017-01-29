@@ -505,11 +505,6 @@ export class WebSocketServer {
     }
 
     game.history.push({order: player_pos ,msg:'played', card: sentCard, round: game.round});
-
-    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-    console.log(player_pos);
-    console.log(game.lastToPlay);
-    console.log(player_pos == game.lastToPlay);
     if(player_pos == game.lastToPlay){
       let gameSuit : number = game.table[game.firstToPlay].suit;
       let trumpSuit : number = game.pack.suitTrump;
@@ -701,57 +696,57 @@ export class WebSocketServer {
             history: []
           };
           if(isTeam2Winner && isTeam1Winner){
-            console.log('draw');
-            team1players[0].totalPoints = player10points;
-            team1players[0].totalStars = team1Stars;
-            console.log('draw 1');
-            team1players[1].totalPoints = player11points;
-            team1players[1].totalPoints = team1Stars;
-console.log('draw 2');
-            team2players[0].totalPoints = player20points;
-            team2players[0].totalStars = team2Stars;
-console.log('draw 3');
-            team2players[1].totalPoints = player21points;
-            team2players[1].totalPoints = team2Stars;
+            team1players[0].totalPoints += player10points;
+            team1players[0].totalStars += team1Stars;
+
+            team1players[1].totalPoints += player11points;
+            team1players[1].totalPoints += team1Stars;
+
+            team2players[0].totalPoints += player20points;
+            team2players[0].totalStars += team2Stars;
+
+            team2players[1].totalPoints += player21points;
+            team2players[1].totalPoints += team2Stars;
+
             gamehistory.isDraw = true;
-            console.log('draw end');
 
           }else if(isTeam2Winner){
-             console.log('team 2');
-             console.log(team2players[0]);
-            team2players[0].totalPoints = player20points;
-            team2players[0].totalStars = team2Stars;
-            console.log('team 2 1');
-            team2players[1].totalPoints = player21points;
-            team2players[1].totalPoints = team2Stars;
-            console.log('team 2 2');
-            gamehistory.winner1 = team2players[0];
-            gamehistory.winner2 = team2players[1];
+            team2players[0].totalPoints += player20points;
+            team2players[0].totalStars += team2Stars;
+
+            team2players[1].totalPoints += player21points;
+            team2players[1].totalPoints += team2Stars;
+
+            gamehistory.winner1 = 2;
+            gamehistory.winner2 = 3;
+
             gamehistory.points = totalTeam1;
-            console.log('team 2 end');
 
           }else if(isTeam1Winner){
-            console.log('team 1');
-            team1players[0].totalPoints = player10points;
-            team1players[0].totalStars = team1Stars;
-            console.log('team 1 1');
-            team1players[1].totalPoints = player11points;
-            team1players[1].totalPoints = team1Stars;
-            console.log('team 1 2');
-            gamehistory.winner1 = team1players[0];
-            gamehistory.winner2 = team1players[1];
-            gamehistory.points = totalTeam1;
-            console.log('team 1 end');
+            team1players[0].totalPoints += player10points;
+            team1players[0].totalStars += team1Stars;
 
+            team1players[1].totalPoints += player11points;
+            team1players[1].totalPoints += team1Stars;
+
+            gamehistory.winner1 = 0;
+            gamehistory.winner2 = 1;
+
+            gamehistory.points = totalTeam1;
           }
-          console.log('win end game history');
+
           gamehistory.state = 'Ended';
           gamehistory.owner = game.owner;
           gamehistory.startDate = game.creationDate;
           gamehistory.endDate = Date.now();
-          gamehistory.players = game.basicOrder;
           gamehistory.history = game.history;
-          console.log('game history end game');
+
+          gamehistory.players.push({username: team1players[0].username, avatar: team1players[0].avatar});
+          gamehistory.players.push({username: team1players[1].username, avatar: team1players[1].avatar});
+
+          gamehistory.players.push({username: team2players[0].username, avatar: team2players[0].avatar});
+          gamehistory.players.push({username: team2players[1].username, avatar: team2players[1].avatar});
+
        
         //delete old game
         database.db.collection('games')
