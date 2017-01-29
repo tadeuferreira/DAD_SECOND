@@ -41,6 +41,7 @@ export class ProfileComponent implements OnInit {
     }
 
     edit(user: User) {
+        user.avatar = this.userProfile.avatar;
         this.submitted = true;
         this.userService.update(user);
         console.log(user);

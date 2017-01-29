@@ -70,7 +70,14 @@ var UserService = (function () {
         return this.http
             .put('http://localhost:7777/api/v1/players/' + sessionStorage.getItem("id"), body, { headers: headers, withCredentials: false })
             .subscribe(function (response) {
+            console.log(response);
             _this.router.navigate(['dashboard']);
+            sessionStorage.setItem('id', response.json()._id);
+            sessionStorage.setItem('token', response.json().token);
+            sessionStorage.setItem('username', response.json().username);
+            sessionStorage.setItem('name', response.json().name);
+            sessionStorage.setItem('email', response.json().email);
+            sessionStorage.setItem('avatar', response.json().avatar);
         }, function (error) {
             console.log(error.text());
         });
