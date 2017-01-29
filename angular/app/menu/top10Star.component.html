@@ -1,15 +1,44 @@
-<div class="col-md-6 col-md-offset-3">
-    <h2>Top 10 Stars <button class="btn btn-primary" (click)="getTop10Star()"> Refresh </button></h2>
-    
-    <table>
-        <tr>
-
-            <th>Name</th>
-            <th>Number of Stars</th>
-        </tr>
-        <tr *ngFor="let m of arrayTop10Star">
-            <td>{{m.name}}</td>
-            <td>{{m.totalStars}}</td>
-        </tr>
-    </table>
+<div class="container">
+    <h2>Top 10 Stars <button class="btn btn-primary" (click)="getTop10Stars()"> Refresh </button></h2>
+    <div class="form-group">
+        <label>Filter </label>
+        <input type="text" id="inputName" [(ngModel)]="inputName" />
+        <input type="button" (click)="FilterByName()" value="Apply" />
+    </div>
+    <div class='row'>
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class='panel-heading'>Top 10 Stars</div>
+            <div class='panel-body'>
+                <table class="table table-bordered table-condensed ">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Number of Stars</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let m of arrayTop10Star">
+                            <td>{{m.name}}</td>
+                            <td>{{m.totalPoints}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="btn-toolbar" role="toolbar" style="margin: 0;">
+                    <div class="btn-group">
+                        <label style="margin-top:10px">Page {{currentIndex}}/{{pageNumber}}</label>
+                    </div>
+                    <div class="btn-group pull-right">
+                        <ul class="pagination">
+                            <li [ngClass]="{'disabled': (currentIndex == 1 || pageNumber == 0)}"><a (click)="prevPage()" href="#">Prev</a></li>
+                            <li *ngFor="let page of pagesIndex" [ngClass]="{'active': (currentIndex == page)}">
+                                <a (click)="setPage(page)" href="#">{{page}}</a>
+                            </li>
+                            <li [ngClass]="{'disabled': (currentIndex == pageNumber || pageNumber == 0)}"><a (click)="nextPage()" href="#">Next</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
