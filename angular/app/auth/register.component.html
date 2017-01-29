@@ -1,26 +1,48 @@
 <div class="container">
-<form [formGroup]="myForm" (ngSubmit)="save(myForm.value, myForm.valid)">
-    <div>
-    <label>Username</label>
-    <input type="text" formControlName="username">
-    <small [hidden]="myForm.controls.username.valid">
-        username is required
-    </small>
+    <div class="col-md-6 col-md-offset-3">
+        <h2>Register</h2>
+        <form [formGroup]="myForm" (ngSubmit)="save(myForm.value, myForm.valid)" novalidate>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" name="username" formControlName="username" #username/>
+                <div class="form-text error" *ngIf="myForm.controls.username.touched">
+                    <div *ngIf="myForm.controls.username.hasError('required')">Username is required.</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="name">name</label>
+                <input type="text" class="form-control" name="name" formControlName="name" #name/>
+                <div class="form-text error" *ngIf="myForm.controls.name.touched">
+                    <div *ngIf="myForm.controls.name.hasError('required')">Name is required.</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="text" class="form-control" name="email" formControlName="email" #email/>
+                <div class="form-text error" *ngIf="myForm.controls.email.touched">
+                    <div *ngIf="myForm.controls.email.hasError('required')">Email is required.</div>
+                    <div *ngIf="myForm.controls.email.hasError('invalidEmail')">Email is invalid.</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" name="password" minlength='6' formControlName="password" #password/>
+                <div class='form-text error' *ngIf="myForm.controls.password.touched">
+                    <div *ngIf="myForm.controls.password.hasError('required')">Password is required.</div>
+                    <div *ngIf="myForm.controls.password.hasError('minlength')">Password isn't long enough.</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="passwordConfirmation">Password Confirmation</label>
+                <input type="password" class="form-control" name="passwordConfirmation" formControlName="passwordConfirmation" #passwordConfirmation/>
+                <div class='form-text error' *ngIf="myForm.controls.passwordConfirmation.touched">
+                    <div *ngIf="myForm.hasError('mismatchedPasswords')">Passwords do not match.</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" type="submit" [disabled]="!myForm.valid">Register</button>
+                <a routerLink="/login" class="btn btn-link">Cancel</a>
+            </div>
+        </form>
     </div>
-    <div>
-    <label>Email</label>
-    <input type="text" formControlName="email">
-    <small [hidden]="myForm.controls.email.valid">
-        email is required
-    </small>
-    </div>
-    <div>
-    <label>Password</label>
-    <input type="password" formControlName="password">
-    <small [hidden]="myForm.controls.password.valid">
-        password is required
-    </small>
-    </div>
-    <button type="submit">Register</button>
-</form>
 </div>

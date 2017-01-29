@@ -9,9 +9,9 @@
        </ul>
        <ul class="nav navbar-nav navbar-right">
        <li class="active"><a *ngIf="isLoggedIn()" (click)="logout()">Logout</a></li>
-       <span class="navbar-text" *ngIf="isLoggedIn()">{{getUsername()}}   <img src="{{getAvatar()}}" style="width: 18px; height: 18px; border-radius: 50%;" alt="">
-    </span>
-       	<li class="active"><a *ngIf="!isLoggedIn()" routerLink="/login">Login</a></li>
+	   <a *ngIf="isLoggedIn()" routerLink="profile"><span class="navbar-text" *ngIf="isLoggedIn()">{{getUsername()}} 	<img src="{{getAvatar()}}" style="width: 18px; height: 18px; border-radius: 50%;"></span>
+       	</a>
+       <li class="active"><a *ngIf="!isLoggedIn()" routerLink="/login">Login</a></li>
        	<li class="active"><a  *ngIf="!isLoggedIn()" routerLink="/register">Register</a></li>
        </ul>
 </div>

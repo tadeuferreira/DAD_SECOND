@@ -10,6 +10,7 @@ import { WebSocketService } from './notifications/websocket.service';
 import { NotificationModule } from './notifications/notifications.module';
 
 import { ChatComponent } from './chat.component';
+
 import { GameChatComponent } from './gameCards/gameChat.component';
 
 import { MenuComponent } from './menu/menu.component';
@@ -20,8 +21,10 @@ import { Top10PointComponent } from './menu/top10Point.component';
 
 import { LoginComponent } from './auth/login.component';
 import { RegisterComponent } from './auth/register.component';
+import { ProfileComponent } from './auth/profile.component';
 
 import { UserService } from './auth/user.service';
+import { ValidatorService } from './auth/validator.service';
 import { GameService } from './gameCards/game.service';
 
 import { GameLobbyComponent } from './gameCards/gameLobby.component';
@@ -46,13 +49,14 @@ import { Routing } from './app.routing';
                   GameComponent,
                   GameLobbyComponent, 
                   LoginComponent, 
-                  RegisterComponent, 
+                  RegisterComponent,
+                  ProfileComponent, 
                   MenuComponent, 
                   ChatComponent,
                   GameChatComponent, 
                   DashboardComponent
   ],
-  providers:    [ WebSocketService, UserService, GameService],
+  providers:    [ WebSocketService, UserService, ValidatorService, GameService],
   bootstrap:    [ AppComponent ]
 })
 

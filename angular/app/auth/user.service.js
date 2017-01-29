@@ -24,11 +24,13 @@ var UserService = (function () {
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/json');
         return this.http
-            .post('http://localhost:7777/api/v1/login', JSON.stringify({ username: username, password: password }), { headers: headers }).subscribe(function (response) {
+            .post('http://localhost:7777/api/v1/login', JSON.stringify({ username: username, password: password }), { headers: headers })
+            .subscribe(function (response) {
             if (response.ok) {
                 sessionStorage.setItem('id', response.json()._id);
                 sessionStorage.setItem('token', response.json().token);
                 sessionStorage.setItem('username', response.json().username);
+                sessionStorage.setItem('name', response.json().name);
                 sessionStorage.setItem('email', response.json().email);
                 sessionStorage.setItem('avatar', response.json().avatar);
                 _this.loggedIn = true;
@@ -39,18 +41,46 @@ var UserService = (function () {
             console.log(error.text());
         });
     };
-    UserService.prototype.register = function (username, email, password) {
+    UserService.prototype.register = function (username, name, email, password) {
         var _this = this;
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/json');
-        var avatar = 'https://api.adorable.io/avatars/285/' + email + '.png';
+        var avatar = 'https://api.adorable.io/avatars/285/' + username + '.png';
+        var totalPoints = 0;
+        var totalStars = 0;
         return this.http
-            .post('http://localhost:7777/api/v1/register', JSON.stringify({ username: username, email: email, password: password, avatar: avatar }), { headers: headers })
+            .post('http://localhost:7777/api/v1/register', JSON.stringify({ username: username, name: name, email: email, password: password, avatar: avatar, totalPoints: totalPoints, totalStars: totalStars }), { headers: headers })
             .subscribe(function (response) {
             _this.router.navigate(['login']);
         }, function (error) {
             console.log(error.text());
         });
+    };
+    UserService.prototype.update = function (user) {
+        var _this = this;
+        var headers = new http_1.Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
+        var avatar = user.avatar;
+        var username = user.username;
+        var name = user.name;
+        var email = user.email;
+        var password = user.password;
+        var body = JSON.stringify({ avatar: avatar, username: username, name: name, email: email, password: password });
+        return this.http
+            .put('http://localhost:7777/api/v1/players/' + sessionStorage.getItem("id"), body, { headers: headers, withCredentials: false })
+            .subscribe(function (response) {
+            _this.router.navigate(['dashboard']);
+        }, function (error) {
+            console.log(error.text());
+        });
+    };
+    UserService.prototype.getProfile = function () {
+        var headers = new http_1.Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
+        return this.http
+            .get('http://localhost:7777/api/v1/players/' + sessionStorage.getItem("id"), { headers: headers, withCredentials: false });
     };
     UserService.prototype.logout = function () {
         sessionStorage.removeItem('auth_token');

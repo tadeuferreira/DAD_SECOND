@@ -49,6 +49,7 @@ var Player = (function () {
                 return next();
             }
             delete player._id;
+            player.password = sha1(player.password);
             app_database_1.databaseConnection.db.collection('players')
                 .updateOne({
                 _id: id
@@ -66,6 +67,10 @@ var Player = (function () {
             }
             if (player.username === undefined || player.username === "") {
                 response.send(400, 'No player username');
+                return next();
+            }
+            if (player.name === undefined || player.name === "") {
+                response.send(400, 'No player name');
                 return next();
             }
             if (player.password === undefined || player.password === "") {
@@ -119,8 +124,8 @@ var Player = (function () {
         };
         this.getTop10Star = function (request, response, next) {
             app_database_1.databaseConnection.db.collection('players')
-                .find({ totalEstrelas: { $exists: true } })
-                .sort({ totalEstrelas: -1 })
+                .find({ totalStars: { $exists: true } })
+                .sort({ totalStars: -1 })
                 .limit(10)
                 .toArray()
                 .then(function (players) {
@@ -132,8 +137,8 @@ var Player = (function () {
         };
         this.getTop10Point = function (request, response, next) {
             app_database_1.databaseConnection.db.collection('players')
-                .find({ totalPontos: { $exists: true } })
-                .sort({ totalPontos: -1 })
+                .find({ totalPoints: { $exists: true } })
+                .sort({ totalPoints: -1 })
                 .limit(10)
                 .toArray()
                 .then(function (players) {
