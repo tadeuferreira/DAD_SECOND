@@ -18,10 +18,13 @@ var WebSocketService = (function () {
         }
     }
     WebSocketService.prototype.sendChatMessage = function (message) {
-        this.socket.emit('chat', new Date().toLocaleTimeString('en-US', { hour12: false,
+        var anonymous = "anonymous";
+        this.socket.emit('chat', new Date().toLocaleTimeString('en-US', {
+            hour12: false,
             hour: "numeric",
             minute: "numeric",
-            second: "numeric" }) + ': ' + sessionStorage.getItem('username') + ': ' + message);
+            second: "numeric"
+        }) + ': ' + (!!sessionStorage.getItem('token') ? sessionStorage.getItem('username') : anonymous) + ': ' + message);
     };
     WebSocketService.prototype.getChatMessages = function () {
         return this.listenOnChannel('chat');

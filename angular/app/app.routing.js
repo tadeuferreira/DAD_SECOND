@@ -14,7 +14,7 @@ var game_component_1 = require("./gameCards/game.component");
 var appRoutes = [
     {
         path: '',
-        redirectTo: '/dashboard',
+        redirectTo: '/home',
         pathMatch: 'full'
     },
     {

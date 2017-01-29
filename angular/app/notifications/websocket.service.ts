@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import {  Http, Response } from '@angular/http';
 
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 
 import * as io from 'socket.io-client';
 
@@ -16,21 +16,24 @@ export class WebSocketService {
     }
 
     sendChatMessage(message: any) {
-        this.socket.emit('chat', new Date().toLocaleTimeString('en-US', { hour12: false, 
-                                                                          hour: "numeric", 
-                                                                          minute: "numeric",
-                                                                          second: "numeric"}) +': ' +sessionStorage.getItem('username') + ': ' + message);
+        let anonymous: string = "anonymous";
+        this.socket.emit('chat', new Date().toLocaleTimeString('en-US', {
+            hour12: false,
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric"
+        }) + ': ' + (!!sessionStorage.getItem('token') ? sessionStorage.getItem('username') : anonymous) +': ' + message);
     }
     getChatMessages(): Observable<any> {
         return this.listenOnChannel('chat');
     }
-    sendPlayersMessages(message: any){
+    sendPlayersMessages(message: any) {
         this.socket.emit('players', message);
     }
     getPlayersMessages(): Observable<any> {
         return this.listenOnChannel('players');
     }
-    
+
 
     sendGameChatMessage(message: any) {
         this.socket.emit('chatGame', message);
@@ -45,7 +48,7 @@ export class WebSocketService {
         return this.listenOnChannel('gameNotification');
     }
 
-    sendLobby(msgData: any){
+    sendLobby(msgData: any) {
         this.socket.emit('gameLobby', msgData);
     }
 
@@ -53,27 +56,27 @@ export class WebSocketService {
         return this.listenOnChannel('gameLobby');
     }
 
-    unsubLobby(){
+    unsubLobby() {
         this.socket.off('gameLobby', null);
     }
 
-    
-    unsubGame(){
+
+    unsubGame() {
         this.socket.off('gamePlay', null);
     }
-    sendGame(msgData: any){
+    sendGame(msgData: any) {
         this.socket.emit('gamePlay', msgData);
     }
-    
+
     subGame(): Observable<any> {
         return this.listenOnChannel('gamePlay');
     }
 
-    
+
 
     private listenOnChannel(channel: string): Observable<any> {
-        return new Observable((observer:any) => {
-            this.socket.on(channel, (data:any) => {
+        return new Observable((observer: any) => {
+            this.socket.on(channel, (data: any) => {
                 observer.next(data);
             });
             return () => this.socket.disconnect();

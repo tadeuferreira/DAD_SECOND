@@ -1,9 +1,8 @@
-import { Component, OnInit , OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router , ActivatedRoute } from '@angular/router';
 import { UserService } from '../auth/user.service';
 import { GameService } from '../gameCards/game.service';
 import { WebSocketService } from '../notifications/websocket.service';
-import { Player } from '../gameEngine/player';
 
 @Component({
     moduleId: module.id,
@@ -11,7 +10,7 @@ import { Player } from '../gameEngine/player';
     templateUrl:'gameSearch.component.html'
 
 })
-export class GameSearchComponent implements OnInit, OnDestroy{
+export class GameSearchComponent implements OnInit{
 
 	public games: string[] = [];
 	constructor(private gameService: GameService ,private userService: UserService, private router: Router) {}

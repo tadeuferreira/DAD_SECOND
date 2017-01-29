@@ -19,7 +19,7 @@ import { GameComponent } from './gameCards/game.component';
 const appRoutes: Routes = [
     {
         path: '',
-        redirectTo: '/dashboard',
+        redirectTo: '/home',
         pathMatch: 'full'
     },
     {
