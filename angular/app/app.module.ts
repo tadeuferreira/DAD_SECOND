@@ -10,7 +10,8 @@ import { WebSocketService } from './notifications/websocket.service';
 import { NotificationModule } from './notifications/notifications.module';
 
 import { ChatComponent } from './chat.component';
-import { GameChatComponent } from './gameCards/gameChat.component'
+
+import { GameChatComponent } from './gameCards/gameChat.component';
 
 import { MenuComponent } from './menu/menu.component';
 import { DashboardComponent } from './menu/dashboard.component';
@@ -52,7 +53,7 @@ import { Routing } from './app.routing';
                   ProfileComponent, 
                   MenuComponent, 
                   ChatComponent,
-                  GameChatComponent,
+                  GameChatComponent, 
                   DashboardComponent
   ],
   providers:    [ WebSocketService, UserService, ValidatorService, GameService],

@@ -14,8 +14,9 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 	private players: string[] = [];
 	public team1: string[] = [];
 	public team2: string[] = [];
-	private gameIsStarting = false;
 	private game_id: string = sessionStorage.getItem('game_id');
+	private player_id: string = sessionStorage.getItem('id');
+	private gameIsStarting :boolean = false;
 
 	constructor(private websocketService: WebSocketService, private gameService: GameService ,private userService: UserService, private router: Router) {}
 
@@ -23,52 +24,40 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 		if(!this.userService.isLoggedIn()){
 			this.router.navigate(['login']);
 		}else{
-			this.gameService.joinGame().subscribe(response => {
-				if (response.ok) {
-					switch (response._body) {
-						case '"joined"':
-						this.websocketService.sendInitLobby({_id: this.game_id, msg: 'joining'});
-						break;
-						case '"start"':
-						this.websocketService.sendInitLobby({_id: this.game_id, msg: 'start'});
-						break;	
-						case '"already In"':
-						this.websocketService.sendInitLobby({_id: this.game_id, msg: 'already In'});
-						break;
-					}
-					this.websocketService.getInitLobby().subscribe((p: any) => 
-						{
-							if(p.msg == 'refresh'){
-								this.gameService.getPlayersGame().subscribe(response => {
-									this.setPlayers(response);
-								}, error => {
-									console.log(error);
-								}
-								);
-							}else if(p.msg == 'startGame'){
-								this.websocketService.unsubLobby();
-								this.gameIsStarting = true;
-								this.router.navigate(['game/playing']);
+			//join game 
+			this.websocketService.sendLobby({_id: this.game_id, player_id: this.player_id, player_avatar: sessionStorage.getItem('avatar'),player_username: sessionStorage.getItem('username'),msg:'join'});
 
-							}
-						});
-					this.websocketService.getExitLobby().subscribe((p: any) => { 	
-							if(p.msg == 'terminated'){
-								this.router.navigate(['dashboard']);
-					}});
+			this.websocketService.subLobby().subscribe(response => {
 
-				}else{
-					this.router.navigate(['dashboard']);
+				switch (response.msg) {
+					case 'update':
+					this.gameService.getPlayersGame().subscribe(response => {
+						if(response.ok)
+							this.setPlayers(response);},
+						error => {
+							console.log(error.text());
+						}
+						);
+					break;
+					case 'start':
+					this.gameIsStarting = true;
+					this.router.navigate(['game/playing']);
+					break;
+					case 'switch_fail':
+					alert('cant switch team');
+					break;
+					case 'terminated':
+					this.end();
+					break;
 				}
-			}, error => {
-				console.log(error);
+
 			});
-		}	
+		}
 	}
 
 	ngOnDestroy() {
 		if(!this.gameIsStarting)
-			this.leave();
+			this.websocketService.sendLobby({_id: this.game_id, player_id: this.player_id, msg:'leave'});
 	}
 
 
@@ -79,46 +68,21 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 	}
 
 	changeTeam(){
-		this.gameService.changeTeamGame().subscribe(response => {
-				if (response.ok) {
-					switch (response._body) {
-						case '"changed"':
-							this.websocketService.sendInitLobby({_id: this.game_id, msg: 'changed'});
-							break;					
-						case '"full"':			
-							alert('The other team is full');
-							break;
-					}			
-				}
-			}, error => {
-				console.log(error);
-			}
-			);
+		this.websocketService.sendLobby({_id: this.game_id, player_id: this.player_id, msg:'switch'});
 	}
 
 	leave(){
-		this.gameService.leaveGame().subscribe(response => {
-				if (response.ok) {
-					switch (response._body) {
-						case '"terminated"':
-							this.websocketService.sendExitLobby({_id: this.game_id, msg: 'terminated'});
-							break;
-						
-						case '"left"':
-							this.websocketService.sendExitLobby({_id: this.game_id, msg: 'left'});
-							break;
-					}
-					this.router.navigate(['dashboard']);
-					
-				}
-			}, error => {
-				console.log(error);
-			}
-			);
+		this.websocketService.sendLobby({_id: this.game_id, player_id: this.player_id, msg:'leave'});
+		this.end();
 	}
 
 	getGameId(){
 		return this.game_id;
+	}
+
+	end(){
+		this.websocketService.unsubLobby();
+		this.router.navigate(['dashboard']);
 	}
 
 }

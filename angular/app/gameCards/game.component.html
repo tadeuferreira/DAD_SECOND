@@ -3,36 +3,36 @@
 <div class="container" *ngIf="isGameReady">
 	<div class="row">
 		<div class="col-lg-3"></div>
-		<div class="col-lg-6"><div *ngFor="let c of getHand(1)"><img class="card card-inline" src="{{c.isFirstTrump ? c.imgUrl : '/img/cards/semFace.png'}}"/></div>
+		<div class="col-lg-6"><div *ngFor="let c of friend.cards"><img class="card card-inline" src="{{c.imgUrl}}"/></div>
 	</div> 
 	<div class="col-lg-3"></div>
 </div>
 <div class="row" >
-	<div class="col-lg-3"><div *ngFor="let c of getHand(2)"><img class="card card-rotated" src="{{c.isFirstTrump ? c.imgUrl : '/img/cards/semFace.png'}}"/></div></div>
+	<div class="col-lg-3"><div *ngFor="let c of foe1.cards"><img class="card card-rotated" src="{{c.imgUrl}}"/></div></div>
 	<div class="col-lg-6">
 		<div class="row">
 			<div class="col-lg-3"></div>
-			<div class="col-lg-6"><img class="card card-inline" src="{{getTableCard(1) != null ? getTableCard(1).imgUrl : ''}}"/></div>
+			<div class="col-lg-6"><img class="card card-inline" src="{{friend.tableCard != null ? friend.tableCard.imgUrl : ''}}"/></div>
 			<div class="col-lg-3"></div>
 		</div>
 		<div class="row">
-			<div class="col-lg-3"><img class="card card-rotated" src="{{getTableCard(2) != null ? getTableCard(2).imgUrl : ''}}"/></div>
+			<div class="col-lg-3"><img class="card card-rotated" src="{{foe1.tableCard != null ? foe1.tableCard.imgUrl : ''}}"/></div>
 			<div class="col-lg-6"><h2>{{message}}</h2></div>
-			<div class="col-lg-3"><img class="card card-rotated" src="{{getTableCard(3) != null? getTableCard(3).imgUrl : ''}}"/></div>
+			<div class="col-lg-3"><img class="card card-rotated" src="{{foe2.tableCard != null ? foe2.tableCard.imgUrl : ''}}"/></div>
 		</div>
 		<div class="row">
 			<div class="col-lg-3"></div>
-			<div class="col-lg-6"><img class="card card-inline" src="{{getTableCard(0) != null ? getTableCard(0).imgUrl : ''}}"/></div>
+			<div class="col-lg-6"><img class="card card-inline" src="{{me.tableCard != null ? me.tableCard.imgUrl : ''}}"/></div>
 			<div class="col-lg-3"></div>
 		</div>	
 	</div>
 	<div class="col-lg-3">
-		<div *ngFor="let c of getHand(3)"><img  class="card card-rotated" src="{{c.isFirstTrump ? c.imgUrl : '/img/cards/semFace.png'}}" /></div>
+		<div *ngFor="let c of foe2.cards"><img  class="card card-rotated" src="{{c.imgUrl}}" /></div>
 	</div>
 </div>
 <div class="row">
 	<div class="col-lg-3"></div>
-	<div class="col-lg-6"><div *ngFor="let c of getHand(0)"><img (click)="playCard($event)" id="{{c.id}}" class="{{c.isFirstTrump ? 'card card-inline trump' : 'card card-inline'}}" src="{{c.imgUrl}}"/></div>
+	<div class="col-lg-6"><div *ngFor="let c of me.cards"><img (click)="playCard($event)" id="{{c.id}}" class="{{c.isFirstTrump ? 'card card-inline trump' : 'card card-inline'}}" src="{{c.imgUrl}}"/></div>
 </div>
 <div class="col-lg-3"></div>
 </div>

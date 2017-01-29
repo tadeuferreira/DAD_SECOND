@@ -37,43 +37,11 @@ export class GameService {
 		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
 		return this.http.get('http://localhost:7777/api/v1/games', <RequestOptionsArgs>{ headers: headers, withCredentials: false });
 	}
-
-	joinGame(): Promise<any>{
-		let body = JSON.stringify({_id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id'),player_avatar : sessionStorage.getItem('avatar')  ,player_username : sessionStorage.getItem('username') });
-		
-		let headers = new Headers();
-		headers.append('Content-Type', 'application/json');
-		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
-		return this.http.post('http://localhost:7777/api/v1/games/join', body, <RequestOptionsArgs>{ headers: headers, withCredentials: false });
-	}
 	getPlayersGame(): Promise<any>{
 		let headers = new Headers();
 		headers.append('Content-Type', 'application/json');
 		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
 		return this.http.get('http://localhost:7777/api/v1/games/players/'+ sessionStorage.getItem('game_id'), <RequestOptionsArgs>{ headers: headers, withCredentials: false });
-	}
-	leaveGame(): Promise<any>{
-		let body = JSON.stringify({_id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id')});
-		
-		let headers = new Headers();
-		headers.append('Content-Type', 'application/json');
-		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
-		return this.http.post('http://localhost:7777/api/v1/games/leave', body, <RequestOptionsArgs>{ headers: headers, withCredentials: false });
-	}
-	ready(): Promise<any>{
-		let body = JSON.stringify({_id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id')});
-		
-		let headers = new Headers();
-		headers.append('Content-Type', 'application/json');
-		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
-		return this.http.post('http://localhost:7777/api/v1/games/ready', body, <RequestOptionsArgs>{ headers: headers, withCredentials: false });
-	}
-	changeTeamGame(): Promise<any>{
-		let body = JSON.stringify({_id: sessionStorage.getItem('game_id'), player_id: sessionStorage.getItem('id')});
-		let headers = new Headers();
-		headers.append('Content-Type', 'application/json');
-		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
-		return this.http.post('http://localhost:7777/api/v1/games/change', body,<RequestOptionsArgs>{ headers: headers, withCredentials: false });
 	}
 	getGame(): Promise<any>{
 		let headers = new Headers();
@@ -81,11 +49,4 @@ export class GameService {
 		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
 		return this.http.get('http://localhost:7777/api/v1/games/'+ sessionStorage.getItem('game_id'), <RequestOptionsArgs>{ headers: headers, withCredentials: false });
 	}
-	updateGame(game:any): Promise<any>{		
-		let headers = new Headers();
-		headers.append('Content-Type', 'application/json');
-		headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
-		return this.http.put('http://localhost:7777/api/v1/games/'+game._id, game,<RequestOptionsArgs>{ headers: headers, withCredentials: false });
-	}
-
 }
