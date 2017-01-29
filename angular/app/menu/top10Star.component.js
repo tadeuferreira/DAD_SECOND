@@ -16,15 +16,9 @@ var Top10StarComponent = (function () {
         this.http = http;
         this.router = router;
         this.arrayTop10Star = [];
-        this.pages = 4;
-        this.pageSize = 5;
-        this.pageNumber = 0;
-        this.currentIndex = 1;
-        this.pageStart = 1;
         this.inputName = '';
         this.getTop10Star();
         this.filteredItems = this.arrayTop10Star;
-        this.init();
     }
     Top10StarComponent.prototype.getTop10Star = function () {
         var _this = this;
@@ -38,20 +32,6 @@ var Top10StarComponent = (function () {
         }, function (error) {
             console.log(error.text());
         });
-    };
-    Top10StarComponent.prototype.init = function () {
-        this.currentIndex = 1;
-        this.pageStart = 1;
-        this.pages = 4;
-        this.pageNumber = parseInt("" + (this.filteredItems.length / this.pageSize));
-        if (this.filteredItems.length % this.pageSize != 0) {
-            this.pageNumber++;
-        }
-        if (this.pageNumber < this.pages) {
-            this.pages = this.pageNumber;
-        }
-        this.refreshItems();
-        console.log("this.pageNumber :  " + this.pageNumber);
     };
     Top10StarComponent.prototype.FilterByName = function () {
         var _this = this;
@@ -67,40 +47,10 @@ var Top10StarComponent = (function () {
             this.filteredItems = this.arrayTop10Star;
         }
         console.log(this.filteredItems);
-        this.init();
-    };
-    Top10StarComponent.prototype.fillArray = function () {
-        var obj = new Array();
-        for (var index = this.pageStart; index < this.pageStart + this.pages; index++) {
-            obj.push(index);
-        }
-        return obj;
+        this.refreshItems();
     };
     Top10StarComponent.prototype.refreshItems = function () {
-        this.arrayTop10Star = this.filteredItems.slice((this.currentIndex - 1) * this.pageSize, (this.currentIndex) * this.pageSize);
-        this.pagesIndex = this.fillArray();
-    };
-    Top10StarComponent.prototype.prevPage = function () {
-        if (this.currentIndex > 1) {
-            this.currentIndex--;
-        }
-        if (this.currentIndex < this.pageStart) {
-            this.pageStart = this.currentIndex;
-        }
-        this.refreshItems();
-    };
-    Top10StarComponent.prototype.nextPage = function () {
-        if (this.currentIndex < this.pageNumber) {
-            this.currentIndex++;
-        }
-        if (this.currentIndex >= (this.pageStart + this.pages)) {
-            this.pageStart = this.currentIndex - this.pages + 1;
-        }
-        this.refreshItems();
-    };
-    Top10StarComponent.prototype.setPage = function (index) {
-        this.currentIndex = index;
-        this.refreshItems();
+        this.arrayTop10Star = this.filteredItems;
     };
     return Top10StarComponent;
 }());

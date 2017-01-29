@@ -16,15 +16,9 @@ var Top10PointComponent = (function () {
         this.http = http;
         this.router = router;
         this.arrayTop10Point = [];
-        this.pages = 4;
-        this.pageSize = 5;
-        this.pageNumber = 0;
-        this.currentIndex = 1;
-        this.pageStart = 1;
         this.inputName = '';
         this.getTop10Point();
         this.filteredItems = this.arrayTop10Point;
-        this.init();
     }
     Top10PointComponent.prototype.getTop10Point = function () {
         var _this = this;
@@ -38,20 +32,6 @@ var Top10PointComponent = (function () {
         }, function (error) {
             console.log(error.text());
         });
-    };
-    Top10PointComponent.prototype.init = function () {
-        this.currentIndex = 1;
-        this.pageStart = 1;
-        this.pages = 4;
-        this.pageNumber = parseInt("" + (this.filteredItems.length / this.pageSize));
-        if (this.filteredItems.length % this.pageSize != 0) {
-            this.pageNumber++;
-        }
-        if (this.pageNumber < this.pages) {
-            this.pages = this.pageNumber;
-        }
-        this.refreshItems();
-        console.log("this.pageNumber :  " + this.pageNumber);
     };
     Top10PointComponent.prototype.FilterByName = function () {
         var _this = this;
@@ -67,40 +47,10 @@ var Top10PointComponent = (function () {
             this.filteredItems = this.arrayTop10Point;
         }
         console.log(this.filteredItems);
-        this.init();
-    };
-    Top10PointComponent.prototype.fillArray = function () {
-        var obj = new Array();
-        for (var index = this.pageStart; index < this.pageStart + this.pages; index++) {
-            obj.push(index);
-        }
-        return obj;
+        this.refreshItems();
     };
     Top10PointComponent.prototype.refreshItems = function () {
-        this.arrayTop10Point = this.filteredItems.slice((this.currentIndex - 1) * this.pageSize, (this.currentIndex) * this.pageSize);
-        this.pagesIndex = this.fillArray();
-    };
-    Top10PointComponent.prototype.prevPage = function () {
-        if (this.currentIndex > 1) {
-            this.currentIndex--;
-        }
-        if (this.currentIndex < this.pageStart) {
-            this.pageStart = this.currentIndex;
-        }
-        this.refreshItems();
-    };
-    Top10PointComponent.prototype.nextPage = function () {
-        if (this.currentIndex < this.pageNumber) {
-            this.currentIndex++;
-        }
-        if (this.currentIndex >= (this.pageStart + this.pages)) {
-            this.pageStart = this.currentIndex - this.pages + 1;
-        }
-        this.refreshItems();
-    };
-    Top10PointComponent.prototype.setPage = function (index) {
-        this.currentIndex = index;
-        this.refreshItems();
+        this.arrayTop10Point = this.filteredItems;
     };
     return Top10PointComponent;
 }());
