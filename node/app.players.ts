@@ -67,49 +67,52 @@ export class Player {
     }
     
     public createPlayer = (request: any, response: any, next: any) => {
-        const player = request.body;
-        if (player === undefined) {
+        const newplayer = request.body;
+        if (newplayer === undefined) {
             response.send(400, 'No player data');
             return next();
         }
-        if(player.username === undefined || player.username === ""){
+        if(newplayer.username === undefined || newplayer.username === ""){
             response.send(400, 'No player username');
             return next();
         }
-        if(player.name === undefined || player.name === ""){
+        if(newplayer.name === undefined || newplayer.name === ""){
             response.send(400, 'No player name');
             return next();
         }
-        if(player.password === undefined || player.password === ""){
+        if(newplayer.password === undefined || newplayer.password === ""){
             response.send(400, 'No player password');
             return next();
         }
-        if(player.email === undefined || player.email === ""){
+        if(newplayer.email === undefined || newplayer.email === ""){
             response.send(400, 'No player email');
             return next();
         }
         database.db.collection('players').findOne({
-            username: player.username
+            username: newplayer.username
         }).then(player => {
             if (player !== null) {
                 response.send(400, 'Player already exist');
                 return next();
-            }
-        }).catch(err => this.handleError(err, response, next));
-        database.db.collection('players').findOne({
-            email: player.email
-        }).then(player => {
-            if (player !== null) {
-                response.send(400, 'Player already exist');
-                return next();
-            }
-        }).catch(err => this.handleError(err, response, next));
+            }else{
+                database.db.collection('players').findOne({
+                    email: newplayer.email
+                }).then(player => {
+                    if (player !== null) {
+                        response.send(400, 'Player already exist');
+                        return next();
+                    }else{
 
-        player.password = sha1(player.password);
-        database.db.collection('players')
-        .insertOne(player)
-        .then(result => this.returnPlayer(result.insertedId, response, next))
-        .catch(err => this.handleError(err, response, next));
+                        newplayer.password = sha1(newplayer.password);
+                        database.db.collection('players')
+                        .insertOne(newplayer)
+                        .then(result => this.returnPlayer(result.insertedId, response, next))
+                        .catch(err => this.handleError(err, response, next));
+                    }
+                }).catch(err => this.handleError(err, response, next));
+            }
+        }).catch(err => this.handleError(err, response, next));
+        
     }
 
     public deletePlayer = (request: any, response: any, next: any) => {

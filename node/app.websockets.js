@@ -45,13 +45,13 @@ var WebSocketServer = (function () {
                     console.log('gameLobby');
                     switch (msgData.msg) {
                         case 'join':
-                            _this.joinGame(msgData, client);
+                            _this.joinGameLobby(msgData, client);
                             break;
                         case 'switch':
-                            _this.changeTeamGame(msgData, client);
+                            _this.changeTeamLobby(msgData, client);
                             break;
                         case 'leave':
-                            _this.leaveGame(msgData, client);
+                            _this.leaveGameLobby(msgData, client);
                             break;
                     }
                 });
@@ -63,7 +63,7 @@ var WebSocketServer = (function () {
                             _this.gameJoin(msgData, client);
                             break;
                         case 'try':
-                            _this.tryPlay(msgData, client);
+                            _this.gameTryPlay(msgData, client);
                             break;
                         case 'leave':
                             _this.gameLeave(msgData, client);
@@ -72,12 +72,12 @@ var WebSocketServer = (function () {
                             _this.gameRenounce(msgData, client);
                             break;
                         case 'startRound':
-                            _this.hand(msgData, client, false);
+                            _this.gameHand(msgData, client, false);
                             _this.responseGamePlay(msgData, client, { msg: 'update' });
-                            _this.play(msgData, client);
+                            _this.gamePlay(msgData, client);
                             break;
                         case 'update':
-                            _this.hand(msgData, client, false);
+                            _this.gameHand(msgData, client, false);
                             break;
                     }
                 });
@@ -105,6 +105,8 @@ var WebSocketServer = (function () {
                 case 'terminated':
                     data = { msg: 'terminated' };
                     break;
+                case 'NoGame':
+                    data = { msg: ' NoGame' };
             }
             console.log(data);
             client.emit('gameLobby', data);
@@ -118,13 +120,14 @@ var WebSocketServer = (function () {
             switch (response.msg) {
                 case 'played':
                     if (!response.roundWon)
-                        _this.play(msgData, client);
+                        _this.gamePlay(msgData, client);
                 case 'hand':
                 case 'play':
                 case 'wonRound':
                 case 'gameEnded':
                 case 'update':
                 case 'players':
+                case 'NoGame':
                     data = response;
             }
             // console.log(data);
@@ -136,7 +139,7 @@ var WebSocketServer = (function () {
         this.notifyAll = function (channel, message) {
             _this.io.sockets.emit(channel, message);
         };
-        this.joinGame = function (msgData, client) {
+        this.joinGameLobby = function (msgData, client) {
             console.log('join Game');
             return app_database_1.databaseConnection.db.collection('games')
                 .findOne({
@@ -224,11 +227,11 @@ var WebSocketServer = (function () {
                     }
                 }
                 else {
-                    console.log('game not found or not on pending');
+                    _this.responseGameLobby(msgData, client, 'NoGame');
                 }
             }).catch(function (err) { return console.log(err.msg); });
         };
-        this.changeTeamGame = function (msgData, client) {
+        this.changeTeamLobby = function (msgData, client) {
             app_database_1.databaseConnection.db.collection('games')
                 .findOne({
                 _id: new mongodb.ObjectID(msgData._id)
@@ -298,7 +301,7 @@ var WebSocketServer = (function () {
             })
                 .catch(function (err) { return console.log(err.msg); });
         };
-        this.leaveGame = function (msgData, client) {
+        this.leaveGameLobby = function (msgData, client) {
             app_database_1.databaseConnection.db.collection('games')
                 .findOne({
                 _id: new mongodb.ObjectID(msgData._id)
@@ -384,10 +387,13 @@ var WebSocketServer = (function () {
                         foe2 = _this.getPlayerFromTeam(game, game.basicOrder[pos]);
                         _this.responseGamePlay(msgData, client, { msg: 'players', friend: friend, foe1: foe1, foe2: foe2 });
                         if (game.onPlay == my_order)
-                            _this.hand(msgData, client, true);
+                            _this.gameHand(msgData, client, true);
                         else
-                            _this.hand(msgData, client, false);
+                            _this.gameHand(msgData, client, false);
                     }
+                }
+                else {
+                    _this.responseGamePlay(msgData, client, { msg: 'NoGame' });
                 }
             }).catch(function (err) { return console.log(err.msg); });
         };
@@ -395,8 +401,8 @@ var WebSocketServer = (function () {
         };
         this.gameLeave = function (msgData, client) {
         };
-        this.hand = function (msgData, client, gameStart) {
-            console.log('hand');
+        this.gameHand = function (msgData, client, gameStart) {
+            console.log('gameHand');
             app_database_1.databaseConnection.db.collection('games')
                 .findOne({
                 _id: new mongodb.ObjectID(msgData._id)
@@ -437,12 +443,12 @@ var WebSocketServer = (function () {
                         }
                         _this.responseGamePlay(msgData, client, { msg: 'hand', me: me, friend: friend, foe1: foe1, foe2: foe2, stash: stash, table: table });
                         if (gameStart)
-                            _this.play(msgData, client);
+                            _this.gamePlay(msgData, client);
                     }
                 }
             }).catch(function (err) { return console.log(err.msg); });
         };
-        this.play = function (msgData, client) {
+        this.gamePlay = function (msgData, client) {
             console.log('play');
             app_database_1.databaseConnection.db.collection('games')
                 .findOne({
@@ -456,7 +462,7 @@ var WebSocketServer = (function () {
                 }
             }).catch(function (err) { return console.log(err.msg); });
         };
-        this.tryPlay = function (msgData, client) {
+        this.gameTryPlay = function (msgData, client) {
             console.log('tryPlay');
             app_database_1.databaseConnection.db.collection('games')
                 .findOne({
@@ -476,12 +482,12 @@ var WebSocketServer = (function () {
                     }
                     if (originalCard.playerOwner == sentCard.playerOwner && originalCard.playerOwner == msgData.player_id
                         && originalCard.isOnHand && !originalCard.isUsed && !originalCard.isOnTable) {
-                        _this.playCard(msgData, game, cardPos, client);
+                        _this.gamePlayCard(msgData, game, cardPos, client);
                     }
                 }
             }).catch(function (err) { return console.log(err.msg); });
         };
-        this.playCard = function (msgData, game, cardPos, client) {
+        this.gamePlayCard = function (msgData, game, cardPos, client) {
             var sentCard = msgData.card;
             var my_order;
             for (var i = 0; i < game.basicOrder.length; ++i) {
@@ -680,40 +686,41 @@ var WebSocketServer = (function () {
                     var gamehistory = {
                         owner: null,
                         state: '',
-                        startData: null,
+                        startDate: null,
                         endDate: null,
                         isDraw: false,
                         winner1: null,
                         winner2: null,
                         points: 0,
-                        players: [null, null, null, null],
+                        stars: 0,
+                        players: [],
                         history: []
                     };
                     if (isTeam2Winner && isTeam1Winner) {
-                        team1players[0].totalPoints += player10points;
-                        team1players[0].totalStars += team1Stars;
-                        team1players[1].totalPoints += player11points;
-                        team1players[1].totalPoints += team1Stars;
-                        team2players[0].totalPoints += player20points;
-                        team2players[0].totalStars += team2Stars;
-                        team2players[1].totalPoints += player21points;
-                        team2players[1].totalPoints += team2Stars;
+                        team1players[0].totalPoints = team1players[0].totalPoints + player10points;
+                        team1players[0].totalStars = team1players[0].totalStars + team1Stars;
+                        team1players[1].totalPoints = team1players[1].totalPoints + player11points;
+                        team1players[1].totalStars = team1players[1].totalStars + team1Stars;
+                        team2players[0].totalPoints = team2players[0].totalPoints + player20points;
+                        team2players[0].totalStars = team2players[0].totalStars + team2Stars;
+                        team2players[1].totalPoints = team2players[1].totalPoints + player21points;
+                        team2players[1].totalStars = team2players[1].totalStars + team2Stars;
                         gamehistory.isDraw = true;
                     }
                     else if (isTeam2Winner) {
-                        team2players[0].totalPoints += player20points;
-                        team2players[0].totalStars += team2Stars;
-                        team2players[1].totalPoints += player21points;
-                        team2players[1].totalPoints += team2Stars;
+                        team2players[0].totalPoints = team2players[0].totalPoints + player20points;
+                        team2players[0].totalStars = team2players[0].totalStars + team2Stars;
+                        team2players[1].totalPoints = team2players[1].totalPoints + player21points;
+                        team2players[1].totalStars = team2players[1].totalStars + team2Stars;
                         gamehistory.winner1 = 2;
                         gamehistory.winner2 = 3;
                         gamehistory.points = totalTeam1;
                     }
                     else if (isTeam1Winner) {
-                        team1players[0].totalPoints += player10points;
-                        team1players[0].totalStars += team1Stars;
-                        team1players[1].totalPoints += player11points;
-                        team1players[1].totalPoints += team1Stars;
+                        team1players[0].totalPoints = team1players[0].totalPoints + player10points;
+                        team1players[0].totalStars = team1players[0].totalStars + team1Stars;
+                        team1players[1].totalPoints = team1players[1].totalPoints + player11points;
+                        team1players[1].totalStars = team1players[1].totalStars + team1Stars;
                         gamehistory.winner1 = 0;
                         gamehistory.winner2 = 1;
                         gamehistory.points = totalTeam1;
@@ -795,12 +802,15 @@ var WebSocketServer = (function () {
         if (totalPoints == 120) {
             stars = 5;
         }
-        else if (totalPoints >= 91 && totalPoints <= 119) {
+        else if (totalPoints > 90 && totalPoints < 120) {
             stars = 4;
         }
-        else if (totalPoints >= 61 && totalPoints <= 90) {
+        else if (totalPoints > 60 && totalPoints < 91) {
             stars = 4;
         }
+        console.log('################################################################');
+        console.log(stars);
+        console.log(totalPoints);
         return stars;
     };
     WebSocketServer.prototype.getStashPoints = function (stash) {

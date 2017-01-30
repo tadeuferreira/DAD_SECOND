@@ -60,48 +60,52 @@ var Player = (function () {
                 .catch(function (err) { return _this.handleError(err, response, next); });
         };
         this.createPlayer = function (request, response, next) {
-            var player = request.body;
-            if (player === undefined) {
+            var newplayer = request.body;
+            if (newplayer === undefined) {
                 response.send(400, 'No player data');
                 return next();
             }
-            if (player.username === undefined || player.username === "") {
+            if (newplayer.username === undefined || newplayer.username === "") {
                 response.send(400, 'No player username');
                 return next();
             }
-            if (player.name === undefined || player.name === "") {
+            if (newplayer.name === undefined || newplayer.name === "") {
                 response.send(400, 'No player name');
                 return next();
             }
-            if (player.password === undefined || player.password === "") {
+            if (newplayer.password === undefined || newplayer.password === "") {
                 response.send(400, 'No player password');
                 return next();
             }
-            if (player.email === undefined || player.email === "") {
+            if (newplayer.email === undefined || newplayer.email === "") {
                 response.send(400, 'No player email');
                 return next();
             }
             app_database_1.databaseConnection.db.collection('players').findOne({
-                username: player.username
+                username: newplayer.username
             }).then(function (player) {
                 if (player !== null) {
                     response.send(400, 'Player already exist');
                     return next();
                 }
-            }).catch(function (err) { return _this.handleError(err, response, next); });
-            app_database_1.databaseConnection.db.collection('players').findOne({
-                email: player.email
-            }).then(function (player) {
-                if (player !== null) {
-                    response.send(400, 'Player already exist');
-                    return next();
+                else {
+                    app_database_1.databaseConnection.db.collection('players').findOne({
+                        email: newplayer.email
+                    }).then(function (player) {
+                        if (player !== null) {
+                            response.send(400, 'Player already exist');
+                            return next();
+                        }
+                        else {
+                            newplayer.password = sha1(newplayer.password);
+                            app_database_1.databaseConnection.db.collection('players')
+                                .insertOne(newplayer)
+                                .then(function (result) { return _this.returnPlayer(result.insertedId, response, next); })
+                                .catch(function (err) { return _this.handleError(err, response, next); });
+                        }
+                    }).catch(function (err) { return _this.handleError(err, response, next); });
                 }
             }).catch(function (err) { return _this.handleError(err, response, next); });
-            player.password = sha1(player.password);
-            app_database_1.databaseConnection.db.collection('players')
-                .insertOne(player)
-                .then(function (result) { return _this.returnPlayer(result.insertedId, response, next); })
-                .catch(function (err) { return _this.handleError(err, response, next); });
         };
         this.deletePlayer = function (request, response, next) {
             var id = new mongodb.ObjectID(request.params.id);

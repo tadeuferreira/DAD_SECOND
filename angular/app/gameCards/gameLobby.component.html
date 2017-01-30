@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" *ngIf="gameFound">
 <h2>Lobby</h2>
 <h2>Team 1</h2>
 <div *ngFor="let m of team1">
@@ -18,4 +18,5 @@
 <div class="container">
     <gameChat [game_id]="getGameId()"></gameChat>
 </div>
+<div class="container" *ngIf="gameFound"><h1>Error: No Game Found or The Game has already ended</h1></div>
 

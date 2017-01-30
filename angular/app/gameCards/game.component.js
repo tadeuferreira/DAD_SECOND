@@ -24,6 +24,7 @@ var GameComponent = (function () {
         this.isMyTurn = false;
         this.isGameReady = false;
         this.message = 'Wait';
+        this.defaultMessage = 'The Game is Loading ...';
         this.me = { cards: null, order: null, tableCard: null, avatar: sessionStorage.getItem('avatar'), username: sessionStorage.getItem('username') };
         this.friend = { cards: null, order: null, tableCard: null, avatar: null, username: null };
         this.foe1 = { cards: null, order: null, tableCard: null, avatar: null, username: null };
@@ -65,6 +66,8 @@ var GameComponent = (function () {
                     case 'players':
                         _this.loadPlayers(response);
                         break;
+                    case 'NoGame':
+                        _this.noGame();
                 }
             }, function (error) {
                 console.log(error.text());
@@ -122,9 +125,19 @@ var GameComponent = (function () {
             }, 4000);
         }
         else {
-            this.message = response.order + ' won the round !!!';
+            this.message = this.getPlayerUsername(response.order) + ' won the round !!!';
             console.log(this.message);
         }
+    };
+    GameComponent.prototype.getPlayerUsername = function (order) {
+        var username = '';
+        if (this.friend.order == order)
+            username = this.friend.username;
+        else if (this.foe1.order == order)
+            username = this.foe1.username;
+        else if (this.foe2.order == order)
+            username = this.foe2.username;
+        return username;
     };
     GameComponent.prototype.loadPlayedCard = function (response) {
         console.log(response);
@@ -145,21 +158,22 @@ var GameComponent = (function () {
     };
     GameComponent.prototype.loadGameHasEnded = function (response) {
         var _this = this;
-        if (response.isDraw) {
+        var gameHistory = response.game_history;
+        if (gameHistory.isDraw) {
             this.message = 'Draw !!';
         }
         else {
-            if ((response.players[response.winner1].username == this.me.username && response.players[response.winner2].username == this.friend.username)
-                || (response.players[response.winner2].username == this.me.username && response.players[response.winner1].username == this.friend.username)) {
-                this.message = 'You Won!!! Points:' + response.points;
+            if ((gameHistory.players[gameHistory.winner1].username == this.me.username && gameHistory.players[gameHistory.winner2].username == this.friend.username)
+                || (gameHistory.players[gameHistory.winner2].username == this.me.username && gameHistory.players[gameHistory.winner1].username == this.friend.username)) {
+                this.message = 'You Won!!! Points:' + gameHistory.points;
             }
             else {
-                this.message = 'You Lost!!! Points:' + response.points;
+                this.message = 'You Lost!!! Points:' + gameHistory.points;
             }
         }
         setTimeout(function () {
             _this.router.navigate(['dashboard']);
-        }, 3000);
+        }, 5000);
     };
     GameComponent.prototype.clearPlayedCard = function (response) {
         if (response.order == this.me.order) {
@@ -195,21 +209,18 @@ var GameComponent = (function () {
     };
     GameComponent.prototype.getCardPos = function (cards, card) {
         var pos = -1;
-        for (var i = 0; i < cards.length; ++i) {
-            if (card.isFirstTrump) {
-                if (cards[i].isFirstTrump && cards[i].id == card.id) {
-                    pos = i;
-                    break;
-                }
-            }
-            else {
+        if (card.isFirstTrump) {
+            pos = 0;
+        }
+        else {
+            for (var i = 0; i < cards.length; ++i) {
+                console.log(cards[i]);
                 if (cards[i].dummy) {
                     pos = i;
                     break;
                 }
             }
         }
-        console.log(pos);
         return pos;
     };
     GameComponent.prototype.loadMyCard = function (cards) {
@@ -223,7 +234,7 @@ var GameComponent = (function () {
         var array = [];
         for (var i = 0; i < cards.length; ++i) {
             if (cards[i].dummy)
-                array.push({ imgUrl: '/img/cards/semFace.png' });
+                array.push({ dummy: true, imgUrl: '/img/cards/semFace.png' });
             else
                 array.push(this.cardToImage(cards[i]));
         }
@@ -259,6 +270,13 @@ var GameComponent = (function () {
             }
         }
         return card;
+    };
+    GameComponent.prototype.noGame = function () {
+        var _this = this;
+        this.defaultMessage = 'Error: No Game Found or The Game has already ended';
+        setTimeout(function () {
+            _this.router.navigate(['dashboard']);
+        }, 5000);
     };
     return GameComponent;
 }());

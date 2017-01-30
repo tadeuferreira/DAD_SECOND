@@ -54,11 +54,11 @@ export class WebSocketServer {
       client.on('gameLobby', (msgData) => {
         console.log('gameLobby');
         switch(msgData.msg){
-          case 'join': this.joinGame(msgData, client);
+          case 'join': this.joinGameLobby(msgData, client);
           break;
-          case 'switch': this.changeTeamGame(msgData, client);
+          case 'switch': this.changeTeamLobby(msgData, client);
           break;
-          case 'leave': this.leaveGame(msgData, client);
+          case 'leave': this.leaveGameLobby(msgData, client);
           break;
         }
       });
@@ -70,7 +70,7 @@ export class WebSocketServer {
           case "gameJoin": this.gameJoin(msgData, client);
           break;  
 
-          case 'try': this.tryPlay(msgData,client);
+          case 'try': this.gameTryPlay(msgData,client);
           break;
 
           case 'leave': this.gameLeave(msgData,client);
@@ -79,14 +79,15 @@ export class WebSocketServer {
           case 'renounce': this.gameRenounce(msgData,client);
           break;
 
-          case 'startRound': this.hand(msgData, client, false);
+          case 'startRound': this.gameHand(msgData, client, false);
           this.responseGamePlay(msgData,client,{msg: 'update'});
-          this.play(msgData,client);
+          this.gamePlay(msgData,client);
           break;
 
           case 'update':
-          this.hand(msgData, client, false);
+          this.gameHand(msgData, client, false);
           break;
+
         }
 
       });
@@ -115,6 +116,8 @@ export class WebSocketServer {
       case 'terminated':
       data = {msg: 'terminated'};
       break;
+      case 'NoGame':
+      data = {msg : ' NoGame'};
     }
     console.log(data);
     client.emit('gameLobby', data); 
@@ -129,7 +132,7 @@ export class WebSocketServer {
     switch (response.msg) {
       case 'played':
       if(!response.roundWon)
-      this.play(msgData,client);
+        this.gamePlay(msgData,client);
 
       case 'hand':
       case 'play':
@@ -137,6 +140,7 @@ export class WebSocketServer {
       case 'gameEnded':
       case 'update':
       case 'players':
+      case 'NoGame':
       data = response;
     }
     // console.log(data);
@@ -150,7 +154,7 @@ export class WebSocketServer {
     this.io.sockets.emit(channel, message);
   };
 
-  public joinGame = (msgData : any, client : any) =>{
+  public joinGameLobby = (msgData : any, client : any) =>{
     console.log('join Game');
     return database.db.collection('games')
     .findOne({
@@ -240,7 +244,7 @@ export class WebSocketServer {
           this.responseGameLobby(msgData,client,'full');
         }
       }else{
-        console.log('game not found or not on pending');
+       this.responseGameLobby(msgData,client,'NoGame');
       }
     }).catch(err => console.log(err.msg)); 
   };
@@ -255,7 +259,7 @@ export class WebSocketServer {
     return cards;   
   }
 
-  public changeTeamGame = (msgData:any , client : any) =>{
+  public changeTeamLobby = (msgData:any , client : any) =>{
     database.db.collection('games')
     .findOne({
       _id: new mongodb.ObjectID(msgData._id)
@@ -326,7 +330,7 @@ export class WebSocketServer {
     .catch(err => console.log(err.msg));
   };
 
-  public leaveGame =  (msgData:any , client : any) => {
+  public leaveGameLobby =  (msgData:any , client : any) => {
     database.db.collection('games')
     .findOne({
       _id: new mongodb.ObjectID(msgData._id)
@@ -415,10 +419,12 @@ export class WebSocketServer {
 
           this.responseGamePlay(msgData,client,{ msg : 'players', friend: friend, foe1: foe1, foe2: foe2});
            if(game.onPlay == my_order) 
-          this.hand(msgData, client, true);
+          this.gameHand(msgData, client, true);
           else 
-            this.hand(msgData,client,false);
+            this.gameHand(msgData,client,false);
         }
+      }else{
+        this.responseGamePlay(msgData,client,{msg : 'NoGame'});
       }
     }).catch(err => console.log(err.msg));
   };
@@ -443,8 +449,8 @@ export class WebSocketServer {
 
   };
 
-  public hand = (msgData:any, client : any, gameStart : boolean) =>{
-    console.log('hand');
+  public gameHand = (msgData:any, client : any, gameStart : boolean) =>{
+    console.log('gameHand');
     database.db.collection('games')
     .findOne({
       _id: new mongodb.ObjectID(msgData._id)
@@ -489,13 +495,13 @@ export class WebSocketServer {
           }
           this.responseGamePlay(msgData,client,{ msg : 'hand', me: me, friend: friend, foe1: foe1, foe2: foe2, stash: stash, table: table})
           if(gameStart)
-            this.play(msgData,client);
+            this.gamePlay(msgData,client);
         }
       }
     }).catch(err => console.log(err.msg));
   };
 
-  public play = (msgData:any, client : any) =>{
+  public gamePlay = (msgData:any, client : any) =>{
     console.log('play');
     database.db.collection('games')
     .findOne({
@@ -510,7 +516,7 @@ export class WebSocketServer {
     }).catch(err => console.log(err.msg));
   };
 
-  public tryPlay = (msgData:any, client : any) =>{
+  public gameTryPlay = (msgData:any, client : any) =>{
     console.log('tryPlay');
     database.db.collection('games')
     .findOne({
@@ -530,13 +536,13 @@ export class WebSocketServer {
         }
         if(originalCard.playerOwner == sentCard.playerOwner && originalCard.playerOwner == msgData.player_id 
           && originalCard.isOnHand && !originalCard.isUsed && !originalCard.isOnTable){
-          this.playCard(msgData,game,cardPos,client);
+          this.gamePlayCard(msgData,game,cardPos,client);
       }
     }
   }).catch(err => console.log(err.msg));
   };
 
-  private playCard = (msgData:any, game: any, cardPos:number ,client : any) =>{
+  private gamePlayCard = (msgData:any, game: any, cardPos:number ,client : any) =>{
 
     let sentCard : any = msgData.card;
     let my_order : number;
@@ -748,36 +754,38 @@ export class WebSocketServer {
         {
           owner : null,
           state: '',
-          startData: null,
+          startDate: null,
           endDate: null,
           isDraw: false,
           winner1: null,
           winner2: null,
           points : 0,
-          players : [null,null,null,null],
+          stars : 0,
+          players : [],
           history: []
         };
         if(isTeam2Winner && isTeam1Winner){
-          team1players[0].totalPoints += player10points;
-          team1players[0].totalStars += team1Stars;
+         team1players[0].totalPoints =   team1players[0].totalPoints + player10points;
+          team1players[0].totalStars =  team1players[0].totalStars + team1Stars;
 
-          team1players[1].totalPoints += player11points;
-          team1players[1].totalPoints += team1Stars;
+          team1players[1].totalPoints =  team1players[1].totalPoints + player11points;
+          team1players[1].totalStars = team1players[1].totalStars + team1Stars;
 
-          team2players[0].totalPoints += player20points;
-          team2players[0].totalStars += team2Stars;
+          team2players[0].totalPoints =   team2players[0].totalPoints + player20points;
+          team2players[0].totalStars =  team2players[0].totalStars + team2Stars;
 
-          team2players[1].totalPoints += player21points;
-          team2players[1].totalPoints += team2Stars;
+          team2players[1].totalPoints =  team2players[1].totalPoints + player21points;
+          team2players[1].totalStars = team2players[1].totalStars + team2Stars;
+
 
           gamehistory.isDraw = true;
 
         }else if(isTeam2Winner){
-          team2players[0].totalPoints += player20points;
-          team2players[0].totalStars += team2Stars;
+          team2players[0].totalPoints =   team2players[0].totalPoints + player20points;
+          team2players[0].totalStars =  team2players[0].totalStars + team2Stars;
 
-          team2players[1].totalPoints += player21points;
-          team2players[1].totalPoints += team2Stars;
+          team2players[1].totalPoints =  team2players[1].totalPoints + player21points;
+          team2players[1].totalStars = team2players[1].totalStars + team2Stars;
 
           gamehistory.winner1 = 2;
           gamehistory.winner2 = 3;
@@ -785,11 +793,11 @@ export class WebSocketServer {
           gamehistory.points = totalTeam1;
 
         }else if(isTeam1Winner){
-          team1players[0].totalPoints += player10points;
-          team1players[0].totalStars += team1Stars;
+          team1players[0].totalPoints =   team1players[0].totalPoints + player10points;
+          team1players[0].totalStars =  team1players[0].totalStars + team1Stars;
 
-          team1players[1].totalPoints += player11points;
-          team1players[1].totalPoints += team1Stars;
+          team1players[1].totalPoints =  team1players[1].totalPoints + player11points;
+          team1players[1].totalStars = team1players[1].totalStars + team1Stars;
 
           gamehistory.winner1 = 0;
           gamehistory.winner2 = 1;
@@ -862,18 +870,24 @@ export class WebSocketServer {
 
     if(totalPoints == 120){
       stars = 5;
-    }else if(totalPoints >= 91 && totalPoints <= 119){
+    }else if(totalPoints > 90 && totalPoints < 120){
       stars = 4;
-    }else if(totalPoints >= 61 && totalPoints <= 90){
+    }else if(totalPoints > 60 && totalPoints < 91){
       stars = 4;
     }
+    console.log('################################################################');
+    console.log(stars);
+    console.log(totalPoints);
+
     return stars;
   }
 
   private getStashPoints(stash:any) : number{
     let total : number = 0;
-
+    console.log('################################################################');
     for (var i = 0; i < stash.length; ++i) {
+      console.log(stash[i]);
+      console.log(this.getCardPoints(stash[i]));
       total += this.getCardPoints(stash[i]);
     }
 

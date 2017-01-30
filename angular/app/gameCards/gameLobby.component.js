@@ -25,6 +25,7 @@ var GameLobbyComponent = (function () {
         this.game_id = sessionStorage.getItem('game_id');
         this.player_id = sessionStorage.getItem('id');
         this.gameIsStarting = false;
+        this.gameFound = true;
     }
     GameLobbyComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -54,6 +55,9 @@ var GameLobbyComponent = (function () {
                     case 'terminated':
                         _this.end();
                         break;
+                    case 'NoGame':
+                        _this.noGame();
+                        break;
                 }
             });
         }
@@ -80,6 +84,13 @@ var GameLobbyComponent = (function () {
     GameLobbyComponent.prototype.end = function () {
         this.websocketService.unsubLobby();
         this.router.navigate(['dashboard']);
+    };
+    GameLobbyComponent.prototype.noGame = function () {
+        var _this = this;
+        this.gameFound = false;
+        setTimeout(function () {
+            _this.router.navigate(['dashboard']);
+        }, 5000);
     };
     return GameLobbyComponent;
 }());

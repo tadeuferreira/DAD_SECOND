@@ -17,6 +17,7 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 	private game_id: string = sessionStorage.getItem('game_id');
 	private player_id: string = sessionStorage.getItem('id');
 	private gameIsStarting :boolean = false;
+	public gameFound : boolean = true;
 
 	constructor(private websocketService: WebSocketService, private gameService: GameService ,private userService: UserService, private router: Router) {}
 
@@ -48,6 +49,9 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 					break;
 					case 'terminated':
 					this.end();
+					break;
+					case 'NoGame':
+					this.noGame();
 					break;
 				}
 
@@ -83,6 +87,13 @@ export class GameLobbyComponent implements OnInit, OnDestroy{
 	end(){
 		this.websocketService.unsubLobby();
 		this.router.navigate(['dashboard']);
+	}
+
+	noGame(){
+		this.gameFound = false;
+	setTimeout(() => {  
+		this.router.navigate(['dashboard']);
+	}, 5000);
 	}
 
 }

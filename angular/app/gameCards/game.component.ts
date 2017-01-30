@@ -18,6 +18,7 @@ export class GameComponent implements OnInit, OnDestroy{
 	public isMyTurn = false;
 	public isGameReady:boolean = false;
 	public message : string = 'Wait';
+	public defaultMessage : string = 'The Game is Loading ...';
 
 	public me : any = {cards : null, order: null, tableCard: null, avatar : sessionStorage.getItem('avatar'), username: sessionStorage.getItem('username')};
 	public friend : any = {cards : null, order: null, tableCard: null, avatar : null, username: null};
@@ -59,6 +60,8 @@ export class GameComponent implements OnInit, OnDestroy{
 					case 'players':
 					this.loadPlayers(response);
 					break;
+					case 'NoGame':
+					this.noGame();
 				}
 			},
 			error => {
@@ -126,9 +129,20 @@ export class GameComponent implements OnInit, OnDestroy{
 				this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, msg:'startRound'});
 			}, 4000);	
 		}else{
-			this.message = response.order + ' won the round !!!';
+			this.message = this.getPlayerUsername(response.order) + ' won the round !!!';
 			console.log(this.message);
 		}
+	}
+
+	getPlayerUsername(order:number ):string{
+		let username : string = '';
+		if(this.friend.order == order)
+			username = this.friend.username;
+		else if(this.foe1.order == order)
+			username = this.foe1.username;
+		else if(this.foe2.order == order)
+			username = this.foe2.username;
+		return username;
 	}
 
 	loadPlayedCard(response : any){
@@ -147,19 +161,20 @@ export class GameComponent implements OnInit, OnDestroy{
 	}
 
 	loadGameHasEnded(response : any){
-		if(response.isDraw){
+		let gameHistory = response.game_history;
+		if(gameHistory.isDraw){
 			this.message = 'Draw !!';
 		}else{
-			if((response.players[response.winner1].username == this.me.username && response.players[response.winner2].username == this.friend.username)
-				|| (response.players[response.winner2].username == this.me.username && response.players[response.winner1].username == this.friend.username)){
-				this.message = 'You Won!!! Points:'+response.points;
+			if((gameHistory.players[gameHistory.winner1].username == this.me.username && gameHistory.players[gameHistory.winner2].username == this.friend.username)
+				|| (gameHistory.players[gameHistory.winner2].username == this.me.username && gameHistory.players[gameHistory.winner1].username == this.friend.username)){
+				this.message = 'You Won!!! Points:'+gameHistory.points;
 		}else{
-			this.message = 'You Lost!!! Points:'+response.points;
+			this.message = 'You Lost!!! Points:'+gameHistory.points;
 		}
 	}
 	setTimeout(() => {  
 		this.router.navigate(['dashboard']);
-	}, 3000);
+	}, 5000);
 }
 clearPlayedCard(response:any): any{
 
@@ -195,20 +210,17 @@ clearPlayedCard(response:any): any{
 
 getCardPos(cards : any , card:any) : number{
 			let pos: number = -1;
-			for (var i = 0; i < cards.length; ++i) {
-				if(card.isFirstTrump){
-					if(cards[i].isFirstTrump && cards[i].id == card.id){
-						pos = i;
-						break;
-					}
-				}else{
+			if(card.isFirstTrump){
+				pos = 0;
+			}else{
+				for (var i = 0; i < cards.length; ++i) {
+					console.log(cards[i]);
 					if(cards[i].dummy){
 						pos = i;
 						break;
 					}
 				}
 			}
-			console.log(pos);
 			return pos;
 }
 
@@ -224,7 +236,7 @@ loadOthersHand(cards : any) : any{
 	let array : any = [];
 	for (var i = 0; i < cards.length; ++i) {
 		if(cards[i].dummy)
-			array.push({imgUrl: '/img/cards/semFace.png'});
+			array.push({dummy: true, imgUrl: '/img/cards/semFace.png'});
 		else
 			array.push(this.cardToImage(cards[i]));
 	}
@@ -260,5 +272,13 @@ cardToImage(card:any) : any{
 	}
 	return card;
 }
+
+noGame(){
+	this.defaultMessage = 'Error: No Game Found or The Game has already ended';
+	setTimeout(() => {  
+		this.router.navigate(['dashboard']);
+	}, 5000);
+}
+
 
 }
