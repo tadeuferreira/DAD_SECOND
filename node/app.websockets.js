@@ -62,9 +62,6 @@ var WebSocketServer = (function () {
                         case "gameJoin":
                             _this.gameJoin(msgData, client);
                             break;
-                        case "play":
-                            _this.play(msgData, client);
-                            break;
                         case 'try':
                             _this.tryPlay(msgData, client);
                             break;
@@ -75,12 +72,12 @@ var WebSocketServer = (function () {
                             _this.gameRenounce(msgData, client);
                             break;
                         case 'startRound':
-                            _this.hand(msgData, client);
+                            _this.hand(msgData, client, false);
                             _this.responseGamePlay(msgData, client, { msg: 'update' });
                             _this.play(msgData, client);
                             break;
                         case 'update':
-                            _this.hand(msgData, client);
+                            _this.hand(msgData, client, false);
                             break;
                     }
                 });
@@ -120,7 +117,8 @@ var WebSocketServer = (function () {
             var data = null;
             switch (response.msg) {
                 case 'played':
-                    _this.play(msgData, client);
+                    if (!response.roundWon)
+                        _this.play(msgData, client);
                 case 'hand':
                 case 'play':
                 case 'wonRound':
@@ -385,7 +383,10 @@ var WebSocketServer = (function () {
                         pos = (my_order - 1 < 0 ? 3 : my_order - 1);
                         foe2 = _this.getPlayerFromTeam(game, game.basicOrder[pos]);
                         _this.responseGamePlay(msgData, client, { msg: 'players', friend: friend, foe1: foe1, foe2: foe2 });
-                        _this.hand(msgData, client);
+                        if (game.onPlay == my_order)
+                            _this.hand(msgData, client, true);
+                        else
+                            _this.hand(msgData, client, false);
                     }
                 }
             }).catch(function (err) { return console.log(err.msg); });
@@ -394,7 +395,7 @@ var WebSocketServer = (function () {
         };
         this.gameLeave = function (msgData, client) {
         };
-        this.hand = function (msgData, client) {
+        this.hand = function (msgData, client, gameStart) {
             console.log('hand');
             app_database_1.databaseConnection.db.collection('games')
                 .findOne({
@@ -435,7 +436,7 @@ var WebSocketServer = (function () {
                                 stash.push(card);
                         }
                         _this.responseGamePlay(msgData, client, { msg: 'hand', me: me, friend: friend, foe1: foe1, foe2: foe2, stash: stash, table: table });
-                        if (game.onPlay == my_order)
+                        if (gameStart)
                             _this.play(msgData, client);
                     }
                 }
@@ -590,7 +591,7 @@ var WebSocketServer = (function () {
                     $set: game
                 })
                     .then(function (result) {
-                    _this.responseGamePlay(msgData, client, { msg: 'played', _id: game._id, order: player_pos, card: sentCard });
+                    _this.responseGamePlay(msgData, client, { msg: 'played', _id: game._id, order: player_pos, card: sentCard, roundWon: roundWon });
                     if (roundWon)
                         _this.responseGamePlay(msgData, client, { msg: 'wonRound', _id: game._id, order: roundWinner });
                 })
@@ -744,7 +745,7 @@ var WebSocketServer = (function () {
                             app_database_1.databaseConnection.db.collection('gamesHistory')
                                 .insertOne(gamehistory)
                                 .then(function (result) {
-                                _this.responseGamePlay(msgData, client, { msg: 'gameEnded', _id: game._id, game_history_id: result.insertedId });
+                                _this.responseGamePlay(msgData, client, { msg: 'gameEnded', _id: game._id, game_history_id: result.insertedId, game_history: gamehistory });
                             }).catch(function (err) { return console.log(err.msg); });
                         }
                         else {
@@ -786,7 +787,6 @@ var WebSocketServer = (function () {
             $set: player
         })
             .then(function (result) {
-            console.log(result);
         })
             .catch(function (err) { return console.log(err.msg); });
     };

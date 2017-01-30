@@ -70,9 +70,6 @@ export class WebSocketServer {
           case "gameJoin": this.gameJoin(msgData, client);
           break;  
 
-          case "play": this.play(msgData,client);
-          break;
-
           case 'try': this.tryPlay(msgData,client);
           break;
 
@@ -82,13 +79,13 @@ export class WebSocketServer {
           case 'renounce': this.gameRenounce(msgData,client);
           break;
 
-          case 'startRound': this.hand(msgData, client);
+          case 'startRound': this.hand(msgData, client, false);
           this.responseGamePlay(msgData,client,{msg: 'update'});
           this.play(msgData,client);
           break;
-          
+
           case 'update':
-          this.hand(msgData, client);
+          this.hand(msgData, client, false);
           break;
         }
 
@@ -131,6 +128,7 @@ export class WebSocketServer {
     let data : any = null;
     switch (response.msg) {
       case 'played':
+      if(!response.roundWon)
       this.play(msgData,client);
 
       case 'hand':
@@ -416,7 +414,10 @@ export class WebSocketServer {
           foe2 = this.getPlayerFromTeam(game,game.basicOrder[pos]);
 
           this.responseGamePlay(msgData,client,{ msg : 'players', friend: friend, foe1: foe1, foe2: foe2});
-          this.hand(msgData, client);
+           if(game.onPlay == my_order) 
+          this.hand(msgData, client, true);
+          else 
+            this.hand(msgData,client,false);
         }
       }
     }).catch(err => console.log(err.msg));
@@ -442,7 +443,7 @@ export class WebSocketServer {
 
   };
 
-  public hand = (msgData:any, client : any) =>{
+  public hand = (msgData:any, client : any, gameStart : boolean) =>{
     console.log('hand');
     database.db.collection('games')
     .findOne({
@@ -487,7 +488,7 @@ export class WebSocketServer {
 
           }
           this.responseGamePlay(msgData,client,{ msg : 'hand', me: me, friend: friend, foe1: foe1, foe2: foe2, stash: stash, table: table})
-          if(game.onPlay == my_order && game.round == 0)
+          if(gameStart)
             this.play(msgData,client);
         }
       }
@@ -651,7 +652,7 @@ export class WebSocketServer {
         $set: game
       })
       .then(result => {
-        this.responseGamePlay(msgData,client,{ msg : 'played', _id : game._id, order: player_pos ,card: sentCard});
+        this.responseGamePlay(msgData,client,{ msg : 'played', _id : game._id, order: player_pos ,card: sentCard , roundWon : roundWon});
         if(roundWon)
           this.responseGamePlay(msgData,client,{ msg : 'wonRound', _id : game._id, order : roundWinner});
       })
@@ -828,7 +829,7 @@ export class WebSocketServer {
             database.db.collection('gamesHistory')
             .insertOne(gamehistory)
             .then(result => {
-              this.responseGamePlay(msgData,client,{ msg : 'gameEnded', _id : game._id, game_history_id: result.insertedId}); 
+              this.responseGamePlay(msgData,client,{ msg : 'gameEnded', _id : game._id, game_history_id: result.insertedId,game_history: gamehistory}); 
             }).catch(err => console.log(err.msg));
           } else {
             console.log(404, 'No game found');
@@ -852,7 +853,6 @@ export class WebSocketServer {
       $set: player
     })
     .then(result => {
-      console.log(result);
     })
     .catch(err => console.log(err.msg)); 
   }

@@ -119,7 +119,7 @@ var GameComponent = (function () {
             this.message = 'you won the round !!!';
             setTimeout(function () {
                 _this.websocketService.sendGame({ _id: _this.game_id, player_id: _this.player_id, msg: 'startRound' });
-            }, 3000);
+            }, 4000);
         }
         else {
             this.message = response.order + ' won the round !!!';

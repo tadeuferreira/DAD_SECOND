@@ -124,7 +124,7 @@ export class GameComponent implements OnInit, OnDestroy{
 			this.message = 'you won the round !!!';
 			setTimeout(() => {  
 				this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, msg:'startRound'});
-			}, 3000);	
+			}, 4000);	
 		}else{
 			this.message = response.order + ' won the round !!!';
 			console.log(this.message);
