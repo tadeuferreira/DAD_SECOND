@@ -17,7 +17,7 @@ var WebSocketServer = (function () {
                     this.broadcast.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false,
                         hour: "numeric",
                         minute: "numeric",
-                        second: "numeric" }) + ': ' + msgData.username + ' has enter the chat');
+                        second: "numeric" }) + ': ' + (msgData.username == null ? 'anonymous' : msgData.username) + ' has enter the chat');
                 });
                 client.on('chatGame', function (msgData) {
                     this.join(msgData.game_id);
@@ -435,7 +435,7 @@ var WebSocketServer = (function () {
                                 stash.push(card);
                         }
                         _this.responseGamePlay(msgData, client, { msg: 'hand', me: me, friend: friend, foe1: foe1, foe2: foe2, stash: stash, table: table });
-                        if (game.onPlay == my_order)
+                        if (game.onPlay == my_order && game.round == 0)
                             _this.play(msgData, client);
                     }
                 }
