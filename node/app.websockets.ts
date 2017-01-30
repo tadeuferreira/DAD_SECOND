@@ -712,6 +712,12 @@ export class WebSocketServer {
 
     let totalTeam1 : number = player10points + player11points;
     let totalTeam2 : number = player20points + player21points;
+    console.log(player10points);
+    console.log(player11points);
+    console.log(player20points);
+    console.log(player21points);
+    console.log('TOTAL TEAM'+ totalTeam1);
+    console.log('TOTAL TEAM'+ totalTeam2);
 
     console.log('points end game');
 

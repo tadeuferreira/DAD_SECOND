@@ -648,6 +648,12 @@ var WebSocketServer = (function () {
             player21points = _this.getStashPoints(stash21);
             var totalTeam1 = player10points + player11points;
             var totalTeam2 = player20points + player21points;
+            console.log(player10points);
+            console.log(player11points);
+            console.log(player20points);
+            console.log(player21points);
+            console.log('TOTAL TEAM' + totalTeam1);
+            console.log('TOTAL TEAM' + totalTeam2);
             console.log('points end game');
             //give them the win
             var isTeam1Winner = false;
@@ -815,7 +821,10 @@ var WebSocketServer = (function () {
     };
     WebSocketServer.prototype.getStashPoints = function (stash) {
         var total = 0;
+        console.log('################################################################');
         for (var i = 0; i < stash.length; ++i) {
+            console.log(stash[i]);
+            console.log(this.getCardPoints(stash[i]));
             total += this.getCardPoints(stash[i]);
         }
         return total;
