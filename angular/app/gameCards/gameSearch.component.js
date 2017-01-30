@@ -18,17 +18,15 @@ var GameSearchComponent = (function () {
         this.userService = userService;
         this.router = router;
         this.games = [];
+        this.inputName = '';
     }
     GameSearchComponent.prototype.ngOnInit = function () {
-        var _this = this;
         if (!this.userService.isLoggedIn()) {
             this.router.navigate(['login']);
         }
         else {
-            this.gameService.getGames().subscribe(function (response) {
-                _this.games = response.json();
-                console.log(response.json());
-            });
+            this.getGames();
+            this.filteredItems = this.games;
         }
     };
     GameSearchComponent.prototype.enterGame = function (m) {
@@ -36,6 +34,31 @@ var GameSearchComponent = (function () {
             sessionStorage.setItem('game_id', m._id);
             this.router.navigate(['game/play']);
         }
+    };
+    GameSearchComponent.prototype.getGames = function () {
+        var _this = this;
+        this.gameService.getGames().subscribe(function (response) {
+            _this.games = response.json();
+        });
+    };
+    GameSearchComponent.prototype.FilterByName = function () {
+        var _this = this;
+        this.filteredItems = [];
+        if (this.inputName != "") {
+            this.games.forEach(function (element) {
+                if (element.ownername.toUpperCase().indexOf(_this.inputName.toUpperCase()) >= 0) {
+                    _this.filteredItems.push(element);
+                }
+            });
+        }
+        else {
+            this.filteredItems = this.games;
+        }
+        console.log(this.filteredItems);
+        this.refreshItems();
+    };
+    GameSearchComponent.prototype.refreshItems = function () {
+        this.games = this.filteredItems;
     };
     return GameSearchComponent;
 }());

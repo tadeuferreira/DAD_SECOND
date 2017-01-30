@@ -36,7 +36,6 @@ export class Top10StarComponent {
 
   FilterByName() {
     this.filteredItems = [];
-
     if (this.inputName != "") {
       this.arrayTop10Star.forEach(element => {
         if (element.name.toUpperCase().indexOf(this.inputName.toUpperCase()) >= 0) {

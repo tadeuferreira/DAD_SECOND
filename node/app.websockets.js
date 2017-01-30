@@ -442,13 +442,8 @@ var WebSocketServer = (function () {
                                 stash.push(card);
                         }
                         _this.responseGamePlay(msgData, client, { msg: 'hand', me: me, friend: friend, foe1: foe1, foe2: foe2, stash: stash, table: table });
-<<<<<<< HEAD
                         if (gameStart)
                             _this.gamePlay(msgData, client);
-=======
-                        if (game.onPlay == my_order && game.round == 0)
-                            _this.play(msgData, client);
->>>>>>> origin/master
                     }
                 }
             }).catch(function (err) { return console.log(err.msg); });
@@ -725,7 +720,7 @@ var WebSocketServer = (function () {
                         team2players[1].totalStars = team2players[1].totalStars + team2Stars;
                         gamehistory.winner1 = 2;
                         gamehistory.winner2 = 3;
-                        gamehistory.points = totalTeam1;
+                        gamehistory.points = totalTeam2;
                     }
                     else if (isTeam1Winner) {
                         team1players[0].totalPoints = team1players[0].totalPoints + player10points;

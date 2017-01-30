@@ -1,11 +1,32 @@
 <div class="container">
-<h2>Games</h2>
-<div *ngFor="let m of games">
-    <span>Owner: {{m.ownername}}</span>
-    <span>Players : {{m.count}}/4</span>
-    <button type="button" class="btn btn-danger" (click)="enterGame(m)">Enter</button>
-</div>
-
+<h2>Games<button class="btn btn-primary" (click)="getGames()"> Refresh </button></h2>
+    <div class="form-group">
+        <label>Filter </label>
+        <input type="text" id="inputName" [(ngModel)]="inputName" />
+        <input type="button" (click)="FilterByName()" value="Apply" />
+    </div>
+    <div class='row'>
+        <div class="panel panel-default">
+            <div class='panel-body'>
+                <table class="table table-bordered table-condensed ">
+                    <thead>
+                        <tr>
+                            <th>Owner</th>
+                            <th>Number of Players</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let m of games">
+                            <td>{{m.ownername}}</td>
+                            <td>{{m.count}} / 4</td>
+                            <td><button type="button" class="btn btn-danger" (click)="enterGame(m)">Enter</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
     <hr>
     <notification-panel></notification-panel>
     <hr>
