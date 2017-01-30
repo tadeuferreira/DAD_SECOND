@@ -175,8 +175,8 @@ export class Game {
     };
 
     public getGameHistory = (request: any, response: any, next: any) => {
-        database.db.collection('gameHistory')
-            .find({ game: { $exists: true } })
+        database.db.collection('gamesHistory')
+            .find()
             .toArray()
             .then(games => {
                 response.json(games || []);
@@ -190,7 +190,7 @@ export class Game {
     public init = (server: any, settings: HandlerSettings) => {
         server.get(settings.prefix + 'games', settings.security.authorize, this.getGames);
 
-        server.get(settings.prefix + 'gameHistory', this.getGameHistory);
+        server.get(settings.prefix + 'gamesHistory', this.getGameHistory);
 
         server.get(settings.prefix + 'games/:id', settings.security.authorize, this.getGame);
         server.put(settings.prefix + 'games/:id', settings.security.authorize, this.updateGame);

@@ -12,7 +12,7 @@
                     <thead>
                         <tr>
                             <th>Game Owner</th>
-                            <th>Terminated</th>
+                            <th>End State</th>
                             <th>Creation Date</th>
                             <th>End Date</th>
                             <th>Winner1</th>
@@ -22,13 +22,13 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let m of arrayGameHistory">
-                            <td>{{m.game.owner}}</td>
-                            <td>{{m.game.terminated}}</td>
-                            <td>{{m.game.creationDate}}</td>
-                            <td>{{m.game.endDate}}</td>
-                            <td>{{m.game.winner1}}</td>
-                            <td>{{m.game.winner2}}</td>
-                            <td>{{m.game.players}}</td>
+                            <td>{{m.owner.username}}</td>
+                            <td>{{m.state}}</td>
+                            <td>{{m.startDate}}</td>
+                            <td>{{m.endDate}}</td>
+                            <td>{{m.players[m.winner1].username}}</td>
+                            <td>{{m.players[m.winner1].username}}</td>
+                            <td>{{m.players}}</td>
                         </tr>
                     </tbody>
                 </table>

@@ -804,9 +804,17 @@ export class WebSocketServer {
 
           gamehistory.points = totalTeam1;
         }
+        let username : string = '';
+        for (var i = 0; i < 2; ++i) {
+          if(game.team1[i].id == game.owner){
+            username = game.team1[i].username;
+          }else if(game.team2[i].id == game.owner){
+            username = game.team2[i].username;
+          }
+        }
 
         gamehistory.state = 'Ended';
-        gamehistory.owner = game.owner;
+        gamehistory.owner = {_id: game.owner, username: username};
         gamehistory.startDate = game.creationDate;
         gamehistory.endDate = Date.now();
         gamehistory.history = game.history;

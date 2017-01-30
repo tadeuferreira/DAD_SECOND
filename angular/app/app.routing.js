@@ -55,7 +55,7 @@ var appRoutes = [
         component: top10Point_component_1.Top10PointComponent
     },
     {
-        path: 'gameHistory',
+        path: 'gamesHistory',
         component: gameHistory_component_1.GameHistoryComponent
     },
     {

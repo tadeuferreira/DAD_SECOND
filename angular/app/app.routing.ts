@@ -60,7 +60,7 @@ const appRoutes: Routes = [
         component: Top10PointComponent
     },
     {
-        path: 'gameHistory',
+        path: 'gamesHistory',
         component: GameHistoryComponent
     },
     {

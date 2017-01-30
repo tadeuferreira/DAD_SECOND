@@ -25,7 +25,8 @@ DashboardComponent = __decorate([
         moduleId: module.id,
         selector: 'my-dashboard',
         templateUrl: 'dashboard.component.html'
-    })
+    }),
+    __metadata("design:paramtypes", [])
 ], DashboardComponent);
 exports.DashboardComponent = DashboardComponent;
 //# sourceMappingURL=dashboard.component.js.map

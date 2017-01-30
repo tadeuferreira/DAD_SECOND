@@ -24,7 +24,7 @@ export class GameHistoryComponent implements OnInit {
         let headers = new Headers();
         headers.append('Content-Type', 'application/json');
 
-        this.http.get('http://localhost:7777/api/v1/gameHistory', <RequestOptionsArgs>{ headers: headers, withCredentials: false })
+        this.http.get('http://localhost:7777/api/v1/gamesHistory', <RequestOptionsArgs>{ headers: headers, withCredentials: false })
             .subscribe(
             response => {
                 if (response.ok) {
