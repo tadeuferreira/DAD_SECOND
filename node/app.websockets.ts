@@ -23,7 +23,7 @@ export class WebSocketServer {
         this.broadcast.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false, 
           hour: "numeric", 
           minute: "numeric",
-          second: "numeric"}) +': ' + msgData.username +' has enter the chat');
+          second: "numeric"}) +': ' + (msgData.username == null ? 'anonymous' : msgData.username) +' has enter the chat');
       });
 
       client.on('chatGame', function (msgData) {
