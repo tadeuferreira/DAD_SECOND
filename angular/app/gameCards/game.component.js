@@ -99,8 +99,6 @@ var GameComponent = (function () {
         this.foe2.username = response.foe2.username;
     };
     GameComponent.prototype.loadHands = function (response) {
-        console.log(response);
-        console.log(response);
         this.me.cards = this.loadMyCard(response.me.cards);
         this.me.order = response.me.order;
         this.me.tableCard = this.cardToImage(response.table.me);
@@ -117,7 +115,6 @@ var GameComponent = (function () {
     };
     GameComponent.prototype.loadRoundWon = function (response) {
         var _this = this;
-        console.log(response.order == this.me.order);
         if (response.order == this.me.order) {
             this.message = 'you won the round !!!';
             setTimeout(function () {

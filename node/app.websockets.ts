@@ -69,18 +69,24 @@ export class WebSocketServer {
         switch (msgData.msg) {
           case "gameJoin": this.gameJoin(msgData, client);
           break;  
+
           case "play": this.play(msgData,client);
           break;
+
           case 'try': this.tryPlay(msgData,client);
           break;
+
           case 'leave': this.gameLeave(msgData,client);
           break;
+
           case 'renounce': this.gameRenounce(msgData,client);
           break;
+
           case 'startRound': this.hand(msgData, client);
           this.responseGamePlay(msgData,client,{msg: 'update'});
           this.play(msgData,client);
           break;
+          
           case 'update':
           this.hand(msgData, client);
           break;
@@ -481,7 +487,7 @@ export class WebSocketServer {
 
           }
           this.responseGamePlay(msgData,client,{ msg : 'hand', me: me, friend: friend, foe1: foe1, foe2: foe2, stash: stash, table: table})
-          if(game.onPlay == my_order)
+          if(game.onPlay == my_order && game.round == 0)
             this.play(msgData,client);
         }
       }

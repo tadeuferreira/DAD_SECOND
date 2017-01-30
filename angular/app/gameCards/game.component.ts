@@ -100,9 +100,6 @@ export class GameComponent implements OnInit, OnDestroy{
 	}
 
 	loadHands(response : any){
-		console.log(response);
-		console.log(response);
-
 		this.me.cards = this.loadMyCard(response.me.cards);
 		this.me.order = response.me.order;
 		this.me.tableCard = this.cardToImage(response.table.me);
@@ -123,7 +120,6 @@ export class GameComponent implements OnInit, OnDestroy{
 	}
 
 	loadRoundWon ( response : any){
-		console.log(response.order == this.me.order);
 		if(response.order == this.me.order){
 			this.message = 'you won the round !!!';
 			setTimeout(() => {  
