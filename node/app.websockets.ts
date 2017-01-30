@@ -23,7 +23,7 @@ export class WebSocketServer {
         this.broadcast.emit('players', new Date().toLocaleTimeString('en-US', { hour12: false, 
           hour: "numeric", 
           minute: "numeric",
-          second: "numeric"}) +': ' + msgData.username +' has enter the chat');
+          second: "numeric"}) +': ' + (msgData.username == null ? 'anonymous' : msgData.username) +' has enter the chat');
       });
 
       client.on('chatGame', function (msgData) {
@@ -796,7 +796,7 @@ export class WebSocketServer {
           gamehistory.winner1 = 2;
           gamehistory.winner2 = 3;
 
-          gamehistory.points = totalTeam1;
+          gamehistory.points = totalTeam2;
 
         }else if(isTeam1Winner){
           team1players[0].totalPoints =   team1players[0].totalPoints + player10points;

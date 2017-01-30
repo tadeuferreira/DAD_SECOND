@@ -23,7 +23,7 @@
                     <label class="col-lg-3 control-label">name:</label>
                     <div class="col-lg-8">
                         <input class="form-control" value="{{userProfile.name}}" type="text" name="name" formControlName="name" #name>
-                        <div class="form-text error" *ngIf="myForm.controls.name.touched">
+                        <div class="form-text error" *ngIf="myForm.controls.name.untouched">
                             <div *ngIf="myForm.controls.name.hasError('required')">Name is required.</div>
                         </div>
                     </div>
@@ -32,7 +32,7 @@
                     <label class="col-lg-3 control-label">Email:</label>
                     <div class="col-lg-8">
                         <input class="form-control" value="{{userProfile.email}}" type="text" name="email" formControlName="email" #email>
-                        <div class="form-text error" *ngIf="myForm.controls.email.touched">
+                        <div class="form-text error" *ngIf="myForm.controls.email.untouched">
                             <div *ngIf="myForm.controls.email.hasError('required')">Email is required.</div>
                             <div *ngIf="myForm.controls.email.hasError('invalidEmail')">Email is invalid.</div>
                         </div>
@@ -42,7 +42,7 @@
                     <label class="col-md-3 control-label">Username:</label>
                     <div class="col-md-8">
                         <input class="form-control" value="{{userProfile.username}}" type="text" name="username" formControlName="username" #username>
-                        <div class="form-text error" *ngIf="myForm.controls.username.touched">
+                        <div class="form-text error" *ngIf="myForm.controls.username.untouched">
                             <div *ngIf="myForm.controls.username.hasError('required')">Username is required.</div>
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                     <label class="col-md-3 control-label">Password:</label>
                     <div class="col-md-8">
                         <input class="form-control" value="" type="password" minlength="6" name="password" formControlName="password" #password>
-                        <div class='form-text error' *ngIf="myForm.controls.password.touched">
+                        <div class='form-text error' *ngIf="myForm.controls.password.untouched">
                             <div *ngIf="myForm.controls.password.hasError('required')">Password is required.</div>
                             <div *ngIf="myForm.controls.password.hasError('minlength')">Password isn't long enough.</div>
                         </div>

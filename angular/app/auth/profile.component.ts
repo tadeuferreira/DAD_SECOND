@@ -36,8 +36,6 @@ export class ProfileComponent implements OnInit {
             password: ['', [<any>Validators.required]],
             passwordConfirmation: ['', [<any>Validators.required]],
         }, { validator: this.validateService.matchingPasswords('password', 'passwordConfirmation') });
-
-        
     }
 
     edit(user: User) {
