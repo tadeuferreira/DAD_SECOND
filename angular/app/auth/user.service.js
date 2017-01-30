@@ -39,6 +39,7 @@ var UserService = (function () {
             }
         }, function (error) {
             console.log(error.text());
+            alert(error.text());
         });
     };
     UserService.prototype.register = function (username, name, email, password) {
@@ -51,9 +52,11 @@ var UserService = (function () {
         return this.http
             .post('http://localhost:7777/api/v1/register', JSON.stringify({ username: username, name: name, email: email, password: password, avatar: avatar, totalPoints: totalPoints, totalStars: totalStars }), { headers: headers })
             .subscribe(function (response) {
-            _this.router.navigate(['login']);
+            if (response.ok)
+                _this.router.navigate(['login']);
         }, function (error) {
             console.log(error.text());
+            alert(error.text());
         });
     };
     UserService.prototype.update = function (user) {

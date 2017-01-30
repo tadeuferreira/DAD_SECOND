@@ -19,10 +19,10 @@ export class GameComponent implements OnInit, OnDestroy{
 	public isGameReady:boolean = false;
 	public message : string = 'Wait';
 
-	public me : any = {cards : null, order: null, tableCard: null};
-	public friend : any = {cards : null, order: null, tableCard: null};
-	public foe1: any = {cards : null, order: null, tableCard: null};
-	public foe2: any = {cards : null, order: null, tableCard: null};
+	public me : any = {cards : null, order: null, tableCard: null, avatar : sessionStorage.getItem('avatar'), username: sessionStorage.getItem('username')};
+	public friend : any = {cards : null, order: null, tableCard: null, avatar : null, username: null};
+	public foe1: any = {cards : null, order: null, tableCard: null, avatar : null, username: null};
+	public foe2: any = {cards : null, order: null, tableCard: null, avatar : null, username: null};
 
 
 	constructor(private websocketService: WebSocketService, private gameService: GameService ,private userService: UserService, private router: Router) {}
@@ -45,7 +45,7 @@ export class GameComponent implements OnInit, OnDestroy{
 					break;
 					case 'play':
 					this.isMyTurn = (response.order == this.me.order);
-					if(this.isMyTurn) this.message = 'Play!';
+					if(this.isMyTurn) this.message = 'Play!'; else this.message = 'Wait';
 					break;
 					case 'played':
 					this.loadPlayedCard(response);
@@ -54,7 +54,10 @@ export class GameComponent implements OnInit, OnDestroy{
 					this.loadRoundWon(response);
 					break;
 					case 'gameEnded':
-					console.log(response.game_history_id);
+					this.loadGameHasEnded(response);
+					break;
+					case 'players':
+					this.loadPlayers(response);
 					break;
 				}
 			},
@@ -84,6 +87,16 @@ export class GameComponent implements OnInit, OnDestroy{
 			if(card != null)
 				this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, msg:'try', card: card});
 		}
+	}
+	loadPlayers(response : any){
+		this.friend.avatar = response.friend.avatar;
+		this.friend.username = response.friend.username;
+
+		this.foe1.avatar = response.foe1.avatar;
+		this.foe1.username = response.foe1.username;
+
+		this.foe2.avatar = response.foe2.avatar;
+		this.foe2.username = response.foe2.username;
 	}
 
 	loadHands(response : any){
@@ -134,66 +147,122 @@ export class GameComponent implements OnInit, OnDestroy{
 		}if(this.foe2.order == response.order){
 			this.foe2.tableCard = response.card;
 		}
+		this.clearPlayedCard(response);
 	}
 
-	/*clearOtherPlayedCard(original:any,card:any): any{
-		let cards : any = [];
-		let isTrump : boolean = card.isFirstTrump;
-		for (var i = 0; i < original.length; ++i) {
-			if(!isTrump){
+	loadGameHasEnded(response : any){
+		if(response.isDraw){
+			this.message = 'Draw !!';
+		}else{
+			if((response.players[response.winner1].username == this.me.username && response.players[response.winner2].username == this.friend.username)
+				|| (response.players[response.winner2].username == this.me.username && response.players[response.winner1].username == this.friend.username)){
+				this.message = 'You Won!!! Points:'+response.points;
+		}else{
+			this.message = 'You Lost!!! Points:'+response.points;
+		}
+	}
+	setTimeout(() => {  
+		this.router.navigate(['dashboard']);
+	}, 3000);
+}
+clearPlayedCard(response:any): any{
 
+	if(response.order == this.me.order){
+		let pos: number = -1;
+		for (var i = 0; i < this.me.cards.length; ++i) {
+			if(this.me.cards[i].id == response.card.id)
+				pos = i;
+		}
+		if(pos != -1) {
+			this.me.cards.splice(pos, 1);
+		}
+
+	}else{
+		if(response.order == this.friend.order){
+			let pos = this.getCardPos(this.friend.cards, response.card);
+			if(pos != -1) {
+				this.friend.cards.splice(pos, 1);
+			}
+		}else if(response.order == this.foe1.order){
+			let pos = this.getCardPos(this.foe1.cards, response.card);
+			if(pos != -1) {
+				this.foe1.cards.splice(pos, 1);
+			}
+		} else if(response.order == this.foe2.order){
+			let pos = this.getCardPos(this.foe2.cards, response.card);
+			if(pos != -1) {
+				this.foe2.cards.splice(pos, 1);
 			}
 		}
-		return cards;
-	}*/
+	}	
+}
 
-	loadMyCard(cards : any) : any{
-		let array : any = [];
-		for (var i = 0; i < cards.length; ++i) {
+getCardPos(cards : any , card:any) : number{
+			let pos: number = -1;
+			for (var i = 0; i < cards.length; ++i) {
+				if(card.isFirstTrump){
+					if(cards[i].isFirstTrump && cards[i].id == card.id){
+						pos = i;
+						break;
+					}
+				}else{
+					if(cards[i].dummy){
+						pos = i;
+						break;
+					}
+				}
+			}
+			console.log(pos);
+			return pos;
+}
+
+loadMyCard(cards : any) : any{
+	let array : any = [];
+	for (var i = 0; i < cards.length; ++i) {
+		array.push(this.cardToImage(cards[i]));
+	}
+	return array;
+}
+
+loadOthersHand(cards : any) : any{
+	let array : any = [];
+	for (var i = 0; i < cards.length; ++i) {
+		if(cards[i].dummy)
+			array.push({imgUrl: '/img/cards/semFace.png'});
+		else
 			array.push(this.cardToImage(cards[i]));
-		}
-		return array;
 	}
+	return array;
+}
 
-	loadOthersHand(cards : any) : any{
-		let array : any = [];
-		for (var i = 0; i < cards.length; ++i) {
-			if(cards[i].dummy)
-				array.push({imgUrl: '/img/cards/semFace.png'});
-			else
-				array.push(this.cardToImage(cards[i]));
+cardToImage(card:any) : any{
+	if(card != null){
+		switch (card.suit) {
+			case 0: 
+			card.imgUrl = "/img/cards/c";
+			break;
+			case 1:
+			card.imgUrl = "/img/cards/e";
+			break;
+			case 2:
+			card.imgUrl = "/img/cards/p";
+			break;
+			case 3:
+			card.imgUrl = "/img/cards/o";
+			break;
 		}
-		return array;
-	}
 
-	cardToImage(card:any) : any{
-		if(card != null){
-			switch (card.suit) {
-				case 0: 
-				card.imgUrl = "/img/cards/c";
-				break;
-				case 1:
-				card.imgUrl = "/img/cards/e";
-				break;
-				case 2:
-				card.imgUrl = "/img/cards/p";
-				break;
-				case 3:
-				card.imgUrl = "/img/cards/o";
-				break;
-			}
-
-			if(card.type <= 4){
-				card.imgUrl += (card.type+2)+'.png';
-			}else if(card.type <= 7 ){
-				card.imgUrl += (card.type+6)+'.png';
-			}else if(card.type == 9){
-				card.imgUrl += 1+'.png';
-			}else if(card.type == 8){
-				card.imgUrl += 7+'.png';
-			}
+		if(card.type <= 4){
+			card.imgUrl += (card.type+2)+'.png';
+		}else if(card.type <= 7 ){
+			card.imgUrl += (card.type+6)+'.png';
+		}else if(card.type == 9){
+			card.imgUrl += 1+'.png';
+		}else if(card.type == 8){
+			card.imgUrl += 7+'.png';
 		}
-		return card;
 	}
+	return card;
+}
 
 }

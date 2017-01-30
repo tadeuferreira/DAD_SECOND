@@ -60,7 +60,7 @@ var WebSocketServer = (function () {
                     console.log(msgData);
                     switch (msgData.msg) {
                         case "gameJoin":
-                            _this.hand(msgData, client);
+                            _this.gameJoin(msgData, client);
                             break;
                         case "play":
                             _this.play(msgData, client);
@@ -69,6 +69,10 @@ var WebSocketServer = (function () {
                             _this.tryPlay(msgData, client);
                             break;
                         case 'leave':
+                            _this.gameLeave(msgData, client);
+                            break;
+                        case 'renounce':
+                            _this.gameRenounce(msgData, client);
                             break;
                         case 'startRound':
                             _this.hand(msgData, client);
@@ -115,30 +119,20 @@ var WebSocketServer = (function () {
             console.log(response.msg);
             var data = null;
             switch (response.msg) {
-                case 'hand':
-                    data = response;
-                    break;
-                case 'play':
-                    data = response;
-                    break;
                 case 'played':
                     _this.play(msgData, client);
-                    data = response;
-                    break;
+                case 'hand':
+                case 'play':
                 case 'wonRound':
-                    data = response;
-                    break;
                 case 'gameEnded':
-                    data = response;
-                    break;
                 case 'update':
+                case 'players':
                     data = response;
-                    break;
             }
             // console.log(data);
             client.join(msgData._id);
             client.emit('gamePlay', data);
-            if (response.msg != 'hand')
+            if (response.msg != 'hand' && response.msg != 'players')
                 client.to(msgData._id).emit('gamePlay', data);
         };
         this.notifyAll = function (channel, message) {
@@ -362,6 +356,44 @@ var WebSocketServer = (function () {
             })
                 .catch(function (err) { return console.log(err.msg); });
         };
+        this.gameJoin = function (msgData, client) {
+            console.log('getGamePlayers');
+            app_database_1.databaseConnection.db.collection('games')
+                .findOne({
+                _id: new mongodb.ObjectID(msgData._id)
+            })
+                .then(function (game) {
+                if (game != null) {
+                    if (game.state == 'in Progress') {
+                        var me = void 0;
+                        var friend = void 0;
+                        var foe1 = void 0;
+                        var foe2 = void 0;
+                        var my_order = void 0;
+                        //create myself
+                        for (var i = 0; i < game.basicOrder.length; ++i) {
+                            if (game.basicOrder[i] == msgData.player_id) {
+                                my_order = i;
+                                break;
+                            }
+                        }
+                        var pos = void 0;
+                        pos = (my_order - 2 < 0 ? my_order + 2 : my_order - 2);
+                        friend = _this.getPlayerFromTeam(game, game.basicOrder[pos]);
+                        pos = (my_order + 1 > 3 ? 0 : my_order + 1);
+                        foe1 = _this.getPlayerFromTeam(game, game.basicOrder[pos]);
+                        pos = (my_order - 1 < 0 ? 3 : my_order - 1);
+                        foe2 = _this.getPlayerFromTeam(game, game.basicOrder[pos]);
+                        _this.responseGamePlay(msgData, client, { msg: 'players', friend: friend, foe1: foe1, foe2: foe2 });
+                        _this.hand(msgData, client);
+                    }
+                }
+            }).catch(function (err) { return console.log(err.msg); });
+        };
+        this.gameRenounce = function (msgData, client) {
+        };
+        this.gameLeave = function (msgData, client) {
+        };
         this.hand = function (msgData, client) {
             console.log('hand');
             app_database_1.databaseConnection.db.collection('games')
@@ -538,11 +570,13 @@ var WebSocketServer = (function () {
                 game.table = [null, null, null, null];
                 game.onPlay = roundWinner;
                 game.firstToPlay = roundWinner;
+                //PLAY ORDER LAST PLAYER 
                 game.lastToPlay = (roundWinner - 1 < 0 ? 3 : roundWinner - 1);
                 game.history.push({ order: roundWinner, msg: 'won', round: game.round });
                 game.round++;
             }
             else {
+                //PLAY ORDER
                 game.onPlay = (game.onPlay + 1 > 3 ? 0 : game.onPlay + 1);
             }
             //end check win
@@ -731,6 +765,17 @@ var WebSocketServer = (function () {
         }
         return cards;
     };
+    WebSocketServer.prototype.getPlayerFromTeam = function (game, id) {
+        var player;
+        for (var i = 0; i < 2; ++i) {
+            if (game.team1[i].id == id)
+                player = { avatar: game.team1[i].avatar, username: game.team1[i].username };
+            else if (game.team2[i].id == id)
+                player = { avatar: game.team2[i].avatar, username: game.team2[i].username };
+        }
+        return player;
+    };
+    ;
     WebSocketServer.prototype.updatePlayer = function (player) {
         var id = new mongodb.ObjectID(player._id);
         delete player._id;

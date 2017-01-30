@@ -33,6 +33,7 @@ export class UserService {
       },
       error => {
         console.log(error.text());
+       alert(error.text());
       });
   }
 
@@ -47,10 +48,12 @@ export class UserService {
     return this.http
       .post('http://localhost:7777/api/v1/register', JSON.stringify({ username, name, email, password, avatar, totalPoints, totalStars }), { headers })
       .subscribe(response => {
-        this.router.navigate(['login']);
+        if(response.ok)
+            this.router.navigate(['login']);  
       },
       error => {
         console.log(error.text());
+       alert(error.text());
       });
   }
 

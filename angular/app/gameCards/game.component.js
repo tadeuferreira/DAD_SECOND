@@ -24,10 +24,10 @@ var GameComponent = (function () {
         this.isMyTurn = false;
         this.isGameReady = false;
         this.message = 'Wait';
-        this.me = { cards: null, order: null, tableCard: null };
-        this.friend = { cards: null, order: null, tableCard: null };
-        this.foe1 = { cards: null, order: null, tableCard: null };
-        this.foe2 = { cards: null, order: null, tableCard: null };
+        this.me = { cards: null, order: null, tableCard: null, avatar: sessionStorage.getItem('avatar'), username: sessionStorage.getItem('username') };
+        this.friend = { cards: null, order: null, tableCard: null, avatar: null, username: null };
+        this.foe1 = { cards: null, order: null, tableCard: null, avatar: null, username: null };
+        this.foe2 = { cards: null, order: null, tableCard: null, avatar: null, username: null };
     }
     GameComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -50,6 +50,8 @@ var GameComponent = (function () {
                         _this.isMyTurn = (response.order == _this.me.order);
                         if (_this.isMyTurn)
                             _this.message = 'Play!';
+                        else
+                            _this.message = 'Wait';
                         break;
                     case 'played':
                         _this.loadPlayedCard(response);
@@ -58,7 +60,10 @@ var GameComponent = (function () {
                         _this.loadRoundWon(response);
                         break;
                     case 'gameEnded':
-                        console.log(response.game_history_id);
+                        _this.loadGameHasEnded(response);
+                        break;
+                    case 'players':
+                        _this.loadPlayers(response);
                         break;
                 }
             }, function (error) {
@@ -84,6 +89,14 @@ var GameComponent = (function () {
             if (card != null)
                 this.websocketService.sendGame({ _id: this.game_id, player_id: this.player_id, msg: 'try', card: card });
         }
+    };
+    GameComponent.prototype.loadPlayers = function (response) {
+        this.friend.avatar = response.friend.avatar;
+        this.friend.username = response.friend.username;
+        this.foe1.avatar = response.foe1.avatar;
+        this.foe1.username = response.foe1.username;
+        this.foe2.avatar = response.foe2.avatar;
+        this.foe2.username = response.foe2.username;
     };
     GameComponent.prototype.loadHands = function (response) {
         console.log(response);
@@ -131,17 +144,77 @@ var GameComponent = (function () {
         if (this.foe2.order == response.order) {
             this.foe2.tableCard = response.card;
         }
+        this.clearPlayedCard(response);
     };
-    /*clearOtherPlayedCard(original:any,card:any): any{
-        let cards : any = [];
-        let isTrump : boolean = card.isFirstTrump;
-        for (var i = 0; i < original.length; ++i) {
-            if(!isTrump){
-
+    GameComponent.prototype.loadGameHasEnded = function (response) {
+        var _this = this;
+        if (response.isDraw) {
+            this.message = 'Draw !!';
+        }
+        else {
+            if ((response.players[response.winner1].username == this.me.username && response.players[response.winner2].username == this.friend.username)
+                || (response.players[response.winner2].username == this.me.username && response.players[response.winner1].username == this.friend.username)) {
+                this.message = 'You Won!!! Points:' + response.points;
+            }
+            else {
+                this.message = 'You Lost!!! Points:' + response.points;
             }
         }
-        return cards;
-    }*/
+        setTimeout(function () {
+            _this.router.navigate(['dashboard']);
+        }, 3000);
+    };
+    GameComponent.prototype.clearPlayedCard = function (response) {
+        if (response.order == this.me.order) {
+            var pos = -1;
+            for (var i = 0; i < this.me.cards.length; ++i) {
+                if (this.me.cards[i].id == response.card.id)
+                    pos = i;
+            }
+            if (pos != -1) {
+                this.me.cards.splice(pos, 1);
+            }
+        }
+        else {
+            if (response.order == this.friend.order) {
+                var pos = this.getCardPos(this.friend.cards, response.card);
+                if (pos != -1) {
+                    this.friend.cards.splice(pos, 1);
+                }
+            }
+            else if (response.order == this.foe1.order) {
+                var pos = this.getCardPos(this.foe1.cards, response.card);
+                if (pos != -1) {
+                    this.foe1.cards.splice(pos, 1);
+                }
+            }
+            else if (response.order == this.foe2.order) {
+                var pos = this.getCardPos(this.foe2.cards, response.card);
+                if (pos != -1) {
+                    this.foe2.cards.splice(pos, 1);
+                }
+            }
+        }
+    };
+    GameComponent.prototype.getCardPos = function (cards, card) {
+        var pos = -1;
+        for (var i = 0; i < cards.length; ++i) {
+            if (card.isFirstTrump) {
+                if (cards[i].isFirstTrump && cards[i].id == card.id) {
+                    pos = i;
+                    break;
+                }
+            }
+            else {
+                if (cards[i].dummy) {
+                    pos = i;
+                    break;
+                }
+            }
+        }
+        console.log(pos);
+        return pos;
+    };
     GameComponent.prototype.loadMyCard = function (cards) {
         var array = [];
         for (var i = 0; i < cards.length; ++i) {
