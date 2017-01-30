@@ -65,7 +65,7 @@ export class WebSocketServer {
 
       client.on('gamePlay', (msgData) => {
         console.log('gamePlay');
-        console.log(msgData);
+        //console.log(msgData);
         switch (msgData.msg) {
           case "gameJoin": this.gameJoin(msgData, client);
           break;  
@@ -154,7 +154,7 @@ export class WebSocketServer {
     this.io.sockets.emit(channel, message);
   };
 
-  public joinGameLobby = (msgData : any, client : any) =>{
+  private joinGameLobby = (msgData : any, client : any) =>{
     console.log('join Game');
     return database.db.collection('games')
     .findOne({
@@ -244,12 +244,12 @@ export class WebSocketServer {
           this.responseGameLobby(msgData,client,'full');
         }
       }else{
-       this.responseGameLobby(msgData,client,'NoGame');
+        this.responseGameLobby(msgData,client,'NoGame');
       }
     }).catch(err => console.log(err.msg)); 
   };
 
-  public updateCards(pos:number , cards:any , owner: string){
+  private updateCards(pos:number , cards:any , owner: string){
     for (var i = 0; i < cards.length; ++i) {
       if( i >= pos * 10 && i < 10 +(pos*10)){
         cards[i].playerOwner = owner;
@@ -259,7 +259,7 @@ export class WebSocketServer {
     return cards;   
   }
 
-  public changeTeamLobby = (msgData:any , client : any) =>{
+  private changeTeamLobby = (msgData:any , client : any) =>{
     database.db.collection('games')
     .findOne({
       _id: new mongodb.ObjectID(msgData._id)
@@ -330,7 +330,7 @@ export class WebSocketServer {
     .catch(err => console.log(err.msg));
   };
 
-  public leaveGameLobby =  (msgData:any , client : any) => {
+  private leaveGameLobby =  (msgData:any , client : any) => {
     database.db.collection('games')
     .findOne({
       _id: new mongodb.ObjectID(msgData._id)
@@ -384,7 +384,7 @@ export class WebSocketServer {
     .catch(err => console.log(err.msg));
   };
 
-  public gameJoin = (msgData:any, client : any) =>{
+  private gameJoin = (msgData:any, client : any) =>{
     console.log('getGamePlayers');
     database.db.collection('games')
     .findOne({
@@ -418,8 +418,8 @@ export class WebSocketServer {
           foe2 = this.getPlayerFromTeam(game,game.basicOrder[pos]);
 
           this.responseGamePlay(msgData,client,{ msg : 'players', friend: friend, foe1: foe1, foe2: foe2});
-           if(game.onPlay == my_order) 
-          this.gameHand(msgData, client, true);
+          if(game.onPlay == my_order) 
+            this.gameHand(msgData, client, true);
           else 
             this.gameHand(msgData,client,false);
         }
@@ -441,15 +441,15 @@ export class WebSocketServer {
     return player;
   };
 
-  public gameRenounce = (msgData:any , client : any) =>{
+  private gameRenounce = (msgData:any , client : any) =>{
 
   };
 
-  public gameLeave = (msgData:any , client : any) =>{
+  private gameLeave = (msgData:any , client : any) =>{
 
   };
 
-  public gameHand = (msgData:any, client : any, gameStart : boolean) =>{
+  private gameHand = (msgData:any, client : any, gameStart : boolean) =>{
     console.log('gameHand');
     database.db.collection('games')
     .findOne({
@@ -488,10 +488,8 @@ export class WebSocketServer {
           table.foe2= game.table[pos];
 
           for (var i = 0; i < game.pack.cards.length; ++i) {
-            let card = game.pack.cards[i];
-            if(card.playerOwner == msgData.player_id && card.isUsed)
-              stash.push(card);
-
+            if(game.pack.cards[i].playerOwner == msgData.player_id && game.pack.cards[i].isUsed)
+              stash.push(game.pack.cards[i]);
           }
           this.responseGamePlay(msgData,client,{ msg : 'hand', me: me, friend: friend, foe1: foe1, foe2: foe2, stash: stash, table: table})
           if(gameStart)
@@ -501,7 +499,7 @@ export class WebSocketServer {
     }).catch(err => console.log(err.msg));
   };
 
-  public gamePlay = (msgData:any, client : any) =>{
+  private gamePlay = (msgData:any, client : any) =>{
     console.log('play');
     database.db.collection('games')
     .findOne({
@@ -528,7 +526,7 @@ export class WebSocketServer {
         let sentCard : any = msgData.card;
         let cardPos : number = -1;
         for (var i = 0; i < game.pack.cards.length; ++i) {
-          if(game.pack.cards[i].id == msgData.card.id){
+          if(game.pack.cards[i].id == msgData.card.id && game.pack.cards[i].suit == msgData.card.suit && game.pack.cards[i].type == msgData.card.type){
             originalCard = game.pack.cards[i];
             cardPos = i;
             break;
@@ -545,24 +543,7 @@ export class WebSocketServer {
   private gamePlayCard = (msgData:any, game: any, cardPos:number ,client : any) =>{
 
     let sentCard : any = msgData.card;
-    let my_order : number;
-    for (var i = 0; i < game.basicOrder.length; ++i) {
-      if(game.basicOrder[i] == msgData.player_id){
-        my_order = i;
-        break;
-      }
-    }
-
-    game.pack.cards[cardPos].isOnTable = true;
-    game.pack.cards[cardPos].isOnHand = false;
-    game.pack.cards[cardPos].isUsed = false;
-    game.table[my_order] = sentCard;
-    let gameWon : boolean = false;
-    let roundWon : boolean = false;
-    let roundWinner : number = -1;
-
-    //check win
-    let player_pos : number = -1;
+    let player_pos : number;
     for (var i = 0; i < game.basicOrder.length; ++i) {
       if(game.basicOrder[i] == msgData.player_id){
         player_pos = i;
@@ -570,13 +551,23 @@ export class WebSocketServer {
       }
     }
 
+    game.pack.cards[cardPos].isOnTable = true;
+    game.pack.cards[cardPos].isOnHand = false;
+    game.pack.cards[cardPos].isUsed = false;
+    game.table[player_pos] = sentCard;
+
+    let gameWon : boolean = false;
+    let roundWon : boolean = false;
+    let roundWinner : number = -1;
+
+    //check win
     game.history.push({order: player_pos ,msg:'played', card: sentCard, round: game.round});
     if(player_pos == game.lastToPlay){
       let gameSuit : number = game.table[game.firstToPlay].suit;
       let trumpSuit : number = game.pack.suitTrump;
 
-      let winnerNormal : number = -1;
-      let winnerTrump : number = -1;
+      let winnerNormal : number = game.firstToPlay;
+      let winnerTrump : number = (game.table[game.firstToPlay].suit == trumpSuit ? game.firstToPlay : -1);
 
       //check for renounce
       for (var i = 0; i < game.basicOrder.length; ++i) {
@@ -607,7 +598,8 @@ export class WebSocketServer {
           }else if(game.table[winnerNormal].type < card.type){
             winnerNormal = i;
           }
-        }else if(card.suit == trumpSuit){
+        }
+        if(card.suit == trumpSuit){
           if(winnerTrump == -1){
             winnerTrump = i;
           }else if(game.table[winnerTrump].type < card.type){
@@ -616,25 +608,24 @@ export class WebSocketServer {
         }
       }
       //define who won
-      console.log(winnerTrump);
-      console.log(winnerNormal);
       roundWinner = (winnerTrump == -1 ? winnerNormal : winnerTrump);
-      console.log(roundWinner);
       roundWon = true;
       //get cards on table
-      console.log('stash start');
-      for (var i = 0; i < game.pack.cards.length; ++i) {
-        let card = game.pack.cards[i];
-
-        if(card.isOnTable){
-          card.playerOwner = game.basicOrder[roundWinner]
-          card.isUsed = true;
-          card.isOnHand = false;
-          card.isOnTable = false;
-          game.pack.cards[i] = card;
-        } 
-      }
-      console.log('stash done');
+      console.log('ROUND WINNER'+roundWinner);
+      let stash : any = [];
+      for (var k = 0; k < game.table.length; ++k) {
+        let card = game.table[k];
+        for (var i = 0; i < game.pack.cards.length; ++i) {
+          if(game.pack.cards[i].id == card.id && game.pack.cards[i].suit == card.suit && game.pack.cards[i].type == card.type){
+            game.pack.cards[i].playerOwner = game.basicOrder[roundWinner];
+            game.pack.cards[i].isUsed = true;
+            game.pack.cards[i].isOnHand = false;
+            game.pack.cards[i].isOnTable = false;
+            stash.push(game.pack.cards[i]);
+          }
+        }
+      } 
+      console.log('STASH SIZE ROUND '+stash.length);
       game.table = [null, null, null, null];
       game.onPlay = roundWinner;
       game.firstToPlay = roundWinner
@@ -649,24 +640,25 @@ export class WebSocketServer {
     //end check win
 
     // check for end game 
-    if(game.round < 10){
-      delete game._id;
-      database.db.collection('games')
-      .updateOne({
-        _id: new mongodb.ObjectID(msgData._id)
-      }, {
-        $set: game
-      })
-      .then(result => {
+    
+    delete game._id;
+    database.db.collection('games')
+    .updateOne({
+      _id: new mongodb.ObjectID(msgData._id)
+    }, {
+      $set: game
+    })
+    .then(result => {
+      if(game.round < 10){
         this.responseGamePlay(msgData,client,{ msg : 'played', _id : game._id, order: player_pos ,card: sentCard , roundWon : roundWon});
         if(roundWon)
           this.responseGamePlay(msgData,client,{ msg : 'wonRound', _id : game._id, order : roundWinner});
-      })
-      .catch(err => console.log(err.msg));  
-    }else{
-      console.log('start end game');
-      this.endGame(msgData, client, game);
-    } 
+      }else{
+        this.endGame(msgData, client, game);
+      } 
+    })
+    .catch(err => console.log(err.msg));  
+    
   }
 
   public endGame = (msgData : any, client : any , game :any) => {
@@ -677,26 +669,29 @@ export class WebSocketServer {
     let stash11 : any = [];
     let stash20 : any = [];
     let stash21 : any = [];
+    let count : number = 0;
 
     for (var i = 0; i < game.pack.cards.length; ++i) {
-      let card = game.pack.cards[i];
-      console.log(game.pack.cards);
-      if(card.isUsed && !card.isOnTable && !card.isOnHand){
-        if(card.playerOwner == game.team1[0]){
-          stash10.push(card);
-        }else if(card.playerOwner == game.team1[1].id){
-          stash11.push(card);
-        }else if(card.playerOwner == game.team2[0].id){
-          stash20.push(card);
-        }else if(card.playerOwner == game.team2[1].id){
-          stash21.push(card);
+      if(game.pack.cards[i].isUsed){
+        if(game.pack.cards[i].playerOwner == game.team1[0].id){
+          count++;
+          stash10.push(game.pack.cards[i]);
+        }else if(game.pack.cards[i].playerOwner == game.team1[1].id){
+          count++;
+          stash11.push(game.pack.cards[i]);
+        }else if(game.pack.cards[i].playerOwner == game.team2[0].id){
+          count++;
+          stash20.push(game.pack.cards[i]);
+        }else if(game.pack.cards[i].playerOwner == game.team2[1].id){
+          count++;
+          stash21.push(game.pack.cards[i]);
         }
       }
     }
-    console.log(stash10);
-    console.log(stash11);
-    console.log(stash21);
-    console.log(stash20);
+    console.log('STASH SIZES');
+    console.log(game.pack.cards.length);
+    console.log(count);
+    console.log(stash10.length+' '+stash11.length+' '+stash20.length+' '+stash21.length);
     console.log('stash end game');
 
     // calculate points
@@ -712,12 +707,13 @@ export class WebSocketServer {
 
     let totalTeam1 : number = player10points + player11points;
     let totalTeam2 : number = player20points + player21points;
+    console.log('players points');
     console.log(player10points);
     console.log(player11points);
     console.log(player20points);
     console.log(player21points);
-    console.log('TOTAL TEAM'+ totalTeam1);
-    console.log('TOTAL TEAM'+ totalTeam2);
+    console.log('TOTAL TEAM '+ totalTeam1);
+    console.log('TOTAL TEAM '+ totalTeam2);
 
     console.log('points end game');
 
@@ -737,8 +733,6 @@ export class WebSocketServer {
       //draw
       isTeam1Winner = true;
       isTeam2Winner = true;
-      team1Stars = 1;
-      team2Stars = 1;
     }
     console.log('win end game');
     console.log(totalTeam1);
@@ -771,7 +765,7 @@ export class WebSocketServer {
           history: []
         };
         if(isTeam2Winner && isTeam1Winner){
-         team1players[0].totalPoints =   team1players[0].totalPoints + player10points;
+          team1players[0].totalPoints =   team1players[0].totalPoints + player10points;
           team1players[0].totalStars =  team1players[0].totalStars + team1Stars;
 
           team1players[1].totalPoints =  team1players[1].totalPoints + player11points;
@@ -851,147 +845,143 @@ export class WebSocketServer {
         }).catch(err =>  console.log(err.msg));
       }).catch(err => console.log(err.msg)); 
     }).catch(err => console.log(err.msg)); 
+}
 
+private updatePlayer(player:any){
+  const id = new mongodb.ObjectID(player._id);
+  delete player._id;
+  database.db.collection('players')
+  .updateOne({
+    _id: id
+  }, {
+    $set: player
+  })
+  .then(result => {
+  })
+  .catch(err => console.log(err.msg)); 
+}
 
+private getStars(totalPoints : number ) : number{
+  let stars : number = 0;
 
-    //create a new object( game history ) ????
+  if(totalPoints == 120){
+    stars = 5;
+  }else if(totalPoints > 90 && totalPoints < 120){
+    stars = 3;
+  }else if(totalPoints > 60 && totalPoints < 91){
+    stars = 2;
+  }else if(totalPoints == 60){
+    stars = 1;
   }
+  console.log('STAR POINTS');
+  console.log(stars);
+  console.log(totalPoints);
 
-  private updatePlayer(player:any){
-    const id = new mongodb.ObjectID(player._id);
-    delete player._id;
-    database.db.collection('players')
-    .updateOne({
-      _id: id
-    }, {
-      $set: player
-    })
-    .then(result => {
-    })
-    .catch(err => console.log(err.msg)); 
+  return stars;
+}
+
+private getStashPoints(stash:any) : number{
+  let total : number = 0;
+  console.log('STASH POINTS');
+  for (var i = 0; i < stash.length; ++i) {
+    console.log(this.getCardPoints(stash[i]));
+    total += this.getCardPoints(stash[i]);
   }
+  console.log('total');
+  console.log(total);
 
-  private getStars(totalPoints : number ) : number{
-    let stars : number = 0;
+  return total;
+}
 
-    if(totalPoints == 120){
-      stars = 5;
-    }else if(totalPoints > 90 && totalPoints < 120){
-      stars = 4;
-    }else if(totalPoints > 60 && totalPoints < 91){
-      stars = 4;
-    }
-    console.log('################################################################');
-    console.log(stars);
-    console.log(totalPoints);
-
-    return stars;
+private getCardPoints(card:any) : number{
+  let points : number = 0;
+  switch (card.type) {
+    case 9:
+    // Ace 
+    points = 11;
+    break;
+    case 8:
+    // Seven
+    points = 10;
+    break;
+    case 7:
+    // King
+    points = 4;
+    break;
+    case 6:
+    // Jack
+    points = 3;
+    break;
+    case 5:
+    // Queen
+    points = 2;
+    break;
   }
+  return points;
+}
 
-  private getStashPoints(stash:any) : number{
-    let total : number = 0;
-    console.log('################################################################');
-    for (var i = 0; i < stash.length; ++i) {
-      console.log(stash[i]);
-      console.log(this.getCardPoints(stash[i]));
-      total += this.getCardPoints(stash[i]);
-    }
-
-    return total;
+private getTeam(game:any , id:string) : number{
+  let team : number;
+  for (var i = 0; i < game.team1.length; ++i) {
+    if(game.team1[i].id == id)
+      team = 1;
+    else if(game.team2[i].id == id)
+      team = 2;
   }
+  return team;
+}
 
-  private getCardPoints(card:any) : number{
-    let points : number = 0;
-    switch (card.type) {
-      case 9:
-      // Ace 
-      points = 11;
-      break;
-      case 8:
-      // Seven
-      points = 10;
-      break;
-      case 7:
-      // King
-      points = 4;
-      break;
-      case 6:
-      // Jack
-      points = 3;
-      break;
-      case 5:
-      // Queen
-      points = 2;
-      break;
-      default:
-      points = 0;
-      break;
-    }
-    return points;
+public switchOtherHand(hand: any){
+  for (var i = 0; i < hand.length; ++i) {
+    if(!hand[i].isFirstTrump)
+      hand[i] = {dummy: true};
+    else
+      hand[i].dummy = false;
   }
+  return hand;
+}
 
-  private getTeam(game:any , id:string) : number{
-    let team : number;
-    for (var i = 0; i < game.team1.length; ++i) {
-      if(game.team1[i].id == id)
-        team = 1;
-      else if(game.team2[i].id == id)
-        team = 2;
-    }
-    return team;
+public getHand(pos : number, pack:any , playerOwner : string){
+  let hand : any = [];
+  for (var k = pos * 10; k < 10 +(pos*10); ++k) {
+    let card = pack.cards[k];
+    if(card.isOnHand && !card.isOnTable && !card.isUsed && card.playerOwner == playerOwner)
+      hand.push(card);
   }
+  return hand;
+}
 
-  public switchOtherHand(hand: any){
-    for (var i = 0; i < hand.length; ++i) {
-      if(!hand[i].isFirstTrump)
-        hand[i] = {dummy: true};
-      else
-        hand[i].dummy = false;
-    }
-    return hand;
-  }
-
-  public getHand(pos : number, pack:any , playerOwner : string){
-    let hand : any = [];
-    for (var k = pos * 10; k < 10 +(pos*10); ++k) {
-      let card = pack.cards[k];
-      if(card.isOnHand && !card.isOnTable && !card.isUsed && card.playerOwner == playerOwner)
-        hand.push(card);
-    }
-    return hand;
-  }
-
-  public createCards() {
-    var pack = {
-      suitTrump: -1,
-      cards : {}
-    };
-    var cards = [];
-    let count : number = 0;
-    for (var i = 0; i < 4; ++i) {
-      for (var j = 0; j < 10; ++j) {
-        cards.push({id: count,type:j , suit: i , isOnHand: false, isOnTable:false, isUsed: false, playerOwner: null, isFirstTrump: false});
-        count++;
-      }
-    }
-    cards = this.shuffleArray(cards);
-    cards[0].isFirstTrump = true;
-    pack.suitTrump =  cards[0].suit;
-    pack.cards = cards;
-    return pack;
+public createCards() {
+  var pack = {
+    suitTrump: -1,
+    cards : {}
   };
-
-  public shuffleArray(array) {
-    for (var i = array.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = array[i];
-      array[i] = array[j];
-      array[j] = temp;
+  var cards = [];
+  let count : number = 0;
+  for (var i = 0; i < 4; ++i) {
+    for (var j = 0; j < 10; ++j) {
+      cards.push({id: count,type:j , suit: i , isOnHand: false, isOnTable:false, isUsed: false, playerOwner: null, isFirstTrump: false});
+      count++;
     }
-    return array;
-  };
+  }
+  cards = this.shuffleArray(cards);
+  cards[0].isFirstTrump = true;
+  pack.suitTrump =  cards[0].suit;
+  pack.cards = cards;
+  return pack;
+};
 
-  public getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
+public shuffleArray(array) {
+  for (var i = array.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+  return array;
+};
+
+public getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 };

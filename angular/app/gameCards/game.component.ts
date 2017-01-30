@@ -169,7 +169,7 @@ export class GameComponent implements OnInit, OnDestroy{
 				|| (gameHistory.players[gameHistory.winner2].username == this.me.username && gameHistory.players[gameHistory.winner1].username == this.friend.username)){
 				this.message = 'You Won!!! Points:'+gameHistory.points;
 		}else{
-			this.message = 'You Lost!!! Points:'+gameHistory.points;
+			this.message = 'You Lost!!! Points:'+(120-gameHistory.points);
 		}
 	}
 	setTimeout(() => {  
@@ -209,19 +209,19 @@ clearPlayedCard(response:any): any{
 }
 
 getCardPos(cards : any , card:any) : number{
-			let pos: number = -1;
-			if(card.isFirstTrump){
-				pos = 0;
-			}else{
-				for (var i = 0; i < cards.length; ++i) {
-					console.log(cards[i]);
-					if(cards[i].dummy){
-						pos = i;
-						break;
-					}
-				}
+	let pos: number = -1;
+	if(card.isFirstTrump){
+		pos = 0;
+	}else{
+		for (var i = 0; i < cards.length; ++i) {
+			console.log(cards[i]);
+			if(cards[i].dummy){
+				pos = i;
+				break;
 			}
-			return pos;
+		}
+	}
+	return pos;
 }
 
 loadMyCard(cards : any) : any{

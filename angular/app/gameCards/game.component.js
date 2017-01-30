@@ -168,7 +168,7 @@ var GameComponent = (function () {
                 this.message = 'You Won!!! Points:' + gameHistory.points;
             }
             else {
-                this.message = 'You Lost!!! Points:' + gameHistory.points;
+                this.message = 'You Lost!!! Points:' + (120 - gameHistory.points);
             }
         }
         setTimeout(function () {

@@ -57,7 +57,7 @@ var WebSocketServer = (function () {
                 });
                 client.on('gamePlay', function (msgData) {
                     console.log('gamePlay');
-                    console.log(msgData);
+                    //console.log(msgData);
                     switch (msgData.msg) {
                         case "gameJoin":
                             _this.gameJoin(msgData, client);
@@ -437,9 +437,8 @@ var WebSocketServer = (function () {
                         foe2 = { cards: _this.switchOtherHand(_this.getHand(pos, game.pack, game.basicOrder[pos])), order: pos };
                         table.foe2 = game.table[pos];
                         for (var i = 0; i < game.pack.cards.length; ++i) {
-                            var card = game.pack.cards[i];
-                            if (card.playerOwner == msgData.player_id && card.isUsed)
-                                stash.push(card);
+                            if (game.pack.cards[i].playerOwner == msgData.player_id && game.pack.cards[i].isUsed)
+                                stash.push(game.pack.cards[i]);
                         }
                         _this.responseGamePlay(msgData, client, { msg: 'hand', me: me, friend: friend, foe1: foe1, foe2: foe2, stash: stash, table: table });
                         if (gameStart)
@@ -474,7 +473,7 @@ var WebSocketServer = (function () {
                     var sentCard = msgData.card;
                     var cardPos = -1;
                     for (var i = 0; i < game.pack.cards.length; ++i) {
-                        if (game.pack.cards[i].id == msgData.card.id) {
+                        if (game.pack.cards[i].id == msgData.card.id && game.pack.cards[i].suit == msgData.card.suit && game.pack.cards[i].type == msgData.card.type) {
                             originalCard = game.pack.cards[i];
                             cardPos = i;
                             break;
@@ -489,34 +488,27 @@ var WebSocketServer = (function () {
         };
         this.gamePlayCard = function (msgData, game, cardPos, client) {
             var sentCard = msgData.card;
-            var my_order;
-            for (var i = 0; i < game.basicOrder.length; ++i) {
-                if (game.basicOrder[i] == msgData.player_id) {
-                    my_order = i;
-                    break;
-                }
-            }
-            game.pack.cards[cardPos].isOnTable = true;
-            game.pack.cards[cardPos].isOnHand = false;
-            game.pack.cards[cardPos].isUsed = false;
-            game.table[my_order] = sentCard;
-            var gameWon = false;
-            var roundWon = false;
-            var roundWinner = -1;
-            //check win
-            var player_pos = -1;
+            var player_pos;
             for (var i = 0; i < game.basicOrder.length; ++i) {
                 if (game.basicOrder[i] == msgData.player_id) {
                     player_pos = i;
                     break;
                 }
             }
+            game.pack.cards[cardPos].isOnTable = true;
+            game.pack.cards[cardPos].isOnHand = false;
+            game.pack.cards[cardPos].isUsed = false;
+            game.table[player_pos] = sentCard;
+            var gameWon = false;
+            var roundWon = false;
+            var roundWinner = -1;
+            //check win
             game.history.push({ order: player_pos, msg: 'played', card: sentCard, round: game.round });
             if (player_pos == game.lastToPlay) {
                 var gameSuit = game.table[game.firstToPlay].suit;
                 var trumpSuit = game.pack.suitTrump;
-                var winnerNormal = -1;
-                var winnerTrump = -1;
+                var winnerNormal = game.firstToPlay;
+                var winnerTrump = (game.table[game.firstToPlay].suit == trumpSuit ? game.firstToPlay : -1);
                 //check for renounce
                 for (var i = 0; i < game.basicOrder.length; ++i) {
                     if (game.table[i].suit != gameSuit) {
@@ -546,7 +538,7 @@ var WebSocketServer = (function () {
                             winnerNormal = i;
                         }
                     }
-                    else if (card.suit == trumpSuit) {
+                    if (card.suit == trumpSuit) {
                         if (winnerTrump == -1) {
                             winnerTrump = i;
                         }
@@ -556,24 +548,24 @@ var WebSocketServer = (function () {
                     }
                 }
                 //define who won
-                console.log(winnerTrump);
-                console.log(winnerNormal);
                 roundWinner = (winnerTrump == -1 ? winnerNormal : winnerTrump);
-                console.log(roundWinner);
                 roundWon = true;
                 //get cards on table
-                console.log('stash start');
-                for (var i = 0; i < game.pack.cards.length; ++i) {
-                    var card = game.pack.cards[i];
-                    if (card.isOnTable) {
-                        card.playerOwner = game.basicOrder[roundWinner];
-                        card.isUsed = true;
-                        card.isOnHand = false;
-                        card.isOnTable = false;
-                        game.pack.cards[i] = card;
+                console.log('ROUND WINNER' + roundWinner);
+                var stash = [];
+                for (var k = 0; k < game.table.length; ++k) {
+                    var card = game.table[k];
+                    for (var i = 0; i < game.pack.cards.length; ++i) {
+                        if (game.pack.cards[i].id == card.id && game.pack.cards[i].suit == card.suit && game.pack.cards[i].type == card.type) {
+                            game.pack.cards[i].playerOwner = game.basicOrder[roundWinner];
+                            game.pack.cards[i].isUsed = true;
+                            game.pack.cards[i].isOnHand = false;
+                            game.pack.cards[i].isOnTable = false;
+                            stash.push(game.pack.cards[i]);
+                        }
                     }
                 }
-                console.log('stash done');
+                console.log('STASH SIZE ROUND ' + stash.length);
                 game.table = [null, null, null, null];
                 game.onPlay = roundWinner;
                 game.firstToPlay = roundWinner;
@@ -588,25 +580,24 @@ var WebSocketServer = (function () {
             }
             //end check win
             // check for end game 
-            if (game.round < 10) {
-                delete game._id;
-                app_database_1.databaseConnection.db.collection('games')
-                    .updateOne({
-                    _id: new mongodb.ObjectID(msgData._id)
-                }, {
-                    $set: game
-                })
-                    .then(function (result) {
+            delete game._id;
+            app_database_1.databaseConnection.db.collection('games')
+                .updateOne({
+                _id: new mongodb.ObjectID(msgData._id)
+            }, {
+                $set: game
+            })
+                .then(function (result) {
+                if (game.round < 10) {
                     _this.responseGamePlay(msgData, client, { msg: 'played', _id: game._id, order: player_pos, card: sentCard, roundWon: roundWon });
                     if (roundWon)
                         _this.responseGamePlay(msgData, client, { msg: 'wonRound', _id: game._id, order: roundWinner });
-                })
-                    .catch(function (err) { return console.log(err.msg); });
-            }
-            else {
-                console.log('start end game');
-                _this.endGame(msgData, client, game);
-            }
+                }
+                else {
+                    _this.endGame(msgData, client, game);
+                }
+            })
+                .catch(function (err) { return console.log(err.msg); });
         };
         this.endGame = function (msgData, client, game) {
             //get both teams stashes 
@@ -614,28 +605,31 @@ var WebSocketServer = (function () {
             var stash11 = [];
             var stash20 = [];
             var stash21 = [];
+            var count = 0;
             for (var i = 0; i < game.pack.cards.length; ++i) {
-                var card = game.pack.cards[i];
-                console.log(game.pack.cards);
-                if (card.isUsed && !card.isOnTable && !card.isOnHand) {
-                    if (card.playerOwner == game.team1[0]) {
-                        stash10.push(card);
+                if (game.pack.cards[i].isUsed) {
+                    if (game.pack.cards[i].playerOwner == game.team1[0].id) {
+                        count++;
+                        stash10.push(game.pack.cards[i]);
                     }
-                    else if (card.playerOwner == game.team1[1].id) {
-                        stash11.push(card);
+                    else if (game.pack.cards[i].playerOwner == game.team1[1].id) {
+                        count++;
+                        stash11.push(game.pack.cards[i]);
                     }
-                    else if (card.playerOwner == game.team2[0].id) {
-                        stash20.push(card);
+                    else if (game.pack.cards[i].playerOwner == game.team2[0].id) {
+                        count++;
+                        stash20.push(game.pack.cards[i]);
                     }
-                    else if (card.playerOwner == game.team2[1].id) {
-                        stash21.push(card);
+                    else if (game.pack.cards[i].playerOwner == game.team2[1].id) {
+                        count++;
+                        stash21.push(game.pack.cards[i]);
                     }
                 }
             }
-            console.log(stash10);
-            console.log(stash11);
-            console.log(stash21);
-            console.log(stash20);
+            console.log('STASH SIZES');
+            console.log(game.pack.cards.length);
+            console.log(count);
+            console.log(stash10.length + ' ' + stash11.length + ' ' + stash20.length + ' ' + stash21.length);
             console.log('stash end game');
             // calculate points
             var player10points = 0;
@@ -648,12 +642,13 @@ var WebSocketServer = (function () {
             player21points = _this.getStashPoints(stash21);
             var totalTeam1 = player10points + player11points;
             var totalTeam2 = player20points + player21points;
+            console.log('players points');
             console.log(player10points);
             console.log(player11points);
             console.log(player20points);
             console.log(player21points);
-            console.log('TOTAL TEAM' + totalTeam1);
-            console.log('TOTAL TEAM' + totalTeam2);
+            console.log('TOTAL TEAM ' + totalTeam1);
+            console.log('TOTAL TEAM ' + totalTeam2);
             console.log('points end game');
             //give them the win
             var isTeam1Winner = false;
@@ -672,8 +667,6 @@ var WebSocketServer = (function () {
                 //draw
                 isTeam1Winner = true;
                 isTeam2Winner = true;
-                team1Stars = 1;
-                team2Stars = 1;
             }
             console.log('win end game');
             console.log(totalTeam1);
@@ -767,7 +760,6 @@ var WebSocketServer = (function () {
                     }).catch(function (err) { return console.log(err.msg); });
                 }).catch(function (err) { return console.log(err.msg); });
             }).catch(function (err) { return console.log(err.msg); });
-            //create a new object( game history ) ????
         };
     }
     WebSocketServer.prototype.updateCards = function (pos, cards, owner) {
@@ -809,24 +801,28 @@ var WebSocketServer = (function () {
             stars = 5;
         }
         else if (totalPoints > 90 && totalPoints < 120) {
-            stars = 4;
+            stars = 3;
         }
         else if (totalPoints > 60 && totalPoints < 91) {
-            stars = 4;
+            stars = 2;
         }
-        console.log('################################################################');
+        else if (totalPoints == 60) {
+            stars = 1;
+        }
+        console.log('STAR POINTS');
         console.log(stars);
         console.log(totalPoints);
         return stars;
     };
     WebSocketServer.prototype.getStashPoints = function (stash) {
         var total = 0;
-        console.log('################################################################');
+        console.log('STASH POINTS');
         for (var i = 0; i < stash.length; ++i) {
-            console.log(stash[i]);
             console.log(this.getCardPoints(stash[i]));
             total += this.getCardPoints(stash[i]);
         }
+        console.log('total');
+        console.log(total);
         return total;
     };
     WebSocketServer.prototype.getCardPoints = function (card) {
@@ -851,9 +847,6 @@ var WebSocketServer = (function () {
             case 5:
                 // Queen
                 points = 2;
-                break;
-            default:
-                points = 0;
                 break;
         }
         return points;
