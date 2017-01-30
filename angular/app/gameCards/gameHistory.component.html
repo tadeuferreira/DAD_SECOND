@@ -1,0 +1,38 @@
+<div class="container">
+    <h2>Game History <button class="btn btn-primary" (click)="getGameHistory()"> Refresh </button></h2>
+    <div class="form-group">
+        <label>Filter </label>
+        <input type="text" id="inputName" [(ngModel)]="inputName" />
+        <input type="button" (click)="FilterByName()" value="Apply" />
+    </div>
+    <div class='row'>
+        <div class="panel panel-default">
+            <div class='panel-body'>
+                <table class="table table-bordered table-condensed">
+                    <thead>
+                        <tr>
+                            <th>Game Owner</th>
+                            <th>Terminated</th>
+                            <th>Creation Date</th>
+                            <th>End Date</th>
+                            <th>Winner1</th>
+                            <th>Winner2</th>
+                            <th>Players</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let m of arrayGameHistory">
+                            <td>{{m.game.owner}}</td>
+                            <td>{{m.game.terminated}}</td>
+                            <td>{{m.game.creationDate}}</td>
+                            <td>{{m.game.endDate}}</td>
+                            <td>{{m.game.winner1}}</td>
+                            <td>{{m.game.winner2}}</td>
+                            <td>{{m.game.players}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

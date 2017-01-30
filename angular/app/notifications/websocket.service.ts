@@ -72,8 +72,6 @@ export class WebSocketService {
         return this.listenOnChannel('gamePlay');
     }
 
-
-
     private listenOnChannel(channel: string): Observable<any> {
         return new Observable((observer: any) => {
             this.socket.on(channel, (data: any) => {

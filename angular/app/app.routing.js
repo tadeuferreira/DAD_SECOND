@@ -11,6 +11,7 @@ var gameLobby_component_1 = require("./gameCards/gameLobby.component");
 var newGame_component_1 = require("./gameCards/newGame.component");
 var gameSearch_component_1 = require("./gameCards/gameSearch.component");
 var game_component_1 = require("./gameCards/game.component");
+var gameHistory_component_1 = require("./gameCards/gameHistory.component");
 var appRoutes = [
     {
         path: '',
@@ -52,6 +53,10 @@ var appRoutes = [
     {
         path: 'top10Points',
         component: top10Point_component_1.Top10PointComponent
+    },
+    {
+        path: 'gameHistory',
+        component: gameHistory_component_1.GameHistoryComponent
     },
     {
         path: 'game/playing',

@@ -1,4 +1,4 @@
-import { Component,Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { WebSocketService } from '../notifications/websocket.service';
 
 import { Http, Response, Headers, RequestOptions, RequestOptionsArgs } from '@angular/http';

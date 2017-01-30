@@ -14,6 +14,7 @@ var websocket_service_1 = require("./notifications/websocket.service");
 var notifications_module_1 = require("./notifications/notifications.module");
 var chat_component_1 = require("./chat.component");
 var gameChat_component_1 = require("./gameCards/gameChat.component");
+var gameHistory_component_1 = require("./gameCards/gameHistory.component");
 var menu_component_1 = require("./menu/menu.component");
 var dashboard_component_1 = require("./menu/dashboard.component");
 var home_component_1 = require("./menu/home.component");
@@ -51,6 +52,7 @@ AppModule = __decorate([
             newGame_component_1.NewGameComponent,
             game_component_1.GameComponent,
             gameLobby_component_1.GameLobbyComponent,
+            gameHistory_component_1.GameHistoryComponent,
             login_component_1.LoginComponent,
             register_component_1.RegisterComponent,
             profile_component_1.ProfileComponent,

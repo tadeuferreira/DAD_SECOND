@@ -167,9 +167,20 @@ var Game = (function () {
             })
                 .catch(function (err) { return _this.handleError(err, response, next); });
         };
+        this.getGameHistory = function (request, response, next) {
+            app_database_1.databaseConnection.db.collection('gameHistory')
+                .find({ game: { $exists: true } })
+                .toArray()
+                .then(function (games) {
+                response.json(games || []);
+                next();
+            })
+                .catch(function (err) { return _this.handleError(err, response, next); });
+        };
         // Routes for the games
         this.init = function (server, settings) {
             server.get(settings.prefix + 'games', settings.security.authorize, _this.getGames);
+            server.get(settings.prefix + 'gameHistory', _this.getGameHistory);
             server.get(settings.prefix + 'games/:id', settings.security.authorize, _this.getGame);
             server.put(settings.prefix + 'games/:id', settings.security.authorize, _this.updateGame);
             server.post(settings.prefix + 'games', settings.security.authorize, _this.createGame);

@@ -12,6 +12,7 @@ import { NotificationModule } from './notifications/notifications.module';
 import { ChatComponent } from './chat.component';
 
 import { GameChatComponent } from './gameCards/gameChat.component';
+import { GameHistoryComponent } from './gameCards/gameHistory.component';
 
 import { MenuComponent } from './menu/menu.component';
 import { DashboardComponent } from './menu/dashboard.component';
@@ -47,7 +48,8 @@ import { Routing } from './app.routing';
                   GameSearchComponent, 
                   NewGameComponent, 
                   GameComponent,
-                  GameLobbyComponent, 
+                  GameLobbyComponent,
+                  GameHistoryComponent, 
                   LoginComponent, 
                   RegisterComponent,
                   ProfileComponent, 
