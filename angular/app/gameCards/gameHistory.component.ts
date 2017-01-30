@@ -29,7 +29,9 @@ export class GameHistoryComponent implements OnInit {
             response => {
                 if (response.ok) {
                     this.arrayGameHistory = response.json();
+                    console.log('game history');
                     console.log(response.json());
+                    console.log(this.arrayGameHistory);
                 }
             },
             error => {

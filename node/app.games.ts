@@ -180,6 +180,7 @@ export class Game {
             .toArray()
             .then(games => {
                 response.json(games || []);
+                console.log(response.json());
                 next();
             })
             .catch(err => this.handleError(err, response, next));

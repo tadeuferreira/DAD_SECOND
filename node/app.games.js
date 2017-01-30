@@ -173,6 +173,7 @@ var Game = (function () {
                 .toArray()
                 .then(function (games) {
                 response.json(games || []);
+                console.log(response.json());
                 next();
             })
                 .catch(function (err) { return _this.handleError(err, response, next); });
