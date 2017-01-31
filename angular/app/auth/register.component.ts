@@ -8,7 +8,7 @@ import { User } from './user';
 @Component({
   moduleId: module.id,
   selector: 'Register',
-  templateUrl: 'Register.component.html',
+  templateUrl: 'register.component.html',
 })
 export class RegisterComponent implements OnInit {
   public myForm: FormGroup; // our model driven form
