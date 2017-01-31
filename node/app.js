@@ -5,7 +5,7 @@ var path = require('path');
 var app_database_1 = require("./app.database");
 var app_websockets_1 = require("./app.websockets");
 var handler_settings_1 = require("./handler.settings");
-var url = 'mongodb://localhost:27017/dad_mongo';
+var url = 'mongodb://40.114.47.134:27017/dad_mongo';
 // Create Restify and WebSocket Server
 var restifyServer = restify.createServer();
 var socketServer = new app_websockets_1.WebSocketServer();
