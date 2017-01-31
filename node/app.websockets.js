@@ -57,7 +57,6 @@ var WebSocketServer = (function () {
                 });
                 client.on('gamePlay', function (msgData) {
                     console.log('gamePlay');
-                    //console.log(msgData);
                     switch (msgData.msg) {
                         case "gameJoin":
                             _this.gameJoin(msgData, client);
@@ -108,14 +107,12 @@ var WebSocketServer = (function () {
                 case 'NoGame':
                     data = { msg: ' NoGame' };
             }
-            console.log(data);
             client.emit('gameLobby', data);
             if (response != 'switch_fail')
                 client.to(msgData._id).emit('gameLobby', data);
         };
         this.responseGamePlay = function (msgData, client, response) {
             console.log('responseGamePlay');
-            console.log(response.msg);
             var data = null;
             switch (response.msg) {
                 case 'played':
@@ -132,7 +129,6 @@ var WebSocketServer = (function () {
                 case 'leaveTerminated':
                     data = response;
             }
-            // console.log(data);
             client.join(msgData._id);
             client.emit('gamePlay', data);
             if (response.msg != 'hand' && response.msg != 'players')
@@ -148,7 +144,6 @@ var WebSocketServer = (function () {
                 _id: new mongodb.ObjectID(msgData._id)
             }).then(function (game) {
                 if (game !== null && game.state == 'pending') {
-                    console.log('Game');
                     var ableToJoin = false;
                     var alreadyIn = false;
                     for (i = 0; i < 2; ++i) {
@@ -202,7 +197,6 @@ var WebSocketServer = (function () {
                             _this.updateCards(2, game.pack.cards, game.basicOrder[2]);
                             _this.updateCards(3, game.pack.cards, game.basicOrder[3]);
                         }
-                        console.log('after startGame');
                         var game_id = game._id;
                         delete game._id;
                         app_database_1.databaseConnection.db.collection('games')
@@ -298,7 +292,7 @@ var WebSocketServer = (function () {
                     }
                 }
                 else {
-                    console.log('game not found');
+                    _this.responseGameLobby(msgData, client, 'NoGame');
                 }
             })
                 .catch(function (err) { return console.log(err.msg); });
@@ -354,7 +348,7 @@ var WebSocketServer = (function () {
                         .catch(function (err) { return console.log(err.msg); });
                 }
                 else {
-                    console.log('game not found');
+                    _this.responseGameLobby(msgData, client, 'NoGame');
                 }
             })
                 .catch(function (err) { return console.log(err.msg); });
@@ -429,13 +423,10 @@ var WebSocketServer = (function () {
             }).catch(function (err) { return console.log(err.msg); });
         };
         this.gameTerminate = function (msgData, client, game, losingTeam, stateMsg, responseMsg) {
-            console.log(stateMsg, responseMsg);
-            console.log(losingTeam);
             app_database_1.databaseConnection.db.collection('players')
                 .find({ $or: [{ _id: new mongodb.ObjectID(game.team1[0].id) }, { _id: new mongodb.ObjectID(game.team1[1].id) }] })
                 .toArray()
                 .then(function (team1players) {
-                console.log('team1 end game');
                 app_database_1.databaseConnection.db.collection('players')
                     .find({ $or: [{ _id: new mongodb.ObjectID(game.team2[0].id) }, { _id: new mongodb.ObjectID(game.team2[1].id) }] })
                     .toArray()
@@ -498,14 +489,12 @@ var WebSocketServer = (function () {
                         _id: new mongodb.ObjectID(msgData._id)
                     })
                         .then(function (result) {
-                        console.log('deleted end game');
                         if (result.deletedCount === 1) {
                             //update players
                             _this.updatePlayer(team1players[0]);
                             _this.updatePlayer(team1players[1]);
                             _this.updatePlayer(team2players[0]);
                             _this.updatePlayer(team2players[1]);
-                            console.log('update p end game');
                             //create game history
                             app_database_1.databaseConnection.db.collection('gamesHistory')
                                 .insertOne(gamehistory)
@@ -514,7 +503,7 @@ var WebSocketServer = (function () {
                             }).catch(function (err) { return console.log(err.msg); });
                         }
                         else {
-                            console.log(404, 'No game found');
+                            _this.responseGameLobby(msgData, client, 'NoGame');
                         }
                     }).catch(function (err) { return console.log(err.msg); });
                 }).catch(function (err) { return console.log(err.msg); });
@@ -527,7 +516,6 @@ var WebSocketServer = (function () {
                 _id: new mongodb.ObjectID(msgData._id)
             })
                 .then(function (game) {
-                console.log(msgData);
                 var player_id = msgData.player_id;
                 var username = '';
                 for (var i = 0; i < 2; ++i) {
@@ -538,11 +526,8 @@ var WebSocketServer = (function () {
                         username = game.team2[i].username;
                     }
                 }
-                console.log('username');
-                console.log(game.basicOrder[msgData.order] == player_id);
                 if (game.basicOrder[msgData.order] == player_id) {
                     var team = _this.getTeam(game, player_id);
-                    console.log((team - 1 < 0 ? 2 : 1));
                     _this.gameTerminate(msgData, client, game, (team - 1 < 0 ? 2 : 1), 'Player Left: ' + username, 'leaveTerminated');
                 }
             }).catch(function (err) { return console.log(err.msg); });
@@ -699,7 +684,6 @@ var WebSocketServer = (function () {
                 roundWinner = (winnerTrump == -1 ? winnerNormal : winnerTrump);
                 roundWon = true;
                 //get cards on table
-                console.log('ROUND WINNER' + roundWinner);
                 var stash = [];
                 for (var k = 0; k < game.table.length; ++k) {
                     var card = game.table[k];
@@ -713,7 +697,6 @@ var WebSocketServer = (function () {
                         }
                     }
                 }
-                console.log('STASH SIZE ROUND ' + stash.length);
                 game.table = [null, null, null, null];
                 game.onPlay = roundWinner;
                 game.firstToPlay = roundWinner;
@@ -774,11 +757,6 @@ var WebSocketServer = (function () {
                     }
                 }
             }
-            console.log('STASH SIZES');
-            console.log(game.pack.cards.length);
-            console.log(count);
-            console.log(stash10.length + ' ' + stash11.length + ' ' + stash20.length + ' ' + stash21.length);
-            console.log('stash end game');
             // calculate points
             var player10points = 0;
             var player11points = 0;
@@ -790,14 +768,6 @@ var WebSocketServer = (function () {
             player21points = _this.getStashPoints(stash21);
             var totalTeam1 = player10points + player11points;
             var totalTeam2 = player20points + player21points;
-            console.log('players points');
-            console.log(player10points);
-            console.log(player11points);
-            console.log(player20points);
-            console.log(player21points);
-            console.log('TOTAL TEAM ' + totalTeam1);
-            console.log('TOTAL TEAM ' + totalTeam2);
-            console.log('points end game');
             //give them the win
             var isTeam1Winner = false;
             var team1Stars = 0;
@@ -816,20 +786,15 @@ var WebSocketServer = (function () {
                 isTeam1Winner = true;
                 isTeam2Winner = true;
             }
-            console.log('win end game');
-            console.log(totalTeam1);
-            console.log(totalTeam2);
             //update the game and players 
             app_database_1.databaseConnection.db.collection('players')
                 .find({ $or: [{ _id: new mongodb.ObjectID(game.team1[0].id) }, { _id: new mongodb.ObjectID(game.team1[1].id) }] })
                 .toArray()
                 .then(function (team1players) {
-                console.log('team1 end game');
                 app_database_1.databaseConnection.db.collection('players')
                     .find({ $or: [{ _id: new mongodb.ObjectID(game.team2[0].id) }, { _id: new mongodb.ObjectID(game.team2[1].id) }] })
                     .toArray()
                     .then(function (team2players) {
-                    console.log('team2 end game');
                     var gamehistory = {
                         owner: null,
                         state: '',
@@ -898,14 +863,12 @@ var WebSocketServer = (function () {
                         _id: new mongodb.ObjectID(msgData._id)
                     })
                         .then(function (result) {
-                        console.log('deleted end game');
                         if (result.deletedCount === 1) {
                             //update players
                             _this.updatePlayer(team1players[0]);
                             _this.updatePlayer(team1players[1]);
                             _this.updatePlayer(team2players[0]);
                             _this.updatePlayer(team2players[1]);
-                            console.log('update p end game');
                             //create game history
                             app_database_1.databaseConnection.db.collection('gamesHistory')
                                 .insertOne(gamehistory)
@@ -914,7 +877,7 @@ var WebSocketServer = (function () {
                             }).catch(function (err) { return console.log(err.msg); });
                         }
                         else {
-                            console.log(404, 'No game found');
+                            _this.responseGameLobby(msgData, client, 'NoGame');
                         }
                     }).catch(function (err) { return console.log(err.msg); });
                 }).catch(function (err) { return console.log(err.msg); });
@@ -968,20 +931,13 @@ var WebSocketServer = (function () {
         else if (totalPoints == 60) {
             stars = 1;
         }
-        console.log('STAR POINTS');
-        console.log(stars);
-        console.log(totalPoints);
         return stars;
     };
     WebSocketServer.prototype.getStashPoints = function (stash) {
         var total = 0;
-        console.log('STASH POINTS');
         for (var i = 0; i < stash.length; ++i) {
-            console.log(this.getCardPoints(stash[i]));
             total += this.getCardPoints(stash[i]);
         }
-        console.log('total');
-        console.log(total);
         return total;
     };
     WebSocketServer.prototype.getCardPoints = function (card) {
