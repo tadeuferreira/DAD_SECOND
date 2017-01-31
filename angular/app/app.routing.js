@@ -12,7 +12,6 @@ var newGame_component_1 = require("./gameCards/newGame.component");
 var gameSearch_component_1 = require("./gameCards/gameSearch.component");
 var game_component_1 = require("./gameCards/game.component");
 var gameHistory_component_1 = require("./gameCards/gameHistory.component");
-var gameHistoryPlayer_component_1 = require("./gameCards/gameHistoryPlayer.component");
 var appRoutes = [
     {
         path: '',
@@ -58,10 +57,6 @@ var appRoutes = [
     {
         path: 'gamesHistory',
         component: gameHistory_component_1.GameHistoryComponent
-    },
-    {
-        path: 'gamesHistoryPlayer',
-        component: gameHistoryPlayer_component_1.GameHistoryPlayerComponent
     },
     {
         path: 'game/playing',

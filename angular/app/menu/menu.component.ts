@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AppComponent } from '../app.component';
-import { UserService } from '../auth/user.service';
 
 @Component({
     moduleId: module.id,
@@ -12,12 +11,8 @@ export class MenuComponent implements OnInit {
 
     @Input() hidden: boolean;
 
-    constructor(private userService: UserService) { }
+    constructor() { }
 
     ngOnInit() {
-    }
-
-    isLoggedIn() {
-        return this.userService.isLoggedIn();
     }
 }

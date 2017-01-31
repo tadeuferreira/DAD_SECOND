@@ -16,7 +16,6 @@ import { NewGameComponent } from './gameCards/newGame.component';
 import { GameSearchComponent } from './gameCards/gameSearch.component';
 import { GameComponent } from './gameCards/game.component';
 import { GameHistoryComponent } from './gameCards/gameHistory.component';
-import { GameHistoryPlayerComponent } from './gameCards/gameHistoryPlayer.component';
 
 const appRoutes: Routes = [
     {
@@ -63,10 +62,6 @@ const appRoutes: Routes = [
     {
         path: 'gamesHistory',
         component: GameHistoryComponent
-    },
-    {
-        path: 'gamesHistoryPlayer',
-        component: GameHistoryPlayerComponent
     },
     {
         path: 'game/playing',

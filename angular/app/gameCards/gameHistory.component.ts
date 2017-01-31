@@ -3,6 +3,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Http, Response, Headers, RequestOptions, RequestOptionsArgs } from '@angular/http';
 import { Router } from '@angular/router';
 
+import { UserService } from '../auth/user.service';
+
 @Component({
     moduleId: module.id,
     selector: 'game-history',
@@ -10,17 +12,19 @@ import { Router } from '@angular/router';
 })
 export class GameHistoryComponent implements OnInit {
     public arrayGameHistory: any[] = [];
+    public arrayMyGameHistory: any[] = [];
     filteredItems: any[];
     inputName: string = '';
+    username: string = sessionStorage.getItem("username");
 
-    constructor(public router: Router, public http: Http) { }
+    constructor(public router: Router, public http: Http, public userService: UserService) { }
 
     ngOnInit() {
-        this.getGameHistory();
+        this.getGamesHistory();
         this.filteredItems = this.arrayGameHistory;
     }
 
-    getGameHistory() {
+    getGamesHistory() {
         let headers = new Headers();
         headers.append('Content-Type', 'application/json');
 
@@ -34,6 +38,14 @@ export class GameHistoryComponent implements OnInit {
             error => {
                 console.log(error.text());
             });
+    }
+
+    getMyGamesHistory() {
+        this.arrayGameHistory.forEach(element => {
+            if (element.players.username == this.username) {
+                this.arrayMyGameHistory.push(element);
+            }
+        });
     }
 
     FilterByName() {
@@ -54,5 +66,9 @@ export class GameHistoryComponent implements OnInit {
 
     refreshItems() {
         this.arrayGameHistory = this.filteredItems;
+    }
+
+    isLoggedIn(){
+        return this.userService.isLoggedIn();
     }
 }
