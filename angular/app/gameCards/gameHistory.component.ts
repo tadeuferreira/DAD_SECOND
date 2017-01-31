@@ -42,8 +42,10 @@ export class GameHistoryComponent implements OnInit {
 
     getMyGamesHistory() {
         this.arrayGameHistory.forEach(element => {
-            if (element.players.username == this.username) {
-                this.arrayMyGameHistory.push(element);
+            for (var i = 0; i < element.players.lenght; ++i) {
+                if (element.players[i].username == this.username) {
+                    this.arrayMyGameHistory.push(element);
+                }
             }
         });
     }
@@ -68,7 +70,7 @@ export class GameHistoryComponent implements OnInit {
         this.arrayGameHistory = this.filteredItems;
     }
 
-    isLoggedIn(){
+    isLoggedIn() {
         return this.userService.isLoggedIn();
     }
 }
