@@ -42,7 +42,7 @@ RegisterComponent = __decorate([
     core_1.Component({
         moduleId: module.id,
         selector: 'Register',
-        templateUrl: 'Register.component.html',
+        templateUrl: 'register.component.html',
     }),
     __metadata("design:paramtypes", [forms_1.FormBuilder, user_service_1.UserService, validator_service_1.ValidatorService, router_1.Router])
 ], RegisterComponent);
