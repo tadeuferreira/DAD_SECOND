@@ -399,21 +399,14 @@ var WebSocketServer = (function () {
             }).catch(function (err) { return console.log(err.msg); });
         };
         this.gameRenounce = function (msgData, client) {
-<<<<<<< HEAD
             console.log('gameRenounce');
-=======
->>>>>>> origin/master
             app_database_1.databaseConnection.db.collection('games')
                 .findOne({
                 _id: new mongodb.ObjectID(msgData._id)
             })
                 .then(function (game) {
                 var player_id = msgData.player_id;
-<<<<<<< HEAD
                 if (game.basicOrder[msgData.order] == player_id) {
-=======
-                if (game.gameOrder[msgData.order] == player_id) {
->>>>>>> origin/master
                     var team = _this.getTeam(game, player_id);
                     if (team == 1) {
                         if (game.renounce2) {
@@ -435,7 +428,6 @@ var WebSocketServer = (function () {
             }).catch(function (err) { return console.log(err.msg); });
         };
         this.gameTerminateRenounce = function (msgData, client, game, accepted, losingTeam) {
-<<<<<<< HEAD
             app_database_1.databaseConnection.db.collection('players')
                 .find({ $or: [{ _id: new mongodb.ObjectID(game.team1[0].id) }, { _id: new mongodb.ObjectID(game.team1[1].id) }] })
                 .toArray()
@@ -525,24 +517,6 @@ var WebSocketServer = (function () {
                     }).catch(function (err) { return console.log(err.msg); });
                 }).catch(function (err) { return console.log(err.msg); });
             }).catch(function (err) { return console.log(err.msg); });
-=======
-            var gamehistory = {
-                owner: null,
-                state: '',
-                startDate: null,
-                endDate: null,
-                isDraw: false,
-                winner1: null,
-                winner2: null,
-                points: 0,
-                stars: 0,
-                players: [],
-                history: []
-            };
-            if (accepted)
-                gameHistory.
-                ;
->>>>>>> origin/master
         };
         this.gameLeave = function (msgData, client) {
         };

@@ -180,16 +180,17 @@ var Game = (function () {
         };
         this.getGameHistoryPlayer = function (request, response, next) {
             var game = request.body;
-            var username = game.owner.username;
+            var username = game.players.username;
             app_database_1.databaseConnection.db.collection('gamesHistory')
                 .find()
                 .toArray()
                 .then(function (games) {
-                if (games.owner.username == username) {
-                    response.json(games || []);
-                    console.log(response.json());
-                    next();
-                }
+                games.players.array.forEach(function (element) {
+                    if (element.username == username) {
+                        response.json(games || []);
+                        next();
+                    }
+                });
             })
                 .catch(function (err) { return _this.handleError(err, response, next); });
         };

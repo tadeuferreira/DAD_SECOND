@@ -188,16 +188,18 @@ export class Game {
 
     public getGameHistoryPlayer = (request: any, response: any, next: any) => {
         let game = request.body;
-        let username = game.owner.username;
+        let username = game.players.username;
         database.db.collection('gamesHistory')
             .find()
             .toArray()
             .then(games => {
-                if (games.owner.username == username) {
-                    response.json(games || []);
-                    console.log(response.json());
-                    next();
-                }
+                games.players.array.forEach(element => {
+                    if (element.username == username) {
+                        response.json(games || []);
+                        console.log(response.json());
+                        next();
+                    }
+                });
             })
             .catch(err => this.handleError(err, response, next));
     }
