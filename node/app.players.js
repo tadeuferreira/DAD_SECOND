@@ -134,7 +134,12 @@ var Player = (function () {
                 .toArray()
                 .then(function (players) {
                 response.json(players || []);
-                _this.settings.wsServer.notifyAll('players', Date.now() + ': Somebody accessed top 10 Star');
+                _this.settings.wsServer.notifyAll('players', new Date().toLocaleTimeString('en-US', {
+                    hour12: false,
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric"
+                }) + ': Somebody accessed top 10 Star');
                 next();
             })
                 .catch(function (err) { return _this.handleError(err, response, next); });
@@ -147,7 +152,12 @@ var Player = (function () {
                 .toArray()
                 .then(function (players) {
                 response.json(players || []);
-                _this.settings.wsServer.notifyAll('players', Date.now() + ': Somebody accessed top 10 Point');
+                _this.settings.wsServer.notifyAll('players', new Date().toLocaleTimeString('en-US', {
+                    hour12: false,
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric"
+                }) + ': Somebody accessed top 10 Point');
                 next();
             })
                 .catch(function (err) { return _this.handleError(err, response, next); });

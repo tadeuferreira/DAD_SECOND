@@ -475,16 +475,16 @@ var WebSocketServer = (function () {
                     gamehistory.players.push({ username: team2players[0].username, avatar: team2players[0].avatar });
                     gamehistory.players.push({ username: team2players[1].username, avatar: team2players[1].avatar });
                     if (losingTeam == 2) {
-                        team1players[0].totalPoints = team1players[0].totalPoints + 120;
-                        team1players[1].totalPoints = team1players[1].totalPoints + 120;
+                        team1players[0].totalPoints = team1players[0].totalPoints + 60;
+                        team1players[1].totalPoints = team1players[1].totalPoints + 60;
                         team1players[0].totalStars = team1players[0].totalStars + 5;
                         team1players[1].totalStars = team1players[1].totalStars + 5;
                         gamehistory.winner1 = team1players[0].username; //2
                         gamehistory.winner2 = team1players[1].username; //3
                     }
                     else if (losingTeam == 1) {
-                        team2players[0].totalPoints = team2players[0].totalPoints + 120;
-                        team2players[1].totalPoints = team2players[1].totalPoints + 120;
+                        team2players[0].totalPoints = team2players[0].totalPoints + 60;
+                        team2players[1].totalPoints = team2players[1].totalPoints + 60;
                         team2players[0].totalStars = team2players[0].totalStars + 5;
                         team2players[1].totalStars = team2players[1].totalStars + 5;
                         gamehistory.winner1 = team2players[0].username; //2

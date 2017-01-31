@@ -21,6 +21,7 @@
                             <th>End Date</th>
                             <th>Winner1</th>
                             <th>Winner2</th>
+                            <th>Draw</th>
                             <th>Players</th>
                         </tr>
                     </thead>
@@ -30,8 +31,11 @@
                             <td>{{m.state}}</td>
                             <td>{{m.startDate | date:'dd-MM-yyyy'}}</td>
                             <td>{{m.endDate | date:'dd-MM-yyyy'}}</td>
-                            <td>{{m.winner1}}</td>
-                            <td>{{m.winner2}}</td>
+                            <td *ngIf="m.winner1 != null">{{m.winner1}}</td>
+                            <td *ngIf="m.winner1 == null">none</td>
+                            <td *ngIf="m.winner2 != null">{{m.winner2}}</td>
+                            <td *ngIf="m.winner2 == null">none</td>
+                            <td>{{m.isDraw}}</td>
                             <td>
                                 <tr *ngFor="let p of m.players">
                                     <td>{{p.username}}</td>
