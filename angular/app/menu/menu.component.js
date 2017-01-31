@@ -9,10 +9,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
+var user_service_1 = require("../auth/user.service");
 var MenuComponent = (function () {
-    function MenuComponent() {
+    function MenuComponent(userService) {
+        this.userService = userService;
     }
     MenuComponent.prototype.ngOnInit = function () {
+    };
+    MenuComponent.prototype.isLoggedIn = function () {
+        return this.userService.isLoggedIn();
     };
     return MenuComponent;
 }());
@@ -25,7 +30,8 @@ MenuComponent = __decorate([
         moduleId: module.id,
         selector: 'menu',
         templateUrl: 'menu.component.html',
-    })
+    }),
+    __metadata("design:paramtypes", [user_service_1.UserService])
 ], MenuComponent);
 exports.MenuComponent = MenuComponent;
 //# sourceMappingURL=menu.component.js.map

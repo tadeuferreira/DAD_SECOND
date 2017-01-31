@@ -13,6 +13,7 @@ import { ChatComponent } from './chat.component';
 
 import { GameChatComponent } from './gameCards/gameChat.component';
 import { GameHistoryComponent } from './gameCards/gameHistory.component';
+import { GameHistoryPlayerComponent } from './gameCards/gameHistoryPlayer.component';
 
 import { MenuComponent } from './menu/menu.component';
 import { DashboardComponent } from './menu/dashboard.component';
@@ -50,6 +51,7 @@ import { Routing } from './app.routing';
                   GameComponent,
                   GameLobbyComponent,
                   GameHistoryComponent, 
+                  GameHistoryPlayerComponent,
                   LoginComponent, 
                   RegisterComponent,
                   ProfileComponent, 

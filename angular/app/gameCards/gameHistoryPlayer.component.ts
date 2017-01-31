@@ -5,30 +5,31 @@ import { Router } from '@angular/router';
 
 @Component({
     moduleId: module.id,
-    selector: 'game-history',
-    templateUrl: 'gameHistory.component.html'
+    selector: 'game-history-player',
+    templateUrl: 'gameHistoryPlayer.component.html'
 })
-export class GameHistoryComponent implements OnInit {
-    public arrayGameHistory: any[] = [];
+export class GameHistoryPlayerComponent implements OnInit {
+    public arrayGameHistoryPlayer: any[] = [];
     filteredItems: any[];
     inputName: string = '';
+    username: string = sessionStorage.getItem("username");
 
     constructor(public router: Router, public http: Http) { }
 
     ngOnInit() {
-        this.getGameHistory();
-        this.filteredItems = this.arrayGameHistory;
+        this.getGameHistoryPlayer();
+        this.filteredItems = this.arrayGameHistoryPlayer;
     }
 
-    getGameHistory() {
+    getGameHistoryPlayer() {
         let headers = new Headers();
         headers.append('Content-Type', 'application/json');
 
-        this.http.get('http://localhost:7777/api/v1/gamesHistory', <RequestOptionsArgs>{ headers: headers, withCredentials: false })
+        this.http.get('http://localhost:7777/api/v1/gamesHistoryPlayer', <RequestOptionsArgs>{ headers: headers, withCredentials: false })
             .subscribe(
             response => {
                 if (response.ok) {
-                    this.arrayGameHistory = response.json();
+                    this.arrayGameHistoryPlayer = response.json();
                 }
             },
             error => {
@@ -40,19 +41,19 @@ export class GameHistoryComponent implements OnInit {
         this.filteredItems = [];
 
         if (this.inputName != "") {
-            this.arrayGameHistory.forEach(element => {
+            this.arrayGameHistoryPlayer.forEach(element => {
                 if (element.name.toUpperCase().indexOf(this.inputName.toUpperCase()) >= 0) {
                     this.filteredItems.push(element);
                 }
             });
         } else {
-            this.filteredItems = this.arrayGameHistory;
+            this.filteredItems = this.arrayGameHistoryPlayer;
         }
         console.log(this.filteredItems);
         this.refreshItems();
     }
 
     refreshItems() {
-        this.arrayGameHistory = this.filteredItems;
+        this.arrayGameHistoryPlayer = this.filteredItems;
     }
 }

@@ -398,6 +398,50 @@ var WebSocketServer = (function () {
             }).catch(function (err) { return console.log(err.msg); });
         };
         this.gameRenounce = function (msgData, client) {
+            app_database_1.databaseConnection.db.collection('games')
+                .findOne({
+                _id: new mongodb.ObjectID(msgData._id)
+            })
+                .then(function (game) {
+                var player_id = msgData.player_id;
+                if (game.gameOrder[msgData.order] == player_id) {
+                    var team = _this.getTeam(game, player_id);
+                    if (team == 1) {
+                        if (game.renounce2) {
+                            _this.gameTerminateRenounce(msgData, client, game, true, 2);
+                        }
+                        else {
+                            _this.gameTerminateRenounce(msgData, client, game, false, 1);
+                        }
+                    }
+                    else if (team == 2) {
+                        if (game.renounce1) {
+                            _this.gameTerminateRenounce(msgData, client, game, true, 1);
+                        }
+                        else {
+                            _this.gameTerminateRenounce(msgData, client, game, false, 2);
+                        }
+                    }
+                }
+            }).catch(function (err) { return console.log(err.msg); });
+        };
+        this.gameTerminateRenounce = function (msgData, client, game, accepted, losingTeam) {
+            var gamehistory = {
+                owner: null,
+                state: '',
+                startDate: null,
+                endDate: null,
+                isDraw: false,
+                winner1: null,
+                winner2: null,
+                points: 0,
+                stars: 0,
+                players: [],
+                history: []
+            };
+            if (accepted)
+                gameHistory.
+                ;
         };
         this.gameLeave = function (msgData, client) {
         };

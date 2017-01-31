@@ -186,11 +186,28 @@ export class Game {
             .catch(err => this.handleError(err, response, next));
     }
 
+    public getGameHistoryPlayer = (request: any, response: any, next: any) => {
+        let game = request.body;
+        let username = game.owner.username;
+        database.db.collection('gamesHistory')
+            .find()
+            .toArray()
+            .then(games => {
+                if (games.owner.username == username) {
+                    response.json(games || []);
+                    console.log(response.json());
+                    next();
+                }
+            })
+            .catch(err => this.handleError(err, response, next));
+    }
+
     // Routes for the games
     public init = (server: any, settings: HandlerSettings) => {
         server.get(settings.prefix + 'games', settings.security.authorize, this.getGames);
 
         server.get(settings.prefix + 'gamesHistory', this.getGameHistory);
+        server.get(settings.prefix + 'gamesHistoryPlayer', settings.security.authorize, this.getGameHistoryPlayer);
 
         server.get(settings.prefix + 'games/:id', settings.security.authorize, this.getGame);
         server.put(settings.prefix + 'games/:id', settings.security.authorize, this.updateGame);
