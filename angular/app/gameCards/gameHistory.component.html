@@ -24,11 +24,15 @@
                         <tr *ngFor="let m of arrayGameHistory">
                             <td>{{m.owner.username}}</td>
                             <td>{{m.state}}</td>
-                            <td>{{m.startDate}}</td>
-                            <td>{{m.endDate}}</td>
+                            <td>{{m.startDate | date:'dd-MM-yyyy'}}</td>
+                            <td>{{m.endDate | date:'dd-MM-yyyy'}}</td>
                             <td>{{m.players[m.winner1].username}}</td>
                             <td>{{m.players[m.winner1].username}}</td>
-                            <td>{{m.players}}</td>
+                            <td>
+                                <tr *ngFor="let p of m.players">
+                                    <td>{{p.username}}</td>
+                                </tr>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
