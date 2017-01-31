@@ -55,7 +55,7 @@ export class GameHistoryComponent implements OnInit {
 
         if (this.inputName != "") {
             this.arrayGameHistory.forEach(element => {
-                if (element.name.toUpperCase().indexOf(this.inputName.toUpperCase()) >= 0) {
+                if (element.owner.username.toUpperCase().indexOf(this.inputName.toUpperCase()) >= 0) {
                     this.filteredItems.push(element);
                 }
             });
