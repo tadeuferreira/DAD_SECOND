@@ -22,6 +22,8 @@
                             <th>Winner1</th>
                             <th>Winner2</th>
                             <th>Draw</th>
+                            <th>Team Winner Points</th>
+                            <th>Team Winner Stars</th>
                             <th>Players</th>
                         </tr>
                     </thead>
@@ -36,6 +38,8 @@
                             <td *ngIf="m.winner2 != null">{{m.winner2}}</td>
                             <td *ngIf="m.winner2 == null">none</td>
                             <td>{{m.isDraw}}</td>
+                            <td>{{m.points}}</td>
+                            <td>{{m.stars}}</td>
                             <td>
                                 <tr *ngFor="let p of m.players">
                                     <td>{{p.username}}</td>
