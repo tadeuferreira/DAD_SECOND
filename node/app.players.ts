@@ -142,7 +142,12 @@ export class Player {
             .toArray()
             .then(players => {
                 response.json(players || []);
-                this.settings.wsServer.notifyAll('players', Date.now() + ': Somebody accessed top 10 Star');
+                this.settings.wsServer.notifyAll('players', new Date().toLocaleTimeString('en-US', {
+                    hour12: false,
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric"
+                }) + ': Somebody accessed top 10 Star');
                 next();
             })
             .catch(err => this.handleError(err, response, next));
@@ -156,7 +161,12 @@ export class Player {
             .toArray()
             .then(players => {
                 response.json(players || []);
-                this.settings.wsServer.notifyAll('players', Date.now() + ': Somebody accessed top 10 Point');
+                this.settings.wsServer.notifyAll('players', new Date().toLocaleTimeString('en-US', {
+                    hour12: false,
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric"
+                }) + ': Somebody accessed top 10 Point');
                 next();
             })
             .catch(err => this.handleError(err, response, next));
