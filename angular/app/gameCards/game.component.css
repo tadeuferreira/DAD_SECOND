@@ -1,7 +1,7 @@
 
 .card{
-	width: 60px; 
-	height: 86px;
+	width: 40px; 
+	height: 57px;
 }
 
 .card-inline{
@@ -26,3 +26,4 @@
     border-color: #9ecaed;
     box-shadow: 0 0 10px #9ecaed;
 }
+

@@ -62,6 +62,9 @@ export class GameComponent implements OnInit, OnDestroy{
 					break;
 					case 'NoGame':
 					this.noGame();
+					case 'gameTerminated':
+					this.loadTerminated(response);
+					break;
 				}
 			},
 			error => {
@@ -90,6 +93,12 @@ export class GameComponent implements OnInit, OnDestroy{
 			if(card != null)
 				this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, msg:'try', card: card});
 		}
+	}
+	loadTerminated(response : any){
+
+	}
+	renounce(){
+		this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, order: this.me.order ,msg:'renounce'});	
 	}
 	loadPlayers(response : any){
 		this.friend.avatar = response.friend.avatar;

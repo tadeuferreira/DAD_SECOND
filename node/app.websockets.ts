@@ -442,9 +442,53 @@ export class WebSocketServer {
   };
 
   private gameRenounce = (msgData:any , client : any) =>{
+     database.db.collection('games')
+    .findOne({
+      _id: new mongodb.ObjectID(msgData._id)
+    })
+    .then(game => {
+      let player_id = msgData.player_id;
+      if(game.gameOrder[msgData.order] == player_id){
 
+        let team : number = this.getTeam(game , player_id);
+
+        if(team == 1){
+          if(game.renounce2){
+            this.gameTerminateRenounce(msgData, client, game,true,  2);
+          }else{
+            this.gameTerminateRenounce(msgData, client, game,false,  1);
+          }
+        }else if(team == 2){
+           if(game.renounce1){
+            this.gameTerminateRenounce(msgData, client, game,true,  1);
+          }else{
+            this.gameTerminateRenounce(msgData, client, game,false,  2);
+          }
+        }
+      }
+    }).catch(err => console.log(err.msg));
   };
 
+  private gameTerminateRenounce = (msgData:any, client : any ,  game:any ,accepted : boolean , losingTeam : number) => {
+     let gamehistory : any =
+        {
+          owner : null,
+          state: '',
+          startDate: null,
+          endDate: null,
+          isDraw: false,
+          winner1: null,
+          winner2: null,
+          points : 0,
+          stars : 0,
+          players : [],
+          history: []
+        };
+        if(accepted)
+          gameHistory.
+
+
+  };
   private gameLeave = (msgData:any , client : any) =>{
 
   };

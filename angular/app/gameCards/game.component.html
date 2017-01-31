@@ -3,12 +3,14 @@
 <div class="container" *ngIf="isGameReady">
 	<div class="row">
 		<div class="col-lg-3"></div>
-		<div class="col-lg-6"><div *ngFor="let c of friend.cards"><img class="card card-inline" src="{{c.imgUrl}}"/></div>
+		<div class="col-lg-6"><div style="text-align: center;" *ngIf="friend.avatar != null"><img src="{{friend.avatar}}" style="width: 50px; height: 50px; border-radius: 50%;"></div>
+		<div style="text-align: center; font-size: 200%" *ngIf="friend.username != null"><span> {{friend.username}}</span></div><div *ngFor="let c of friend.cards"><img class="card card-inline" src="{{c.imgUrl}}"/></div>
 	</div> 
 	<div class="col-lg-3"></div>
 </div>
-<div class="row" >
-	<div class="col-lg-3"><div *ngFor="let c of foe1.cards"><img class="card card-rotated" src="{{c.imgUrl}}"/></div></div>
+<div class="row" id="column-wrap">
+	<div class="col-lg-3"><div *ngFor="let c of foe1.cards"><img class="card card-rotated" src="{{c.imgUrl}}"/></div><div style="text-align: center; float:left;" *ngIf="foe1.avatar != null"><img src="{{foe1.avatar}}" style="width: 50px; height: 50px; border-radius: 50%;"></div>
+		<div style="text-align: center; font-size: 200%; float: left;" *ngIf="foe1.username != null"><span> {{foe1.username}}</span></div></div>
 	<div class="col-lg-6">
 		<div class="row">
 			<div class="col-lg-3"></div>
@@ -28,16 +30,24 @@
 	</div>
 	<div class="col-lg-3">
 		<div *ngFor="let c of foe2.cards"><img  class="card card-rotated" src="{{c.imgUrl}}" /></div>
+		<div style="text-align: center; float:right;" *ngIf="foe2.avatar != null"><img src="{{foe2.avatar}}" style="width: 50px; height: 50px; border-radius: 50%;"></div>
+		<div style="text-align: center; font-size: 200%; float: right;" *ngIf="foe2.username != null"><span> {{foe2.username}}</span></div>
 	</div>
 </div>
 <div class="row">
 	<div class="col-lg-3"></div>
-	<div class="col-lg-6"><div *ngFor="let c of me.cards"><img (click)="playCard($event)" id="{{c.id}}" class="{{c.isFirstTrump ? 'card card-inline trump' : 'card card-inline'}}" src="{{c.imgUrl}}"/></div>
-</div>
-<div class="col-lg-3"></div>
+	<div class="col-lg-6">
+		<div *ngFor="let c of me.cards">
+			<img (click)="playCard($event)" id="{{c.id}}" class="{{c.isFirstTrump ? 'card card-inline trump' : 'card card-inline'}}" src="{{c.imgUrl}}"/>
+		</div>
+		<div style="text-align: center;" *ngIf="me.avatar != null"><img src="{{me.avatar}}" style="width: 50px; height: 50px; border-radius: 50%;"></div>
+		<div style="text-align: center; font-size: 200%" *ngIf="me.username != null"><span> {{me.username}}</span></div>
+	</div>
+	<div class="col-lg-3"></div>
 </div>
 &nbsp;
 <div class="row">
+<div style="text-align: center;"><button class="btn btn-warning" (click)="renounce()"> Renounce </button></div>
 	<gameChat [game_id]="getGameId"></gameChat>
 </div>
 </div>
