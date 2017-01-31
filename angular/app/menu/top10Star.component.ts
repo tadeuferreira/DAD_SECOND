@@ -21,7 +21,7 @@ export class Top10StarComponent {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
-    this.http.get('http://localhost:7777/api/v1/top10Stars', <RequestOptionsArgs>{ headers: headers, withCredentials: false })
+    this.http.get('http://40.114.47.134:7777/api/v1/top10Stars', <RequestOptionsArgs>{ headers: headers, withCredentials: false })
       .subscribe(
       response => {
         if (response.ok) {

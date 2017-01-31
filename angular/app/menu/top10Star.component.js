@@ -24,7 +24,7 @@ var Top10StarComponent = (function () {
         var _this = this;
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/json');
-        this.http.get('http://localhost:7777/api/v1/top10Stars', { headers: headers, withCredentials: false })
+        this.http.get('http://40.114.47.134:7777/api/v1/top10Stars', { headers: headers, withCredentials: false })
             .subscribe(function (response) {
             if (response.ok) {
                 _this.arrayTop10Star = response.json();

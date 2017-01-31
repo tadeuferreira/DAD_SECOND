@@ -25,7 +25,7 @@ var GameService = (function () {
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
         this.http
-            .post('http://localhost:7777/api/v1/games', body, { headers: headers, withCredentials: false })
+            .post('http://40.114.47.134:7777/api/v1/games', body, { headers: headers, withCredentials: false })
             .subscribe(function (response) {
             if (response.ok) {
                 sessionStorage.setItem('game_id', response.json()._id);
@@ -39,19 +39,19 @@ var GameService = (function () {
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
-        return this.http.get('http://localhost:7777/api/v1/games', { headers: headers, withCredentials: false });
+        return this.http.get('http://40.114.47.134:7777/api/v1/games', { headers: headers, withCredentials: false });
     };
     GameService.prototype.getPlayersGame = function () {
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
-        return this.http.get('http://localhost:7777/api/v1/games/players/' + sessionStorage.getItem('game_id'), { headers: headers, withCredentials: false });
+        return this.http.get('http://40.114.47.134:7777/api/v1/games/players/' + sessionStorage.getItem('game_id'), { headers: headers, withCredentials: false });
     };
     GameService.prototype.getGame = function () {
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
-        return this.http.get('http://localhost:7777/api/v1/games/' + sessionStorage.getItem('game_id'), { headers: headers, withCredentials: false });
+        return this.http.get('http://40.114.47.134:7777/api/v1/games/' + sessionStorage.getItem('game_id'), { headers: headers, withCredentials: false });
     };
     return GameService;
 }());

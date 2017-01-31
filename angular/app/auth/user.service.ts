@@ -17,7 +17,7 @@ export class UserService {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
     return this.http
-      .post('http://localhost:7777/api/v1/login', JSON.stringify({ username, password }), { headers })
+      .post('http://40.114.47.134:7777/api/v1/login', JSON.stringify({ username, password }), { headers })
       .subscribe(response => {
         if (response.ok) {
           sessionStorage.setItem('id', response.json()._id);
@@ -46,7 +46,7 @@ export class UserService {
     let totalStars: number = 0;
 
     return this.http
-      .post('http://localhost:7777/api/v1/register', JSON.stringify({ username, name, email, password, avatar, totalPoints, totalStars }), { headers })
+      .post('http://40.114.47.134:7777/api/v1/register', JSON.stringify({ username, name, email, password, avatar, totalPoints, totalStars }), { headers })
       .subscribe(response => {
         if(response.ok)
             this.router.navigate(['login']);  
@@ -71,7 +71,7 @@ export class UserService {
     let body = JSON.stringify({ avatar, username, name, email, password });
 
     return this.http
-      .put('http://localhost:7777/api/v1/players/' + sessionStorage.getItem("id"), body, <RequestOptionsArgs>{ headers: headers, withCredentials: false })
+      .put('http://40.114.47.134:7777/api/v1/players/' + sessionStorage.getItem("id"), body, <RequestOptionsArgs>{ headers: headers, withCredentials: false })
       .subscribe(response => {
         console.log(response);
         this.router.navigate(['dashboard']);
@@ -93,7 +93,7 @@ export class UserService {
     headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
 
     return this.http
-      .get('http://localhost:7777/api/v1/players/' + sessionStorage.getItem("id"), <RequestOptionsArgs>{ headers: headers, withCredentials: false });
+      .get('http://40.114.47.134:7777/api/v1/players/' + sessionStorage.getItem("id"), <RequestOptionsArgs>{ headers: headers, withCredentials: false });
   }
 
   logout() {

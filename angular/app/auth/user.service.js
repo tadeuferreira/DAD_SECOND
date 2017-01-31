@@ -24,7 +24,7 @@ var UserService = (function () {
         var headers = new http_1.Headers();
         headers.append('Content-Type', 'application/json');
         return this.http
-            .post('http://localhost:7777/api/v1/login', JSON.stringify({ username: username, password: password }), { headers: headers })
+            .post('http://40.114.47.134:7777/api/v1/login', JSON.stringify({ username: username, password: password }), { headers: headers })
             .subscribe(function (response) {
             if (response.ok) {
                 sessionStorage.setItem('id', response.json()._id);
@@ -50,7 +50,7 @@ var UserService = (function () {
         var totalPoints = 0;
         var totalStars = 0;
         return this.http
-            .post('http://localhost:7777/api/v1/register', JSON.stringify({ username: username, name: name, email: email, password: password, avatar: avatar, totalPoints: totalPoints, totalStars: totalStars }), { headers: headers })
+            .post('http://40.114.47.134:7777/api/v1/register', JSON.stringify({ username: username, name: name, email: email, password: password, avatar: avatar, totalPoints: totalPoints, totalStars: totalStars }), { headers: headers })
             .subscribe(function (response) {
             if (response.ok)
                 _this.router.navigate(['login']);
@@ -71,7 +71,7 @@ var UserService = (function () {
         var password = user.password;
         var body = JSON.stringify({ avatar: avatar, username: username, name: name, email: email, password: password });
         return this.http
-            .put('http://localhost:7777/api/v1/players/' + sessionStorage.getItem("id"), body, { headers: headers, withCredentials: false })
+            .put('http://40.114.47.134:7777/api/v1/players/' + sessionStorage.getItem("id"), body, { headers: headers, withCredentials: false })
             .subscribe(function (response) {
             console.log(response);
             _this.router.navigate(['dashboard']);
@@ -90,7 +90,7 @@ var UserService = (function () {
         headers.append('Content-Type', 'application/json');
         headers.append('Authorization', 'bearer ' + sessionStorage.getItem('token'));
         return this.http
-            .get('http://localhost:7777/api/v1/players/' + sessionStorage.getItem("id"), { headers: headers, withCredentials: false });
+            .get('http://40.114.47.134:7777/api/v1/players/' + sessionStorage.getItem("id"), { headers: headers, withCredentials: false });
     };
     UserService.prototype.logout = function () {
         sessionStorage.removeItem('auth_token');
