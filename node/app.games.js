@@ -178,10 +178,26 @@ var Game = (function () {
             })
                 .catch(function (err) { return _this.handleError(err, response, next); });
         };
+        this.getGameHistoryPlayer = function (request, response, next) {
+            var game = request.body;
+            var username = game.owner.username;
+            app_database_1.databaseConnection.db.collection('gamesHistory')
+                .find()
+                .toArray()
+                .then(function (games) {
+                if (games.owner.username == username) {
+                    response.json(games || []);
+                    console.log(response.json());
+                    next();
+                }
+            })
+                .catch(function (err) { return _this.handleError(err, response, next); });
+        };
         // Routes for the games
         this.init = function (server, settings) {
             server.get(settings.prefix + 'games', settings.security.authorize, _this.getGames);
             server.get(settings.prefix + 'gamesHistory', _this.getGameHistory);
+            server.get(settings.prefix + 'gamesHistoryPlayer', settings.security.authorize, _this.getGameHistoryPlayer);
             server.get(settings.prefix + 'games/:id', settings.security.authorize, _this.getGame);
             server.put(settings.prefix + 'games/:id', settings.security.authorize, _this.updateGame);
             server.post(settings.prefix + 'games', settings.security.authorize, _this.createGame);

@@ -3,10 +3,8 @@
 </div>
 <div class="container" *ngIf="!isLoading">
     <h1 class="page-header">Edit Profile</h1>
-    <!-- edit form column -->
     <form class="form-horizontal" role="form" (ngSubmit)="edit(myForm.value)" [formGroup]="myForm" novalidate>
         <div class="row">
-            <!-- left column -->
             <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="form-group">
                     <div class="text-center">
