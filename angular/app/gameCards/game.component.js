@@ -68,6 +68,9 @@ var GameComponent = (function () {
                         break;
                     case 'NoGame':
                         _this.noGame();
+                    case 'gameTerminated':
+                        _this.loadTerminated(response);
+                        break;
                 }
             }, function (error) {
                 console.log(error.text());
@@ -92,6 +95,11 @@ var GameComponent = (function () {
             if (card != null)
                 this.websocketService.sendGame({ _id: this.game_id, player_id: this.player_id, msg: 'try', card: card });
         }
+    };
+    GameComponent.prototype.loadTerminated = function (response) {
+    };
+    GameComponent.prototype.renounce = function () {
+        this.websocketService.sendGame({ _id: this.game_id, player_id: this.player_id, order: this.me.order, msg: 'renounce' });
     };
     GameComponent.prototype.loadPlayers = function (response) {
         this.friend.avatar = response.friend.avatar;
