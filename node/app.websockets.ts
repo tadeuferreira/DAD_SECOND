@@ -527,8 +527,8 @@ export class WebSocketServer {
 
 
         if(losingTeam == 2){
-          team1players[0].totalPoints = team1players[0].totalPoints + 120;
-          team1players[1].totalPoints = team1players[1].totalPoints + 120;
+          team1players[0].totalPoints = team1players[0].totalPoints + 60;
+          team1players[1].totalPoints = team1players[1].totalPoints + 60;
 
           team1players[0].totalStars = team1players[0].totalStars + 5;
           team1players[1].totalStars = team1players[1].totalStars + 5;
@@ -537,8 +537,8 @@ export class WebSocketServer {
           gamehistory.winner2 = team1players[1].username; //3
 
         }else if(losingTeam == 1){
-          team2players[0].totalPoints = team2players[0].totalPoints + 120;
-          team2players[1].totalPoints = team2players[1].totalPoints + 120;
+          team2players[0].totalPoints = team2players[0].totalPoints + 60;
+          team2players[1].totalPoints = team2players[1].totalPoints + 60;
 
           team2players[0].totalStars = team2players[0].totalStars + 5;
           team2players[1].totalStars = team2players[1].totalStars + 5;
@@ -693,17 +693,10 @@ export class WebSocketServer {
     let roundWon : boolean = false;
     let roundWinner : number = -1;
 
-    //check win
-    game.history.push({order: player_pos ,msg:'played', card: sentCard, round: game.round});
-    if(player_pos == game.lastToPlay){
-      let gameSuit : number = game.table[game.firstToPlay].suit;
-      let trumpSuit : number = game.pack.suitTrump;
-
-      let winnerNormal : number = game.firstToPlay;
-      let winnerTrump : number = (game.table[game.firstToPlay].suit == trumpSuit ? game.firstToPlay : -1);
-
-      //check for renounce
-      for (var i = 0; i < game.basicOrder.length; ++i) {
+    //check for renounce
+    let gameSuit : number = game.table[game.firstToPlay].suit;
+    for (var i = 0; i < game.basicOrder.length; ++i) {
+      if(game.table[i]){
         if(game.table[i].suit != gameSuit){
           let hand : any = this.getHand(i, game.pack , game.basicOrder[i]);
           let team : number = this.getTeam(game, game.basicOrder[i]);
@@ -720,6 +713,17 @@ export class WebSocketServer {
           } 
         }
       }
+    }
+
+    //check win
+    game.history.push({order: player_pos ,msg:'played', card: sentCard, round: game.round});
+    if(player_pos == game.lastToPlay){
+
+      let trumpSuit : number = game.pack.suitTrump;
+
+      let winnerNormal : number = game.firstToPlay;
+      let winnerTrump : number = (game.table[game.firstToPlay].suit == trumpSuit ? game.firstToPlay : -1);
+
       //check who won
       for (var i = 0; i < game.table.length; ++i) {
 

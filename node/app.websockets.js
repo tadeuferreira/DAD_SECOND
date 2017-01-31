@@ -621,15 +621,10 @@ var WebSocketServer = (function () {
             var gameWon = false;
             var roundWon = false;
             var roundWinner = -1;
-            //check win
-            game.history.push({ order: player_pos, msg: 'played', card: sentCard, round: game.round });
-            if (player_pos == game.lastToPlay) {
-                var gameSuit = game.table[game.firstToPlay].suit;
-                var trumpSuit = game.pack.suitTrump;
-                var winnerNormal = game.firstToPlay;
-                var winnerTrump = (game.table[game.firstToPlay].suit == trumpSuit ? game.firstToPlay : -1);
-                //check for renounce
-                for (var i = 0; i < game.basicOrder.length; ++i) {
+            //check for renounce
+            var gameSuit = game.table[game.firstToPlay].suit;
+            for (var i = 0; i < game.basicOrder.length; ++i) {
+                if (game.table[i]) {
                     if (game.table[i].suit != gameSuit) {
                         var hand = _this.getHand(i, game.pack, game.basicOrder[i]);
                         var team = _this.getTeam(game, game.basicOrder[i]);
@@ -646,6 +641,13 @@ var WebSocketServer = (function () {
                         }
                     }
                 }
+            }
+            //check win
+            game.history.push({ order: player_pos, msg: 'played', card: sentCard, round: game.round });
+            if (player_pos == game.lastToPlay) {
+                var trumpSuit = game.pack.suitTrump;
+                var winnerNormal = game.firstToPlay;
+                var winnerTrump = (game.table[game.firstToPlay].suit == trumpSuit ? game.firstToPlay : -1);
                 //check who won
                 for (var i = 0; i < game.table.length; ++i) {
                     var card = game.table[i];
