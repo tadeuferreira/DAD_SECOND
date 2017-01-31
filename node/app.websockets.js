@@ -711,8 +711,8 @@ var WebSocketServer = (function () {
                         team2players[0].totalStars = team2players[0].totalStars + team2Stars;
                         team2players[1].totalPoints = team2players[1].totalPoints + player21points;
                         team2players[1].totalStars = team2players[1].totalStars + team2Stars;
-                        gamehistory.winner1 = 2;
-                        gamehistory.winner2 = 3;
+                        gamehistory.winner1 = team2players[0].username; //2
+                        gamehistory.winner2 = team2players[1].username; //3
                         gamehistory.points = totalTeam2;
                     }
                     else if (isTeam1Winner) {
@@ -720,8 +720,8 @@ var WebSocketServer = (function () {
                         team1players[0].totalStars = team1players[0].totalStars + team1Stars;
                         team1players[1].totalPoints = team1players[1].totalPoints + player11points;
                         team1players[1].totalStars = team1players[1].totalStars + team1Stars;
-                        gamehistory.winner1 = 0;
-                        gamehistory.winner2 = 1;
+                        gamehistory.winner1 = team1players[0].username; //0
+                        gamehistory.winner2 = team1players[1].username; //1
                         gamehistory.points = totalTeam1;
                     }
                     var username = '';

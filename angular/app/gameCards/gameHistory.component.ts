@@ -12,6 +12,7 @@ export class GameHistoryComponent implements OnInit {
     public arrayGameHistory: any[] = [];
     filteredItems: any[];
     inputName: string = '';
+    @Input() isMyGames: boolean;
 
     constructor(public router: Router, public http: Http) { }
 
@@ -33,13 +34,17 @@ export class GameHistoryComponent implements OnInit {
                     console.log(response.json());
                     console.log(this.arrayGameHistory);
 
-                    
+
                 }
             },
             error => {
                 console.log(error.text());
             });
     }
+
+    
+
+
     FilterByName() {
         this.filteredItems = [];
 

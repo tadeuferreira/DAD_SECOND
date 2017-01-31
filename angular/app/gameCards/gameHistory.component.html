@@ -26,8 +26,8 @@
                             <td>{{m.state}}</td>
                             <td>{{m.startDate | date:'dd-MM-yyyy'}}</td>
                             <td>{{m.endDate | date:'dd-MM-yyyy'}}</td>
-                            <td>{{m.players[m.winner1].username}}</td>
-                            <td>{{m.players[m.winner1].username}}</td>
+                            <td>{{m.winner1}}</td>
+                            <td>{{m.winner2}}</td>
                             <td>
                                 <tr *ngFor="let p of m.players">
                                     <td>{{p.username}}</td>
