@@ -71,6 +71,8 @@ var GameComponent = (function () {
                     case 'renounceTerminated':
                         _this.loadRenounceTerminated(response);
                         break;
+                    case 'leaveTerminated':
+                        _this.loadLeaveTerminated(response);
                 }
             }, function (error) {
                 console.log(error.text());
@@ -78,7 +80,7 @@ var GameComponent = (function () {
         }
     };
     GameComponent.prototype.ngOnDestroy = function () {
-        this.websocketService.sendGame({ _id: this.game_id, player_id: this.player_id, msg: 'leave' });
+        this.websocketService.sendGame({ _id: this.game_id, player_id: this.player_id, order: this.me.order, msg: 'leave' });
         this.websocketService.unsubGame();
     };
     GameComponent.prototype.getGameId = function () {
@@ -105,6 +107,20 @@ var GameComponent = (function () {
         }
         else {
             this.message = 'You Lost(Renounce)!!!';
+        }
+        setTimeout(function () {
+            _this.router.navigate(['dashboard']);
+        }, 5000);
+    };
+    GameComponent.prototype.loadLeaveTerminated = function (response) {
+        var _this = this;
+        var gameHistory = response.game_history;
+        if ((gameHistory.winner1 == this.me.username && gameHistory.winner2 == this.friend.username)
+            || (gameHistory.winner2 == this.me.username && gameHistory.winner1 == this.friend.username)) {
+            this.message = 'You Won(Player left)!!!';
+        }
+        else {
+            this.message = 'You Lost(Your Teammate left)!!!';
         }
         setTimeout(function () {
             _this.router.navigate(['dashboard']);

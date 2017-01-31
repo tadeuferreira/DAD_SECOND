@@ -129,6 +129,7 @@ var WebSocketServer = (function () {
                 case 'players':
                 case 'NoGame':
                 case 'renounceTerminated':
+                case 'leaveTerminated':
                     data = response;
             }
             // console.log(data);
@@ -410,24 +411,26 @@ var WebSocketServer = (function () {
                     var team = _this.getTeam(game, player_id);
                     if (team == 1) {
                         if (game.renounce2) {
-                            _this.gameTerminateRenounce(msgData, client, game, true, 2);
+                            _this.gameTerminate(msgData, client, game, 2, 'Renounce Win', 'renounceTerminated');
                         }
                         else {
-                            _this.gameTerminateRenounce(msgData, client, game, false, 1);
+                            _this.gameTerminate(msgData, client, game, 1, 'Renounce Fail', 'renounceTerminated');
                         }
                     }
                     else if (team == 2) {
                         if (game.renounce1) {
-                            _this.gameTerminateRenounce(msgData, client, game, true, 1);
+                            _this.gameTerminate(msgData, client, game, 1, 'Renounce Win', 'renounceTerminated');
                         }
                         else {
-                            _this.gameTerminateRenounce(msgData, client, game, false, 2);
+                            _this.gameTerminate(msgData, client, game, 2, 'Renounce Fail', 'renounceTerminated');
                         }
                     }
                 }
             }).catch(function (err) { return console.log(err.msg); });
         };
-        this.gameTerminateRenounce = function (msgData, client, game, accepted, losingTeam) {
+        this.gameTerminate = function (msgData, client, game, losingTeam, stateMsg, responseMsg) {
+            console.log(stateMsg, responseMsg);
+            console.log(losingTeam);
             app_database_1.databaseConnection.db.collection('players')
                 .find({ $or: [{ _id: new mongodb.ObjectID(game.team1[0].id) }, { _id: new mongodb.ObjectID(game.team1[1].id) }] })
                 .toArray()
@@ -450,10 +453,7 @@ var WebSocketServer = (function () {
                         players: [],
                         history: []
                     };
-                    if (accepted)
-                        gamehistory.state = 'Renounce Win';
-                    else
-                        gamehistory.state = 'Renounce Try';
+                    gamehistory.state = stateMsg;
                     gamehistory.isDraw = false;
                     gamehistory.points = 120;
                     gamehistory.stars = 5;
@@ -474,6 +474,8 @@ var WebSocketServer = (function () {
                     gamehistory.players.push({ username: team1players[1].username, avatar: team1players[1].avatar });
                     gamehistory.players.push({ username: team2players[0].username, avatar: team2players[0].avatar });
                     gamehistory.players.push({ username: team2players[1].username, avatar: team2players[1].avatar });
+                    gamehistory.points = 120;
+                    gamehistory.stars = 5;
                     if (losingTeam == 2) {
                         team1players[0].totalPoints = team1players[0].totalPoints + 60;
                         team1players[1].totalPoints = team1players[1].totalPoints + 60;
@@ -508,7 +510,7 @@ var WebSocketServer = (function () {
                             app_database_1.databaseConnection.db.collection('gamesHistory')
                                 .insertOne(gamehistory)
                                 .then(function (result) {
-                                _this.responseGamePlay(msgData, client, { msg: 'renounceTerminated', _id: game._id, game_history_id: result.insertedId, game_history: gamehistory });
+                                _this.responseGamePlay(msgData, client, { msg: responseMsg, _id: game._id, game_history_id: result.insertedId, game_history: gamehistory });
                             }).catch(function (err) { return console.log(err.msg); });
                         }
                         else {
@@ -519,6 +521,31 @@ var WebSocketServer = (function () {
             }).catch(function (err) { return console.log(err.msg); });
         };
         this.gameLeave = function (msgData, client) {
+            console.log('gameLeave');
+            app_database_1.databaseConnection.db.collection('games')
+                .findOne({
+                _id: new mongodb.ObjectID(msgData._id)
+            })
+                .then(function (game) {
+                console.log(msgData);
+                var player_id = msgData.player_id;
+                var username = '';
+                for (var i = 0; i < 2; ++i) {
+                    if (game.team1[i].id == player_id) {
+                        username = game.team1[i].username;
+                    }
+                    else if (game.team2[i].id == player_id) {
+                        username = game.team2[i].username;
+                    }
+                }
+                console.log('username');
+                console.log(game.basicOrder[msgData.order] == player_id);
+                if (game.basicOrder[msgData.order] == player_id) {
+                    var team = _this.getTeam(game, player_id);
+                    console.log((team - 1 < 0 ? 2 : 1));
+                    _this.gameTerminate(msgData, client, game, (team - 1 < 0 ? 2 : 1), 'Player Left: ' + username, 'leaveTerminated');
+                }
+            }).catch(function (err) { return console.log(err.msg); });
         };
         this.gameHand = function (msgData, client, gameStart) {
             console.log('gameHand');
@@ -835,6 +862,7 @@ var WebSocketServer = (function () {
                         gamehistory.winner1 = team2players[0].username; //2
                         gamehistory.winner2 = team2players[1].username; //3
                         gamehistory.points = totalTeam2;
+                        gamehistory.stars = team2Stars;
                     }
                     else if (isTeam1Winner) {
                         team1players[0].totalPoints = team1players[0].totalPoints + player10points;
@@ -844,6 +872,7 @@ var WebSocketServer = (function () {
                         gamehistory.winner1 = team1players[0].username; //0
                         gamehistory.winner2 = team1players[1].username; //1
                         gamehistory.points = totalTeam1;
+                        gamehistory.stars = team1Stars;
                     }
                     var username = '';
                     for (var i = 0; i < 2; ++i) {

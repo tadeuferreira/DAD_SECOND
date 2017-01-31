@@ -65,6 +65,8 @@ export class GameComponent implements OnInit, OnDestroy{
 					case 'renounceTerminated':
 					this.loadRenounceTerminated(response);
 					break;
+					case 'leaveTerminated':
+					this.loadLeaveTerminated(response);
 				}
 			},
 			error => {
@@ -74,7 +76,7 @@ export class GameComponent implements OnInit, OnDestroy{
 	}
 
 	ngOnDestroy(){
-		this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, msg:'leave'});
+		this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, order : this.me.order , msg:'leave'});
 		this.websocketService.unsubGame();
 	}
 
@@ -107,6 +109,20 @@ export class GameComponent implements OnInit, OnDestroy{
 		this.router.navigate(['dashboard']);
 	}, 5000);
 }
+
+loadLeaveTerminated(response : any){
+		let gameHistory = response.game_history;
+		if((gameHistory.winner1 == this.me.username && gameHistory.winner2 == this.friend.username)
+			|| (gameHistory.winner2 == this.me.username && gameHistory.winner1 == this.friend.username)){
+			this.message = 'You Won(Player left)!!!';
+	}else{
+		this.message = 'You Lost(Your Teammate left)!!!';
+	}
+	setTimeout(() => {  
+		this.router.navigate(['dashboard']);
+	}, 5000);
+}
+
 renounce(){
 	this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, order: this.me.order ,msg:'renounce'});	
 }
