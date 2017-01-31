@@ -39,7 +39,6 @@ var GameComponent = (function () {
             console.log(this.player_id);
             this.websocketService.sendGame({ _id: this.game_id, player_id: this.player_id, msg: 'gameJoin' });
             this.websocketService.subGame().subscribe(function (response) {
-                console.log(response);
                 switch (response.msg) {
                     case 'update':
                         _this.websocketService.sendGame({ _id: _this.game_id, player_id: _this.player_id, msg: 'update' });
@@ -176,7 +175,6 @@ var GameComponent = (function () {
         return username;
     };
     GameComponent.prototype.loadPlayedCard = function (response) {
-        console.log(response);
         if (this.me.order == response.order) {
             this.me.tableCard = response.card;
             this.message = 'Wait!';

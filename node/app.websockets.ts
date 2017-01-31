@@ -65,7 +65,6 @@ export class WebSocketServer {
 
       client.on('gamePlay', (msgData) => {
         console.log('gamePlay');
-        //console.log(msgData);
         switch (msgData.msg) {
           case "gameJoin": this.gameJoin(msgData, client);
           break;  
@@ -119,7 +118,6 @@ export class WebSocketServer {
       case 'NoGame':
       data = {msg : ' NoGame'};
     }
-    console.log(data);
     client.emit('gameLobby', data); 
     if(response != 'switch_fail')
       client.to(msgData._id).emit('gameLobby', data);
@@ -127,7 +125,6 @@ export class WebSocketServer {
 
   public responseGamePlay = (msgData : any , client : any, response : any) =>{
     console.log('responseGamePlay');
-    console.log(response.msg);
     let data : any = null;
     switch (response.msg) {
       case 'played':
@@ -145,7 +142,6 @@ export class WebSocketServer {
       case 'leaveTerminated':
       data = response;
     }
-    // console.log(data);
     client.join(msgData._id);
     client.emit('gamePlay', data); 
     if(response.msg != 'hand' && response.msg != 'players')
@@ -163,7 +159,6 @@ export class WebSocketServer {
       _id: new mongodb.ObjectID(msgData._id)
     }).then(game => {
       if (game !== null && game.state == 'pending') {
-        console.log('Game');
         var ableToJoin = false;
         var alreadyIn = false;
 
@@ -221,7 +216,7 @@ export class WebSocketServer {
             this.updateCards(2, game.pack.cards, game.basicOrder[2]);
             this.updateCards(3, game.pack.cards, game.basicOrder[3]);
           }
-          console.log('after startGame');
+
 
           var game_id = game._id;
           delete game._id;
@@ -326,7 +321,7 @@ export class WebSocketServer {
 
         }  
       } else {          
-        console.log('game not found');         
+         this.responseGameLobby(msgData,client,'NoGame');        
       }
     })
     .catch(err => console.log(err.msg));
@@ -380,7 +375,7 @@ export class WebSocketServer {
         })
         .catch(err => console.log(err.msg));    
       } else {
-        console.log('game not found');   
+         this.responseGameLobby(msgData,client,'NoGame');  
       }
     })
     .catch(err => console.log(err.msg));
@@ -473,13 +468,12 @@ export class WebSocketServer {
 
   private gameTerminate = (msgData:any, client : any ,  game:any , losingTeam : number , stateMsg : string , responseMsg : string) => {
 
-    console.log(stateMsg, responseMsg);
-    console.log(losingTeam);
+
     database.db.collection('players')
     .find({ $or : [{_id : new mongodb.ObjectID(game.team1[0].id)},{_id : new mongodb.ObjectID(game.team1[1].id)}]})
     .toArray()
     .then( team1players => {
-      console.log('team1 end game');
+
       database.db.collection('players')
       .find({ $or : [{_id : new mongodb.ObjectID(game.team2[0].id)},{_id : new mongodb.ObjectID(game.team2[1].id)}]})
       .toArray()
@@ -555,14 +549,13 @@ export class WebSocketServer {
           _id: new mongodb.ObjectID(msgData._id)
         })
         .then(result => {
-          console.log('deleted end game');
           if (result.deletedCount === 1) {
             //update players
             this.updatePlayer(team1players[0]);
             this.updatePlayer(team1players[1]);
             this.updatePlayer(team2players[0]);
             this.updatePlayer(team2players[1]);
-            console.log('update p end game');
+
             //create game history
             database.db.collection('gamesHistory')
             .insertOne(gamehistory)
@@ -570,7 +563,7 @@ export class WebSocketServer {
               this.responseGamePlay(msgData,client,{ msg : responseMsg, _id : game._id, game_history_id: result.insertedId, game_history: gamehistory}); 
             }).catch(err => console.log(err.msg));
           } else {
-            console.log(404, 'No game found');
+           this.responseGameLobby(msgData,client,'NoGame');
           }
         }).catch(err =>  console.log(err.msg));
       }).catch(err => console.log(err.msg)); 
@@ -587,7 +580,7 @@ export class WebSocketServer {
       _id: new mongodb.ObjectID(msgData._id)
     })
     .then(game => {
-      console.log(msgData);
+
       let player_id = msgData.player_id;
       let username : string = '';
         for (var i = 0; i < 2; ++i) {
@@ -597,12 +590,10 @@ export class WebSocketServer {
             username = game.team2[i].username;
           }
         }
-        console.log('username');
-        console.log(game.basicOrder[msgData.order] == player_id);
+
 
       if(game.basicOrder[msgData.order] == player_id){
         let team : number = this.getTeam(game , player_id);
-        console.log((team - 1 < 0 ? 2 : 1));
         this.gameTerminate(msgData, client, game,  (team - 1 < 0 ? 2 : 1), 'Player Left: '+username, 'leaveTerminated');
       }
     }).catch(err => console.log(err.msg));
@@ -774,7 +765,6 @@ export class WebSocketServer {
       roundWinner = (winnerTrump == -1 ? winnerNormal : winnerTrump);
       roundWon = true;
       //get cards on table
-      console.log('ROUND WINNER'+roundWinner);
       let stash : any = [];
       for (var k = 0; k < game.table.length; ++k) {
         let card = game.table[k];
@@ -788,7 +778,6 @@ export class WebSocketServer {
           }
         }
       } 
-      console.log('STASH SIZE ROUND '+stash.length);
       game.table = [null, null, null, null];
       game.onPlay = roundWinner;
       game.firstToPlay = roundWinner
@@ -851,12 +840,6 @@ export class WebSocketServer {
         }
       }
     }
-    console.log('STASH SIZES');
-    console.log(game.pack.cards.length);
-    console.log(count);
-    console.log(stash10.length+' '+stash11.length+' '+stash20.length+' '+stash21.length);
-    console.log('stash end game');
-
     // calculate points
     let player10points : number = 0;
     let player11points : number = 0;
@@ -870,16 +853,6 @@ export class WebSocketServer {
 
     let totalTeam1 : number = player10points + player11points;
     let totalTeam2 : number = player20points + player21points;
-    console.log('players points');
-    console.log(player10points);
-    console.log(player11points);
-    console.log(player20points);
-    console.log(player21points);
-    console.log('TOTAL TEAM '+ totalTeam1);
-    console.log('TOTAL TEAM '+ totalTeam2);
-
-    console.log('points end game');
-
     //give them the win
     let isTeam1Winner : boolean = false;
     let team1Stars: number = 0;
@@ -897,9 +870,6 @@ export class WebSocketServer {
       isTeam1Winner = true;
       isTeam2Winner = true;
     }
-    console.log('win end game');
-    console.log(totalTeam1);
-    console.log(totalTeam2);
 
 
     //update the game and players 
@@ -907,12 +877,10 @@ export class WebSocketServer {
     .find({ $or : [{_id : new mongodb.ObjectID(game.team1[0].id)},{_id : new mongodb.ObjectID(game.team1[1].id)}]})
     .toArray()
     .then( team1players => {
-      console.log('team1 end game');
       database.db.collection('players')
       .find({ $or : [{_id : new mongodb.ObjectID(game.team2[0].id)},{_id : new mongodb.ObjectID(game.team2[1].id)}]})
       .toArray()
       .then( team2players => {
-        console.log('team2 end game');
         let gamehistory : any =
         {
           owner : null,
@@ -997,7 +965,7 @@ export class WebSocketServer {
           _id: new mongodb.ObjectID(msgData._id)
         })
         .then(result => {
-          console.log('deleted end game');
+
           if (result.deletedCount === 1) {
             //update players
 
@@ -1005,7 +973,6 @@ export class WebSocketServer {
             this.updatePlayer(team1players[1]);
             this.updatePlayer(team2players[0]);
             this.updatePlayer(team2players[1]);
-            console.log('update p end game');
             //create game history
             database.db.collection('gamesHistory')
             .insertOne(gamehistory)
@@ -1013,7 +980,7 @@ export class WebSocketServer {
               this.responseGamePlay(msgData,client,{ msg : 'gameEnded', _id : game._id, game_history_id: result.insertedId,game_history: gamehistory}); 
             }).catch(err => console.log(err.msg));
           } else {
-            console.log(404, 'No game found');
+            this.responseGameLobby(msgData,client,'NoGame');
           }
         }).catch(err =>  console.log(err.msg));
       }).catch(err => console.log(err.msg)); 
@@ -1046,22 +1013,16 @@ private getStars(totalPoints : number ) : number{
   }else if(totalPoints == 60){
     stars = 1;
   }
-  console.log('STAR POINTS');
-  console.log(stars);
-  console.log(totalPoints);
 
   return stars;
 }
 
 private getStashPoints(stash:any) : number{
   let total : number = 0;
-  console.log('STASH POINTS');
+
   for (var i = 0; i < stash.length; ++i) {
-    console.log(this.getCardPoints(stash[i]));
     total += this.getCardPoints(stash[i]);
   }
-  console.log('total');
-  console.log(total);
 
   return total;
 }

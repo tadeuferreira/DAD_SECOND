@@ -36,7 +36,6 @@ export class GameComponent implements OnInit, OnDestroy{
 			console.log(this.player_id);
 			this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, msg:'gameJoin'});
 			this.websocketService.subGame().subscribe(response => {
-				console.log(response);
 				switch (response.msg) {
 					case 'update':
 					this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, msg:'update'});
@@ -181,7 +180,6 @@ getPlayerUsername(order:number ):string{
 }
 
 loadPlayedCard(response : any){
-	console.log(response)
 	if(this.me.order == response.order){
 		this.me.tableCard = response.card;
 		this.message = 'Wait!';
