@@ -25,7 +25,8 @@ MenuComponent = __decorate([
         moduleId: module.id,
         selector: 'menu',
         templateUrl: 'menu.component.html',
-    })
+    }),
+    __metadata("design:paramtypes", [])
 ], MenuComponent);
 exports.MenuComponent = MenuComponent;
 //# sourceMappingURL=menu.component.js.map

@@ -68,8 +68,8 @@ var GameComponent = (function () {
                         break;
                     case 'NoGame':
                         _this.noGame();
-                    case 'gameTerminated':
-                        _this.loadTerminated(response);
+                    case 'renounceTerminated':
+                        _this.loadRenounceTerminated(response);
                         break;
                 }
             }, function (error) {
@@ -96,7 +96,19 @@ var GameComponent = (function () {
                 this.websocketService.sendGame({ _id: this.game_id, player_id: this.player_id, msg: 'try', card: card });
         }
     };
-    GameComponent.prototype.loadTerminated = function (response) {
+    GameComponent.prototype.loadRenounceTerminated = function (response) {
+        var _this = this;
+        var gameHistory = response.game_history;
+        if ((gameHistory.winner1 == this.me.username && gameHistory.winner2 == this.friend.username)
+            || (gameHistory.winner2 == this.me.username && gameHistory.winner1 == this.friend.username)) {
+            this.message = 'You Won(Renounce)!!!';
+        }
+        else {
+            this.message = 'You Lost(Renounce)!!!';
+        }
+        setTimeout(function () {
+            _this.router.navigate(['dashboard']);
+        }, 5000);
     };
     GameComponent.prototype.renounce = function () {
         this.websocketService.sendGame({ _id: this.game_id, player_id: this.player_id, order: this.me.order, msg: 'renounce' });
@@ -171,8 +183,8 @@ var GameComponent = (function () {
             this.message = 'Draw !!';
         }
         else {
-            if ((gameHistory.players[gameHistory.winner1].username == this.me.username && gameHistory.players[gameHistory.winner2].username == this.friend.username)
-                || (gameHistory.players[gameHistory.winner2].username == this.me.username && gameHistory.players[gameHistory.winner1].username == this.friend.username)) {
+            if ((gameHistory.winner1 == this.me.username && gameHistory.winner2 == this.friend.username)
+                || (gameHistory.winner2 == this.me.username && gameHistory.winner1 == this.friend.username)) {
                 this.message = 'You Won!!! Points:' + gameHistory.points;
             }
             else {

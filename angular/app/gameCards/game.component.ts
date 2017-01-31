@@ -62,8 +62,8 @@ export class GameComponent implements OnInit, OnDestroy{
 					break;
 					case 'NoGame':
 					this.noGame();
-					case 'gameTerminated':
-					this.loadTerminated(response);
+					case 'renounceTerminated':
+					this.loadRenounceTerminated(response);
 					break;
 				}
 			},
@@ -94,96 +94,106 @@ export class GameComponent implements OnInit, OnDestroy{
 				this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, msg:'try', card: card});
 		}
 	}
-	loadTerminated(response : any){
-
-	}
-	renounce(){
-		this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, order: this.me.order ,msg:'renounce'});	
-	}
-	loadPlayers(response : any){
-		this.friend.avatar = response.friend.avatar;
-		this.friend.username = response.friend.username;
-
-		this.foe1.avatar = response.foe1.avatar;
-		this.foe1.username = response.foe1.username;
-
-		this.foe2.avatar = response.foe2.avatar;
-		this.foe2.username = response.foe2.username;
-	}
-
-	loadHands(response : any){
-		this.me.cards = this.loadMyCard(response.me.cards);
-		this.me.order = response.me.order;
-		this.me.tableCard = this.cardToImage(response.table.me);
-
-		this.friend.cards = this.loadOthersHand(response.friend.cards);
-		this.friend.order = response.friend.order;
-		this.friend.tableCard = this.cardToImage(response.table.friend);
-
-		this.foe1.cards = this.loadOthersHand(response.foe1.cards);
-		this.foe1.order = response.foe1.order;
-		this.foe1.tableCard = this.cardToImage(response.table.foe1);
-
-		this.foe2.cards = this.loadOthersHand(response.foe2.cards);
-		this.foe2.order = response.foe2.order;
-		this.foe2.tableCard = this.cardToImage(response.table.foe2);
-
-		this.isGameReady = true;
-	}
-
-	loadRoundWon ( response : any){
-		if(response.order == this.me.order){
-			this.message = 'you won the round !!!';
-			setTimeout(() => {  
-				this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, msg:'startRound'});
-			}, 4000);	
-		}else{
-			this.message = this.getPlayerUsername(response.order) + ' won the round !!!';
-			console.log(this.message);
-		}
-	}
-
-	getPlayerUsername(order:number ):string{
-		let username : string = '';
-		if(this.friend.order == order)
-			username = this.friend.username;
-		else if(this.foe1.order == order)
-			username = this.foe1.username;
-		else if(this.foe2.order == order)
-			username = this.foe2.username;
-		return username;
-	}
-
-	loadPlayedCard(response : any){
-		console.log(response)
-		if(this.me.order == response.order){
-			this.me.tableCard = response.card;
-			this.message = 'Wait!';
-		}if(this.friend.order == response.order){
-			this.friend.tableCard = response.card;
-		}if(this.foe1.order == response.order){
-			this.foe1.tableCard = response.card;
-		}if(this.foe2.order == response.order){
-			this.foe2.tableCard = response.card;
-		}
-		this.clearPlayedCard(response);
-	}
-
-	loadGameHasEnded(response : any){
+	loadRenounceTerminated(response : any){
 		let gameHistory = response.game_history;
-		if(gameHistory.isDraw){
-			this.message = 'Draw !!';
-		}else{
-			if((gameHistory.players[gameHistory.winner1].username == this.me.username && gameHistory.players[gameHistory.winner2].username == this.friend.username)
-				|| (gameHistory.players[gameHistory.winner2].username == this.me.username && gameHistory.players[gameHistory.winner1].username == this.friend.username)){
-				this.message = 'You Won!!! Points:'+gameHistory.points;
-		}else{
-			this.message = 'You Lost!!! Points:'+(120-gameHistory.points);
-		}
+
+		if((gameHistory.winner1 == this.me.username && gameHistory.winner2 == this.friend.username)
+			|| (gameHistory.winner2 == this.me.username && gameHistory.winner1 == this.friend.username)){
+			this.message = 'You Won(Renounce)!!!';
+	}else{
+		this.message = 'You Lost(Renounce)!!!';
 	}
 	setTimeout(() => {  
 		this.router.navigate(['dashboard']);
 	}, 5000);
+}
+renounce(){
+	this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, order: this.me.order ,msg:'renounce'});	
+}
+loadPlayers(response : any){
+	this.friend.avatar = response.friend.avatar;
+	this.friend.username = response.friend.username;
+
+	this.foe1.avatar = response.foe1.avatar;
+	this.foe1.username = response.foe1.username;
+
+	this.foe2.avatar = response.foe2.avatar;
+	this.foe2.username = response.foe2.username;
+}
+
+loadHands(response : any){
+	this.me.cards = this.loadMyCard(response.me.cards);
+	this.me.order = response.me.order;
+	this.me.tableCard = this.cardToImage(response.table.me);
+
+	this.friend.cards = this.loadOthersHand(response.friend.cards);
+	this.friend.order = response.friend.order;
+	this.friend.tableCard = this.cardToImage(response.table.friend);
+
+	this.foe1.cards = this.loadOthersHand(response.foe1.cards);
+	this.foe1.order = response.foe1.order;
+	this.foe1.tableCard = this.cardToImage(response.table.foe1);
+
+	this.foe2.cards = this.loadOthersHand(response.foe2.cards);
+	this.foe2.order = response.foe2.order;
+	this.foe2.tableCard = this.cardToImage(response.table.foe2);
+
+	this.isGameReady = true;
+}
+
+loadRoundWon ( response : any){
+	if(response.order == this.me.order){
+		this.message = 'you won the round !!!';
+		setTimeout(() => {  
+			this.websocketService.sendGame({_id: this.game_id, player_id: this.player_id, msg:'startRound'});
+		}, 4000);	
+	}else{
+		this.message = this.getPlayerUsername(response.order) + ' won the round !!!';
+		console.log(this.message);
+	}
+}
+
+getPlayerUsername(order:number ):string{
+	let username : string = '';
+	if(this.friend.order == order)
+		username = this.friend.username;
+	else if(this.foe1.order == order)
+		username = this.foe1.username;
+	else if(this.foe2.order == order)
+		username = this.foe2.username;
+	return username;
+}
+
+loadPlayedCard(response : any){
+	console.log(response)
+	if(this.me.order == response.order){
+		this.me.tableCard = response.card;
+		this.message = 'Wait!';
+	}if(this.friend.order == response.order){
+		this.friend.tableCard = response.card;
+	}if(this.foe1.order == response.order){
+		this.foe1.tableCard = response.card;
+	}if(this.foe2.order == response.order){
+		this.foe2.tableCard = response.card;
+	}
+	this.clearPlayedCard(response);
+}
+
+loadGameHasEnded(response : any){
+	let gameHistory = response.game_history;
+	if(gameHistory.isDraw){
+		this.message = 'Draw !!';
+	}else{
+		if((gameHistory.winner1 == this.me.username && gameHistory.winner2 == this.friend.username)
+			|| (gameHistory.winner2 == this.me.username && gameHistory.winner1 == this.friend.username)){
+			this.message = 'You Won!!! Points:'+gameHistory.points;
+	}else{
+		this.message = 'You Lost!!! Points:'+(120-gameHistory.points);
+	}
+}
+setTimeout(() => {  
+	this.router.navigate(['dashboard']);
+}, 5000);
 }
 clearPlayedCard(response:any): any{
 

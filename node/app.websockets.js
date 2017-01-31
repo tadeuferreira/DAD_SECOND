@@ -128,6 +128,7 @@ var WebSocketServer = (function () {
                 case 'update':
                 case 'players':
                 case 'NoGame':
+                case 'renounceTerminated':
                     data = response;
             }
             // console.log(data);
@@ -398,6 +399,124 @@ var WebSocketServer = (function () {
             }).catch(function (err) { return console.log(err.msg); });
         };
         this.gameRenounce = function (msgData, client) {
+            console.log('gameRenounce');
+            app_database_1.databaseConnection.db.collection('games')
+                .findOne({
+                _id: new mongodb.ObjectID(msgData._id)
+            })
+                .then(function (game) {
+                var player_id = msgData.player_id;
+                if (game.basicOrder[msgData.order] == player_id) {
+                    var team = _this.getTeam(game, player_id);
+                    if (team == 1) {
+                        if (game.renounce2) {
+                            _this.gameTerminateRenounce(msgData, client, game, true, 2);
+                        }
+                        else {
+                            _this.gameTerminateRenounce(msgData, client, game, false, 1);
+                        }
+                    }
+                    else if (team == 2) {
+                        if (game.renounce1) {
+                            _this.gameTerminateRenounce(msgData, client, game, true, 1);
+                        }
+                        else {
+                            _this.gameTerminateRenounce(msgData, client, game, false, 2);
+                        }
+                    }
+                }
+            }).catch(function (err) { return console.log(err.msg); });
+        };
+        this.gameTerminateRenounce = function (msgData, client, game, accepted, losingTeam) {
+            app_database_1.databaseConnection.db.collection('players')
+                .find({ $or: [{ _id: new mongodb.ObjectID(game.team1[0].id) }, { _id: new mongodb.ObjectID(game.team1[1].id) }] })
+                .toArray()
+                .then(function (team1players) {
+                console.log('team1 end game');
+                app_database_1.databaseConnection.db.collection('players')
+                    .find({ $or: [{ _id: new mongodb.ObjectID(game.team2[0].id) }, { _id: new mongodb.ObjectID(game.team2[1].id) }] })
+                    .toArray()
+                    .then(function (team2players) {
+                    var gamehistory = {
+                        owner: null,
+                        state: '',
+                        startDate: null,
+                        endDate: null,
+                        isDraw: false,
+                        winner1: null,
+                        winner2: null,
+                        points: 0,
+                        stars: 0,
+                        players: [],
+                        history: []
+                    };
+                    if (accepted)
+                        gamehistory.state = 'Renounce Win';
+                    else
+                        gamehistory.state = 'Renounce Try';
+                    gamehistory.isDraw = false;
+                    gamehistory.points = 120;
+                    gamehistory.stars = 5;
+                    var username = '';
+                    for (var i = 0; i < 2; ++i) {
+                        if (game.team1[i].id == game.owner) {
+                            username = game.team1[i].username;
+                        }
+                        else if (game.team2[i].id == game.owner) {
+                            username = game.team2[i].username;
+                        }
+                    }
+                    gamehistory.owner = { _id: game.owner, username: username };
+                    gamehistory.startDate = game.creationDate;
+                    gamehistory.endDate = Date.now();
+                    gamehistory.history = game.history;
+                    gamehistory.players.push({ username: team1players[0].username, avatar: team1players[0].avatar });
+                    gamehistory.players.push({ username: team1players[1].username, avatar: team1players[1].avatar });
+                    gamehistory.players.push({ username: team2players[0].username, avatar: team2players[0].avatar });
+                    gamehistory.players.push({ username: team2players[1].username, avatar: team2players[1].avatar });
+                    if (losingTeam == 2) {
+                        team1players[0].totalPoints = team1players[0].totalPoints + 120;
+                        team1players[1].totalPoints = team1players[1].totalPoints + 120;
+                        team1players[0].totalStars = team1players[0].totalStars + 5;
+                        team1players[1].totalStars = team1players[1].totalStars + 5;
+                        gamehistory.winner1 = team1players[0].username; //2
+                        gamehistory.winner2 = team1players[1].username; //3
+                    }
+                    else if (losingTeam == 1) {
+                        team2players[0].totalPoints = team2players[0].totalPoints + 120;
+                        team2players[1].totalPoints = team2players[1].totalPoints + 120;
+                        team2players[0].totalStars = team2players[0].totalStars + 5;
+                        team2players[1].totalStars = team2players[1].totalStars + 5;
+                        gamehistory.winner1 = team2players[0].username; //2
+                        gamehistory.winner2 = team2players[1].username; //3
+                    }
+                    //delete old game
+                    app_database_1.databaseConnection.db.collection('games')
+                        .deleteOne({
+                        _id: new mongodb.ObjectID(msgData._id)
+                    })
+                        .then(function (result) {
+                        console.log('deleted end game');
+                        if (result.deletedCount === 1) {
+                            //update players
+                            _this.updatePlayer(team1players[0]);
+                            _this.updatePlayer(team1players[1]);
+                            _this.updatePlayer(team2players[0]);
+                            _this.updatePlayer(team2players[1]);
+                            console.log('update p end game');
+                            //create game history
+                            app_database_1.databaseConnection.db.collection('gamesHistory')
+                                .insertOne(gamehistory)
+                                .then(function (result) {
+                                _this.responseGamePlay(msgData, client, { msg: 'renounceTerminated', _id: game._id, game_history_id: result.insertedId, game_history: gamehistory });
+                            }).catch(function (err) { return console.log(err.msg); });
+                        }
+                        else {
+                            console.log(404, 'No game found');
+                        }
+                    }).catch(function (err) { return console.log(err.msg); });
+                }).catch(function (err) { return console.log(err.msg); });
+            }).catch(function (err) { return console.log(err.msg); });
         };
         this.gameLeave = function (msgData, client) {
         };

@@ -141,6 +141,7 @@ export class WebSocketServer {
       case 'update':
       case 'players':
       case 'NoGame':
+      case 'renounceTerminated':
       data = response;
     }
     // console.log(data);
@@ -441,15 +442,15 @@ export class WebSocketServer {
     return player;
   };
 
-  private gameRenounce = (msgData:any , client : any) =>{
-     database.db.collection('games')
+  private gameRenounce = (msgData:any , client : any) => {
+    console.log('gameRenounce');
+    database.db.collection('games')
     .findOne({
       _id: new mongodb.ObjectID(msgData._id)
     })
     .then(game => {
       let player_id = msgData.player_id;
-      if(game.gameOrder[msgData.order] == player_id){
-
+      if(game.basicOrder[msgData.order] == player_id){
         let team : number = this.getTeam(game , player_id);
 
         if(team == 1){
@@ -459,7 +460,7 @@ export class WebSocketServer {
             this.gameTerminateRenounce(msgData, client, game,false,  1);
           }
         }else if(team == 2){
-           if(game.renounce1){
+          if(game.renounce1){
             this.gameTerminateRenounce(msgData, client, game,true,  1);
           }else{
             this.gameTerminateRenounce(msgData, client, game,false,  2);
@@ -470,7 +471,18 @@ export class WebSocketServer {
   };
 
   private gameTerminateRenounce = (msgData:any, client : any ,  game:any ,accepted : boolean , losingTeam : number) => {
-     let gamehistory : any =
+
+
+    database.db.collection('players')
+    .find({ $or : [{_id : new mongodb.ObjectID(game.team1[0].id)},{_id : new mongodb.ObjectID(game.team1[1].id)}]})
+    .toArray()
+    .then( team1players => {
+      console.log('team1 end game');
+      database.db.collection('players')
+      .find({ $or : [{_id : new mongodb.ObjectID(game.team2[0].id)},{_id : new mongodb.ObjectID(game.team2[1].id)}]})
+      .toArray()
+      .then( team2players => {
+        let gamehistory : any =
         {
           owner : null,
           state: '',
@@ -484,8 +496,85 @@ export class WebSocketServer {
           players : [],
           history: []
         };
+
         if(accepted)
-          gameHistory.
+          gamehistory.state ='Renounce Win';
+        else
+          gamehistory.state ='Renounce Try';
+
+        gamehistory.isDraw = false;
+        gamehistory.points = 120;
+        gamehistory.stars = 5;
+
+        let username : string = '';
+        for (var i = 0; i < 2; ++i) {
+          if(game.team1[i].id == game.owner){
+            username = game.team1[i].username;
+          }else if(game.team2[i].id == game.owner){
+            username = game.team2[i].username;
+          }
+        }
+        gamehistory.owner = {_id: game.owner, username: username};
+        gamehistory.startDate = game.creationDate;
+        gamehistory.endDate = Date.now();
+        gamehistory.history = game.history;
+
+        gamehistory.players.push({username: team1players[0].username, avatar: team1players[0].avatar});
+        gamehistory.players.push({username: team1players[1].username, avatar: team1players[1].avatar});
+
+        gamehistory.players.push({username: team2players[0].username, avatar: team2players[0].avatar});
+        gamehistory.players.push({username: team2players[1].username, avatar: team2players[1].avatar});
+
+
+        if(losingTeam == 2){
+          team1players[0].totalPoints = team1players[0].totalPoints + 120;
+          team1players[1].totalPoints = team1players[1].totalPoints + 120;
+
+          team1players[0].totalStars = team1players[0].totalStars + 5;
+          team1players[1].totalStars = team1players[1].totalStars + 5;
+
+          gamehistory.winner1 = team1players[0].username; //2
+          gamehistory.winner2 = team1players[1].username; //3
+
+        }else if(losingTeam == 1){
+          team2players[0].totalPoints = team2players[0].totalPoints + 120;
+          team2players[1].totalPoints = team2players[1].totalPoints + 120;
+
+          team2players[0].totalStars = team2players[0].totalStars + 5;
+          team2players[1].totalStars = team2players[1].totalStars + 5;
+
+          gamehistory.winner1 = team2players[0].username; //2
+          gamehistory.winner2 = team2players[1].username; //3
+
+        }
+        //delete old game
+        database.db.collection('games')
+        .deleteOne({
+          _id: new mongodb.ObjectID(msgData._id)
+        })
+        .then(result => {
+          console.log('deleted end game');
+          if (result.deletedCount === 1) {
+            //update players
+            this.updatePlayer(team1players[0]);
+            this.updatePlayer(team1players[1]);
+            this.updatePlayer(team2players[0]);
+            this.updatePlayer(team2players[1]);
+            console.log('update p end game');
+            //create game history
+            database.db.collection('gamesHistory')
+            .insertOne(gamehistory)
+            .then(result => {
+              this.responseGamePlay(msgData,client,{ msg : 'renounceTerminated', _id : game._id, game_history_id: result.insertedId, game_history: gamehistory}); 
+            }).catch(err => console.log(err.msg));
+          } else {
+            console.log(404, 'No game found');
+          }
+        }).catch(err =>  console.log(err.msg));
+      }).catch(err => console.log(err.msg)); 
+    }).catch(err => console.log(err.msg)); 
+
+
 
 
   };
@@ -896,7 +985,7 @@ export class WebSocketServer {
           }
         }).catch(err =>  console.log(err.msg));
       }).catch(err => console.log(err.msg)); 
-    }).catch(err => console.log(err.msg)); 
+}).catch(err => console.log(err.msg)); 
 }
 
 private updatePlayer(player:any){
